@@ -3,6 +3,7 @@ name: api-design
 description: "Design or evolve an API: pick REST/GraphQL/gRPC/tRPC, model resources and status codes, version without breaking, RFC 9457 errors, cursor pagination, idempotency, schema-first OpenAPI/proto/GraphQL contracts."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (RFC 9457, OpenAPI 3.1/3.2, Idempotency-Key draft, Relay connections, Richardson maturity). Details in references/."
 ---
 

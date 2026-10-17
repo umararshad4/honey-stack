@@ -3,6 +3,7 @@ name: tooling
 description: "Set up repo tooling: monorepo (Turborepo/Nx/pnpm workspaces), micro-frontends, microservices, pre-commit hooks, lint/format/typecheck (Biome/ESLint/Ruff), test wiring and CI."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (Turborepo/pnpm, Module Federation 2, Pact, Husky v9/Lefthook, ESLint 10 flat config, Biome 2, Ruff, Vitest 3). Configs in references/."
 ---
 

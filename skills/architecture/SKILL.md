@@ -4,6 +4,7 @@ description: "Find deepening opportunities, design an interface two ways, or pla
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills improve-codebase-architecture (+ HTML-REPORT.md), codebase-design (+ DEEPENING.md, DESIGN-IT-TWICE.md), design-an-interface, request-refactor-plan; MCT (local) skills/refactor-safely; cursor/plugins pstack 0.15.25 architect (+ references/design-red-flags.md, rationale-template.md, runner-prompt.md), principle-minimize-reader-load, principle-migrate-callers-then-delete-legacy-apis"
 ---
 

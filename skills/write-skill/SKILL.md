@@ -4,6 +4,7 @@ description: "Write a new honey-stack skill or patch an existing one to the qual
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills writing-great-skills (SKILL.md, GLOSSARY.md), write-a-skill; obra/superpowers 7.0.0 skills/writing-skills (SKILL.md: SDO, match the form to the failure, RED-GREEN-REFACTOR), testing-skills-with-subagents.md; anthropics/claude-plugins-official skill-creator skills/skill-creator/SKILL.md (Apache-2.0, modified: near-miss negatives, explain the why, keep the prompt lean); cursor/plugins pstack 0.15.25 skills/principle-encode-lessons-in-structure; Codex CLI bundled ~/.codex/skills/.system/skill-creator/references/openai_yaml.md"
 ---
 

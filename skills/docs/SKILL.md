@@ -3,6 +3,7 @@ name: docs
 description: "Use when writing or updating docs, READMEs, changelogs, ADRs or PR text, or when a change alters setup, commands, APIs or documented behavior."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "MCT (local) ~/.claude/skills/docs-maintainer; cursor/plugins pstack 0.15.25 skills/technical-writing, skills/unslop"
 ---
 

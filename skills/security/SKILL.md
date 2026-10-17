@@ -3,6 +3,7 @@ name: security
 description: "Use when touching auth, sessions, permissions, secrets, payments, user data, DB writes, webhooks or deploy config, or when asked for a security audit."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "MCT (local) ~/.claude/skills/security-sanity; garrytan/gstack 1.60.1.0 cso/SKILL.md.tmpl (phases 0-1, 12-13: confidence gate, false-positive rules, findings format, leaked-secret playbook), cso/sections/audit-phases.md (phases 2-11); cursor/plugins pstack 0.15.25 skills/principle-boundary-discipline"
 ---
 

@@ -3,6 +3,7 @@ name: qa
 description: "Use to check a change in a real browser, QA a page or user flow, or when a UI change needs visual proof."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "garrytan/gstack 1.60.1.0 qa/SKILL.md.tmpl (test, fix, re-verify loop; regression test per fix; self-regulation), qa/SKILL.md (Modes: diff-aware; Workflow phases 2-5; Framework-Specific Guidance; Important Rules), qa/references/issue-taxonomy.md, qa/templates/qa-report-template.md; MCT (local) ~/.claude/MCT.md (Post-Task Verification, Strict Proof And Audit), ~/.claude/policies/automation-policy.json (postTaskVerification)"
 ---
 

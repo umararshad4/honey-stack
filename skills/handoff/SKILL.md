@@ -4,6 +4,7 @@ description: "Write or restore a handoff doc so a fresh session can pick up this
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills handoff (Codex copy); garrytan/gstack 1.60.1.0 context-save, context-restore; cursor/plugins pstack 0.15.25 recall"
 ---
 

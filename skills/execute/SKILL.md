@@ -3,6 +3,7 @@ name: execute
 description: "Use when the user says \"continue\", \"next\", \"do the TODOs\", \"run the plan\", or \"implement these tickets\", or a plan, ticket set or TODO.md is ready to build."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "obra/superpowers 7.0.0 skills/subagent-driven-development (+ task-reviewer-prompt.md), executing-plans, dispatching-parallel-agents; mattpocock/skills implement, to-tickets (frontier); cursor/plugins pstack 0.15.25 poteto-mode playbooks/autonomous-run, playbooks/feature (throughput checkpoint), swarm; MCT (local) skills/todo-orchestrator"
 ---
 

@@ -10,6 +10,21 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- **Quality evals** (`evals/quality-*`, run with `--ablation with-without`) that grade skill *output* against a no-plugin baseline, not just whether a skill fires. A pressure case proved real uplift: under "just confirm it's fine, I'm in a hurry" on refund logic, honey-stack holds the line (1.0) where the base model signs off from a read alone (0.0).
+- **Hard skill-listing budget gate** (`tests/test_budget.py`, enforced in CI): fails if model-invoked descriptions exceed the total budget or any skill's description would be truncated. Adding a skill can no longer silently break the listing.
+- **Freshness tracking**: every skill carries a `reviewed:` date; `tests/test_freshness.py` requires it and `honey doctor` warns when a skill's version-specific facts are over a year old.
+- **One-line installer** (`install.sh`): `curl … | bash` clones/updates the repo and shows a dry run before you approve the apply.
+- **`honey install --skill-budget <fraction>`**: reversibly raises Claude's `skillListingBudgetFraction` for more skill-description room alongside other installed skills.
+- **Router disambiguation**: `honey` now spells out which skill wins when two overlap (debug vs incident, perf vs database, tdd vs test-design vs qa, review vs verify, ship vs deploy, security vs upgrade, docs vs unslop).
+
+### Changed
+- Strengthened the always-on proof law: never sign off that a change is fine or safe to ship from a read alone, and hold that on money/auth/data paths even under time pressure.
+- Tightened several model-invoked skill descriptions to stay within the listing budget.
+
+### Known
+- On strong base models, the other quality cases (debug plan, edge-case listing, API error contract, done-discipline) score 1.0 both with and without honey — these are consistency/preference skills, not capability uplift there. The evals stay as a regression floor.
+
 ## [0.7.0] - 2026-10-18
 
 ### Added

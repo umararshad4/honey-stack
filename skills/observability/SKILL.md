@@ -3,6 +3,7 @@ name: observability
 description: "Instrument a service for production: structured logs, metrics (RED/USE), distributed tracing, error tracking, SLOs and alerting. OpenTelemetry-first."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (OpenTelemetry spec status, Prometheus, Sentry, Google SRE SLOs/burn-rate alerts). Details in references/."
 ---
 

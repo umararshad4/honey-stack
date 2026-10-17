@@ -4,6 +4,7 @@ description: "honey RSI: review what it learned, coach on your progress, save or
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack original; review flow after cursor/plugins pstack 0.15.25 skills/reflect (explicit approval) and BayramAnnakov/claude-reflect (Apply/Edit/Skip); learning gate after EveryInc/compound-engineering-plugin ce-compound"
 ---
 

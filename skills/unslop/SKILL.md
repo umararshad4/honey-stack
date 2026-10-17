@@ -4,6 +4,7 @@ description: "Cut AI tells and filler from any text: docs, messages, posts, prom
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "cursor/plugins pstack 0.15.25 skills/unslop (rules 3-33, modified: procedure and output added)"
 ---
 

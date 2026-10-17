@@ -4,6 +4,7 @@ description: "Engineering principles index; read the leaf file before citing a p
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "cursor/plugins pstack 0.15.25 skills/principle-* (all 24, copied to references/ with frontmatter stripped and links rewritten)"
 ---
 

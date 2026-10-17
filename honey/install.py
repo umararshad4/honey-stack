@@ -49,6 +49,7 @@ class Env:
         self.only = only
         self.slim = False      # opt-in: replace CLAUDE.md / AGENTS.md with migrate/ templates (author's personal prefs by default)
         self.retire = False    # opt-in: move absorbed MCT / Matt Pocock / duplicate skills to backups
+        self.budget_fraction = None  # opt-in: raise Claude skillListingBudgetFraction for more description room
         self.stamp = time.strftime("%Y%m%dT%H%M%S")
         self.backups = os.path.join(self.honey, "backups", self.stamp)
         self.manifest = os.path.join(self.honey, "install-manifest.json")
@@ -214,6 +215,16 @@ def plan(env: Env) -> list:
         if env.retire and os.path.exists(mct):
             steps.append({"kind": "move", "src": mct, "dst": os.path.join(env.backups, "claude", "MCT.md"),
                           "summary": f"retire {mct} (moved to backups)"})
+        if env.budget_fraction:
+            fp = os.path.join(env.claude, "settings.json")
+            raw = _read(fp)
+            if raw is not None:
+                d = json.loads(raw)
+                if d.get("skillListingBudgetFraction") != env.budget_fraction:
+                    new = json.dumps(dict(d, skillListingBudgetFraction=env.budget_fraction), indent=2) + "\n"
+                    steps.append({"kind": "edit_json", "file": fp, "before_sha": _sha(raw), "new": new, "old": raw,
+                                  "undo": {"budget_fraction": d.get("skillListingBudgetFraction")},
+                                  "summary": f"settings.json: skillListingBudgetFraction -> {env.budget_fraction} (more room for skill descriptions)"})
         link = os.path.join(env.localbin, "honey")
         if not os.path.lexists(link):
             steps.append({"kind": "symlink", "path": link, "target": os.path.join(paths.REPO, "bin", "honey"),
@@ -292,6 +303,11 @@ def _undo_json(rec: dict) -> str:
     u = rec["undo"]
     for p, v in u.get("plugins", {}).items():
         s.setdefault("enabledPlugins", {})[p] = v
+    if "budget_fraction" in u:
+        if u["budget_fraction"] is None:
+            s.pop("skillListingBudgetFraction", None)
+        else:
+            s["skillListingBudgetFraction"] = u["budget_fraction"]
     if "statusLine" in u:
         if u["statusLine"] is None:
             s.pop("statusLine", None)
@@ -475,9 +491,12 @@ def main(cmd: str, argv: list) -> int:
                     help="replace ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md with migrate/ templates (edit them first; originals backed up)")
     ap.add_argument("--retire-legacy", action="store_true",
                     help="move skills/commands/agents honey-stack absorbs (MCT, Matt Pocock duplicates) to backups")
+    ap.add_argument("--skill-budget", type=float, default=None, metavar="FRACTION",
+                    help="set Claude skillListingBudgetFraction (e.g. 0.02) for more skill-description room; reversible")
     a = ap.parse_args(argv)
     env = Env(a.home, a.only)
     env.slim, env.retire = a.slim_instructions, a.retire_legacy
+    env.budget_fraction = a.skill_budget
     if cmd == "install":
         return install(env, a.dry_run, a.yes)
     if cmd == "uninstall":

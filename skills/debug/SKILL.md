@@ -3,6 +3,7 @@ name: debug
 description: "Use when something is broken, throwing, failing, flaky or slow, a test fails unexpectedly, the user says \"debug\" or \"diagnose\", or a fix didn't work."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills diagnosing-bugs, diagnose; obra/superpowers 7.0.0 skills/systematic-debugging (+ root-cause-tracing.md, condition-based-waiting.md, defense-in-depth.md, find-polluter.sh); cursor/plugins pstack 0.15.25 principle-fix-root-causes, principle-attack-the-premise, poteto-mode playbooks/bug-fix, playbooks/perf-issue; garrytan/gstack investigate; MCT (local) skills/debugging-loop"
 ---
 

@@ -3,6 +3,7 @@ name: upgrade
 description: "Safely upgrade dependencies, patch a CVE, or handle a breaking change or runtime EOL. Use for dependency bumps, audits (osv-scanner/npm audit), vulnerable transitive deps, framework codemods, or lockfile hygiene."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (Renovate/Dependabot, osv-scanner v2, uv/pip-audit, React 19 codemods, Node EOL). Details in references/."
 ---
 

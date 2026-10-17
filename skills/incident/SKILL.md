@@ -3,6 +3,7 @@ name: incident
 description: "Respond to a production outage: assess severity, mitigate first (roll back/flip a flag/scale), investigate safely, communicate, write a blameless postmortem. Use when prod is down, degraded, or errors spike."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (Google SRE golden signals, SEV levels, blameless postmortems, mitigation-first). Details in references/."
 ---
 

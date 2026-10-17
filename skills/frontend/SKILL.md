@@ -3,6 +3,7 @@ name: frontend
 description: "Use for UI, styling, layout, components, responsive or interaction work, and React or Next.js component, hook, route or rendering changes."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "MCT (local) ~/.claude/skills/frontend-ui-ux-harness, ~/.claude/skills/ui-system, ~/.claude/skills/design-consistency, ~/.claude/skills/frontend-architecture, ~/.claude/skills/react-quality, ~/.claude/skills/nextjs-app-router, ~/.claude/skills/performance-audit, ~/.claude/skills/react-doctor"
 ---
 

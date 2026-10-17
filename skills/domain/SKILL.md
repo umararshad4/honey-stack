@@ -4,6 +4,7 @@ description: "Sharpen domain terms and record decisions in CONTEXT.md and ADRs."
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills domain-modeling (Codex copy, + CONTEXT-FORMAT.md, ADR-FORMAT.md), ubiquitous-language"
 ---
 

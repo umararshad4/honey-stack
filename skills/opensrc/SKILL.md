@@ -4,6 +4,7 @@ description: "Build or refresh opensrc/ library context from package.json and of
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "MCT (local) ~/.claude/skills/opensrc/SKILL.md, ~/.claude/bin/mct command_opensrc (manifest, stub files, .gitignore entry)"
 ---
 

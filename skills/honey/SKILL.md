@@ -4,6 +4,7 @@ description: "Pick the honey-stack skill or flow for a situation, or switch mode
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills ask-matt, handoff; DietrichGebert/ponytail 4.7.0 skills/ponytail-help; obra/superpowers 7.0.0 skills/brainstorming (size table); cursor/plugins pstack 0.15.25 poteto-mode"
 ---
 
@@ -67,6 +68,15 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Understand a shipped app, binary, APK or site you don't have source for (authorized) | `reverse` |
 
 When two rows fit, take the earlier one in the main flow: settle intent before planning, plan before executing.
+
+### Overlaps — which one wins
+- **`debug` vs `incident`**: local/non-urgent root-cause → `debug`; production is down or degraded right now → `incident` (mitigate first, then `debug` for the root cause).
+- **`perf` vs `database`**: a slow query, N+1, index, or migration → `database`; profiling, caching, load testing, or a non-DB hot path → `perf`. A slow endpoint caused by SQL is `database`; by CPU/serialization/IO is `perf`.
+- **`tdd` vs `test-design` vs `qa`**: *what* cases to test → `test-design`; *writing* them test-first → `tdd`; driving the real browser/UI → `qa`.
+- **`review` vs `verify`**: judging someone's diff/PR → `review`; proving your own change is actually done before you claim it → `verify`.
+- **`ship` vs `deploy`**: commit/push/PR → `ship`; getting it running on a server/cloud → `deploy`.
+- **`security` vs `upgrade`**: a design/code security concern or audit → `security`; patching a vulnerable dependency → `upgrade`.
+- **`docs` vs `unslop`**: writing/updating project docs → `docs`; tightening any prose of AI tells → `unslop`.
 
 ## Modes
 

@@ -4,6 +4,7 @@ description: "Teach a concept, explain how or why some code works, or zoom out t
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills teach (+ LEARNING-RECORD-FORMAT.md, MISSION-FORMAT.md, RESOURCES-FORMAT.md, GLOSSARY-FORMAT.md), zoom-out; cursor/plugins pstack 0.15.25 how (+ references/explainer-prompt.md), why (+ references/epistemics.md), teach"
 ---
 

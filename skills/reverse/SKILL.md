@@ -4,6 +4,7 @@ description: "Reverse-engineer software you're authorized to study, via the REA 
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "morluto/rea (REA, MIT) README, docs/mcp-contracts.md, docs/installation.md, .agents/skills/reverse-engineer-anything/SKILL.md"
 ---
 

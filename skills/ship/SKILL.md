@@ -3,6 +3,7 @@ name: ship
 description: "Use when the user asks to commit, push, open or prepare a PR, resolve a merge conflict, set up a worktree, or finish a branch."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "obra/superpowers 7.0.0 skills/finishing-a-development-branch, skills/using-git-worktrees; mattpocock/skills resolving-merge-conflicts; garrytan/gstack 1.60.1.0 ship/SKILL.md.tmpl (pre-flight, bisectable commits, verification gate, push), ship/sections/pr-body.md; cursor/plugins pstack 0.15.25 skills/principle-sequence-verifiable-units; MCT (local) ~/.claude/skills/git-pr-workflow, ~/.claude/commands/commit-ready.md, ~/.claude/commands/pr-ready.md, ~/.claude/MCT.md (TODO Commit Flow)"
 ---
 

@@ -3,6 +3,7 @@ name: plan
 description: "Use when work spans several files or sessions, the user asks for a plan, spec, PRD or tickets, or after grill settles a project-size design."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "obra/superpowers 7.0.0 skills/writing-plans; mattpocock/skills to-spec, to-tickets, to-prd, to-issues, wayfinder; garrytan/gstack plan-ceo-review (scope modes, premise challenge, alternatives), plan-eng-review (prime directives, failure modes, parallel lanes); cursor/plugins pstack 0.15.25 poteto-mode playbooks/multi-phase-plan; MCT (local) agents/planner.md"
 ---
 

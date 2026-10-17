@@ -3,6 +3,7 @@ name: database
 description: "Design schemas, write safe/online migrations, add indexes, fix slow queries and N+1, get transactions and concurrency right. Postgres-first. Use when touching schema, migrations, indexing, query perf, or locking."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (PostgreSQL 18 docs, EXPLAIN/pg_stat_statements, expand-contract migrations, isolation levels). Details in references/."
 ---
 

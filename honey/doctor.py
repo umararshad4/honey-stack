@@ -129,6 +129,13 @@ def main(argv: list) -> int:
     total, users = skills_budget()
     rep.ok(total <= BUDGET, f"model-invoked descriptions {total} chars (≤{BUDGET}); {users} user-invoked skills cost 0",
            f"model-invoked descriptions {total} chars > {BUDGET}")
+    import datetime as _dt
+    stale = []
+    for f in glob.glob(os.path.join(paths.REPO, "skills", "*", "SKILL.md")):
+        m = re.search(r'^\s*reviewed:\s*"?(\d{4}-\d{2}-\d{2})', open(f, encoding="utf-8").read(), re.M)
+        if m and (_dt.date.today() - _dt.date.fromisoformat(m.group(1))).days > 365:
+            stale.append(os.path.basename(os.path.dirname(f)))
+    rep.ok(not stale, "skill facts fresh (reviewed <1y)", f"skills with facts >1y old, refresh them: {stale}", warn=True)
 
     print("RSI")
     h = paths.home()

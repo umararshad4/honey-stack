@@ -3,6 +3,7 @@ name: perf
 description: "Performance engineering: profile to find the real bottleneck, fix the hot path, add caching, and load-test with before/after numbers. Use when something is slow, costs too much, or misses an SLO. Measure first."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (USE/RED methods, profilers per stack, caching, k6 load testing, percentiles). Details in references/."
 ---
 

@@ -3,6 +3,7 @@ name: deploy
 description: "Deploy to a cloud or PaaS, write Docker/Kubernetes/Helm/IaC, set up CI/CD, or diagnose a failing deploy. Platform-aware: AWS, GCP, Azure, Vercel/Netlify/Fly/Railway/Render/Cloudflare, Terraform/OpenTofu/Pulumi/CDK."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "honey-stack research 2026-10-18 (cloud provider docs, Docker/K8s best practices, GitHub Actions OIDC). Full reports distilled into references/."
 ---
 

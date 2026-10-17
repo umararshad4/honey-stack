@@ -3,6 +3,7 @@ name: verify
 description: "Use before saying done, fixed or passing, before a commit or PR, or when asked 'have I missed something?'"
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "obra/superpowers 7.0.0 skills/verification-before-completion; cursor/plugins pstack 0.15.25 skills/principle-prove-it-works, skills/principle-sequence-verifiable-units; garrytan/gstack 1.60.1.0 review/checklist.md (enum completeness), ship/SKILL.md.tmpl (verification gate); MCT (local) ~/.claude/MCT.md (Check Selection, Post-Task Verification, Completion Receipt), skills/have-i-missed-something, skills/testing-strategy, agents/test-runner.md"
 ---
 

@@ -3,6 +3,7 @@ name: grill
 description: "Use when the user says \"brainstorm\", \"grill me\", or \"think this through\", or a feature lacks a product decision the repo can't answer."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "obra/superpowers 7.0.0 skills/brainstorming (+ builder-check-prompt.md); mattpocock/skills grilling, grill-me, grill-with-docs; garrytan/gstack plan-ceo-review (premise challenge, AskUserQuestion decision-brief format); cursor/plugins pstack 0.15.25 poteto-mode (prototype-before-asking)"
 ---
 

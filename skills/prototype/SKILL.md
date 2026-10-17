@@ -4,6 +4,7 @@ description: "Build a throwaway prototype, or several, to settle a design questi
 disable-model-invocation: true
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills prototype (Codex copy, + LOGIC.md, UI.md); cursor/plugins pstack 0.15.25 principle-exhaust-the-design-space, arena"
 ---
 

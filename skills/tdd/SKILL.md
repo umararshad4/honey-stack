@@ -3,6 +3,7 @@ name: tdd
 description: "Use when building or fixing test-first, the user mentions TDD, red-green or a regression test, or process mode is strict."
 license: MIT
 metadata:
+  reviewed: "2026-10-18"
   sources: "mattpocock/skills tdd (SKILL.md, tests.md, mocking.md, refactoring.md); obra/superpowers 7.0.0 skills/test-driven-development (SKILL.md, writing-good-tests.md); cursor/plugins pstack 0.15.25 skills/tdd, skills/principle-test-behavior-not-implementation"
 ---
 

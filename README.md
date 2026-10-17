@@ -21,6 +21,14 @@ honey-stack distills the best of [Superpowers](https://github.com/obra/superpowe
 
 ### Option A: full install (recommended)
 
+One line (clones + shows a dry run; you approve the apply):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/umararshad4/honey-stack/main/install.sh | bash
+```
+
+Or by hand:
+
 ```bash
 git clone https://github.com/umararshad4/honey-stack.git
 cd honey-stack
@@ -130,6 +138,12 @@ Useful commands: `/rsi review` · `/rsi coach` · `/rsi status` · `/rsi why <id
 
 `holdout_rate: 0.1` leaves the brief out of 10% of sessions, so the coach can measure whether the learned rules actually help.
 
+**Skill-listing room.** honey keeps its model-invoked skill descriptions under a hard budget (CI fails if they exceed it). Those descriptions share ~1% of the context window with every other skill you have installed. If you run many other skills and want more room, `honey install --skill-budget 0.02` raises Claude's `skillListingBudgetFraction` (reversible via `honey uninstall`).
+
+**Freshness.** Each skill carries a `reviewed:` date; `honey doctor` warns when a skill's version-specific facts are over a year old so you can refresh them.
+
+**Platform.** Built and tested on macOS and Linux (CI runs both, Python 3.9 and 3.12). Windows is not yet supported — the hooks and installer assume a POSIX shell and paths.
+
 **Privacy.** No telemetry. Prompts are stored only as redacted snippets (≤300 characters) around signals. Sessions that pulled in web or MCP content can't auto-promote rules. Network use is limited to your model provider and anonymous `git fetch`es of public repos (the radar).
 
 ---
@@ -179,6 +193,7 @@ python3 scripts/release.py 0.3.0 --push              # maintainers: bump, test, 
 python3 tests/run.py && /usr/bin/python3 tests/run.py          # stdlib self-checks, Python 3.9+
 claude plugin validate .
 claude plugin eval . --tag smoke --runs 1 --ablation none --max-cost-usd 2 --no-publish --allow-tools Bash Write Edit
+claude plugin eval . --tag quality --ablation with-without --no-publish --allow-tools Bash   # does honey improve output vs no plugin?
 ```
 
 Style guide for skills: [docs/skill-style.md](docs/skill-style.md). Design: [docs/design/plan.md](docs/design/plan.md).
