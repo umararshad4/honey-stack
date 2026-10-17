@@ -10,6 +10,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-18
+
 ### Added
 - **`deploy` skill** — platform-aware deploys and infrastructure: AWS (ECS/Lambda), GCP Cloud Run, Azure Container Apps, Vercel/Netlify/Fly/Railway/Render/Cloudflare, plus Docker, Kubernetes/Helm, Terraform/OpenTofu/Pulumi/CDK, and GitHub Actions OIDC CI/CD. Reference files per platform with the top real errors and fixes, a production/destructive-op confirmation gate, and a failed-deploy diagnosis loop.
 - **`test-design` skill** — derives the full test matrix and hard edge cases for a feature (equivalence/boundary/decision-table/state/pairwise, data-type and systemic edge-case checklists, property-based tests, mutation-testing as the real coverage signal, level/double choices), then hands concrete cases to `tdd`.
@@ -65,7 +67,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/umararshad4/honey-stack/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/umararshad4/honey-stack/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/umararshad4/honey-stack/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/umararshad4/honey-stack/compare/v0.3.0...v0.3.1
