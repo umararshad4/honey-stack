@@ -87,8 +87,10 @@ def main(argv: list) -> int:
     rep.ok(not broken, "no dangling skill links", f"{len(broken)} dangling skill links in {cdir}/skills")
     inst = (store.read_json(os.path.join(cdir, "plugins", "installed_plugins.json"), {}) or {}).get("plugins", {}).get(PLUGIN) or []
     where = inst[0].get("installPath", "") if inst else ""
-    rep.ok(not inst or os.path.realpath(where) == os.path.realpath(paths.REPO) or _tree_hash(where) == _tree_hash(paths.REPO),
-           "Claude runs the current repo code", f"Claude's copy at {where} differs from the repo (run /plugin update or reinstall)", warn=True)
+    mk = (store.read_json(os.path.join(cdir, "plugins", "known_marketplaces.json"), {}) or {}).get("honey-stack") or {}
+    in_place = os.path.realpath(((mk.get("source") or {}).get("path") or "")) == os.path.realpath(paths.REPO)
+    rep.ok(not inst or in_place or os.path.realpath(where) == os.path.realpath(paths.REPO) or _tree_hash(where) == _tree_hash(paths.REPO),
+           "Claude loads honey in place from the repo" if in_place else "Claude runs the current repo code", f"Claude's copy at {where} differs from the repo (run /plugin update or reinstall)", warn=True)
 
     print("Codex")
     toml = ""

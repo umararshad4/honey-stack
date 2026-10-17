@@ -200,7 +200,8 @@ def _plan_codex_agents(env: Env, steps: list) -> None:
 def plan(env: Env) -> list:
     steps = []
     if env.want("claude"):
-        if not env.sandbox:
+        cs = store.read_json(os.path.join(env.claude, "settings.json"), {}) or {}
+        if not env.sandbox and not (cs.get("enabledPlugins") or {}).get(PLUGIN):
             steps.append({"kind": "cli", "agent": "claude", "summary": f"claude plugin marketplace add + install {PLUGIN}",
                           "cmds": [["plugin", "marketplace", "add", paths.REPO], ["plugin", "install", PLUGIN]],
                           "undo_cmds": [["plugin", "uninstall", PLUGIN], ["plugin", "marketplace", "remove", "honey-stack"]]})
@@ -216,7 +217,7 @@ def plan(env: Env) -> list:
             steps.append({"kind": "symlink", "path": link, "target": os.path.join(paths.REPO, "bin", "honey"),
                           "summary": f"link {link} → repo bin/honey"})
     if env.want("codex"):
-        if not env.sandbox:
+        if not env.sandbox and f'[plugins."{PLUGIN}"]' not in (_read(os.path.join(env.codex, "config.toml")) or ""):
             steps.append({"kind": "cli", "agent": "codex", "summary": f"codex plugin marketplace add + add {PLUGIN}",
                           "cmds": [["plugin", "marketplace", "add", paths.REPO], ["plugin", "add", PLUGIN]],
                           "undo_cmds": [["plugin", "remove", PLUGIN], ["plugin", "marketplace", "remove", "honey-stack"]]})
@@ -377,7 +378,12 @@ def install(env: Env, dry: bool, yes: bool) -> int:
     man = store.read_json(env.manifest, {"actions": []}) or {"actions": []}
     done = []
     try:
-        for st in steps:
+        for st in [s for s in steps if s["kind"] == "cli"]:
+            done.append(_apply(env, st))
+            print(f"  done: {st['summary']}")
+        if done:  # agent CLIs edit settings.json/config.toml themselves; re-plan file edits against the new state
+            steps = [s for s in plan(env) if s["kind"] != "cli"]
+        for st in [s for s in steps if s["kind"] != "cli"]:
             done.append(_apply(env, st))
             print(f"  done: {st['summary']}")
     finally:

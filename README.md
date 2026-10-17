@@ -24,7 +24,7 @@ What the install does:
 
 `bin/honey uninstall` replays the install manifest in reverse. If you edited a file after installing, uninstall reverts only honey's own keys and keeps your edits. Backups live in `~/.honey/backups/<timestamp>/`. `bin/honey install --home /tmp/sandbox` rehearses the whole thing against a fake home.
 
-`bin/honey doctor` checks both agents, the hooks, the skill-listing budget and RSI. `bin/honey sync` re-copies the plugin into Codex's cache after repo changes (Claude runs it straight from this checkout).
+`bin/honey doctor` checks both agents, the hooks, the skill-listing budget and RSI. `bin/honey sync` re-copies the plugin into Codex's cache after repo changes. Claude reads it straight from this checkout (a `directory` marketplace), so edits apply at the next session or `/reload-plugins`.
 
 ## Use
 
