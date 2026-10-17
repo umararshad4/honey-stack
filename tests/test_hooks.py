@@ -11,6 +11,7 @@ out = hook("claude", dict(C, hook_event_name="SessionStart", source="startup"))
 boot = ctx_text(out)
 assert boot.startswith("honey-stack active · scope=full · process=light · voice=terse"), boot[:80]
 assert "honey:debug" in boot and "$debug" not in boot
+assert "begin every reply to the user with `🍯 HONEY`" in boot, boot[:400]
 assert len(boot) < 3000, len(boot)
 
 # harness text never triggers anything (the MCT-router bug class)
@@ -23,7 +24,8 @@ ack = ctx_text(hook("claude", dict(C, hook_event_name="UserPromptSubmit", prompt
 assert "saved" in ack and "never commit unless asked" in ack, ack
 
 # mode switch, and a lookalike that must not switch
-assert "scope=ultra process=strict" in ctx_text(hook("claude", dict(C, hook_event_name="UserPromptSubmit", prompt="/honey ultra strict")))
+sw = ctx_text(hook("claude", dict(C, hook_event_name="UserPromptSubmit", prompt="/honey ultra strict")))
+assert "scope=ultra process=strict" in sw and "`🍯 HONEY · ultra · strict`" in sw, sw
 assert "HONEY MODE" not in ctx_text(hook("claude", dict(C, hook_event_name="UserPromptSubmit", prompt="add a normal mode toggle")))
 
 # guard: ask on Claude default, deny under bypass and on Codex; quoted text passes

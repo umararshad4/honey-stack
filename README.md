@@ -50,7 +50,7 @@ codex plugin add honey@honey-stack
 | Codex | Run `codex`, then `/hooks`, and **trust the honey entries** (Codex asks once per hook). |
 | Both | `honey doctor` checks that everything is wired. After Option B, run it as `python3 <plugin dir>/bin/honey doctor`. |
 
-You'll know it's active when the statusline shows `[HONEY]` (Claude), or when you ask *"what honey-stack mode are you in?"*
+You'll know it's active when every reply starts with **`🍯 HONEY`** (plus any non-default mode, e.g. `🍯 HONEY · ultra · strict`). Claude's statusline also shows `[HONEY]`.
 
 ---
 

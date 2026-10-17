@@ -10,6 +10,13 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- **Reply indicator.** Every reply starts with `🍯 HONEY`, plus any non-default mode (e.g. `🍯 HONEY · ultra · strict`), so you can see at a glance that honey-stack is on. `honey off` hides it.
+
+### Fixed
+- The `review` skill now fires reliably on short pasted diffs: the bootstrap routes "review code/diff/PR" requests to the skill instead of an inline opinion (trigger eval 3/3, up from 2/3).
+- Verified the Codex agent role format against Codex 0.163: all 4 `honey-*` agents are discovered.
+
 ## [0.2.0] - 2026-10-17
 
 ### Added

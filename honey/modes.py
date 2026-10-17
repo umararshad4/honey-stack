@@ -46,8 +46,8 @@ def apply_command(state: dict, args: list) -> str:
     persist = "default" in args
     if "off" in args:
         state["off"] = True
-        return ("honey-stack paused for this session. Ignore honey-stack routing, ladder and receipt rules until the user says `honey on`. "
-                "Safety guards stay on. Confirm in one short line.")
+        return ("honey-stack paused for this session. Ignore honey-stack routing, ladder, receipt and indicator rules until the user says "
+                "`honey on`. Safety guards stay on. Confirm in one short line.")
     if "on" in args:
         state["off"] = False
     for a in args:
@@ -60,7 +60,14 @@ def apply_command(state: dict, args: list) -> str:
     line = "HONEY MODE scope={scope} process={process} voice={voice}".format(**{k: state.get(k, DEFAULTS[k]) for k in AXES})
     if args == ["status"]:
         return line + (" (paused)" if state.get("off") else "") + ". Report this to the user in one line."
-    return line + (" (saved as default)" if persist else " (this session)") + ". Apply from now on. Confirm in one short line.\n" + mode_lines(state)
+    return (line + (" (saved as default)" if persist else " (this session)") + ". Apply from now on. Confirm in one short line.\n"
+            + f"From now on begin every reply with `{indicator(state)}`.\n" + mode_lines(state))
+
+
+def indicator(state: dict) -> str:
+    """🍯 HONEY, plus any axis that differs from the defaults: 🍯 HONEY · ultra · strict."""
+    extra = [state.get(k) for k in AXES if state.get(k, DEFAULTS[k]) != DEFAULTS[k]]
+    return "🍯 HONEY" + "".join(f" · {e}" for e in extra)
 
 
 def _skill(agent: str, name: str) -> str:
@@ -83,7 +90,7 @@ def render(agent: str, state: dict, template: str = None) -> str:
     text = "\n".join(out).strip()
     text = re.sub(r"\{s:([\w-]+)\}", lambda m: _skill(agent, m.group(1)), text)
     router = "`$honey`" if agent == "codex" else "`/honey`"
-    return text.format(router=router, **{k: state.get(k, DEFAULTS[k]) for k in AXES})
+    return text.format(router=router, indicator=indicator(state), **{k: state.get(k, DEFAULTS[k]) for k in AXES})
 
 
 def mode_lines(state: dict) -> str:
