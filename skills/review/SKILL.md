@@ -1,6 +1,6 @@
 ---
 name: review
-description: "Use when asked to review a diff, branch, PR or repo, when handling review feedback, or to check what a change could break."
+description: "Code review. Use when the user asks to review code, a diff (including a pasted one), branch, PR or repo, wants a second look before merging, is handling review feedback, or asks what a change could break."
 license: MIT
 metadata:
   sources: "DietrichGebert/ponytail 4.7.0 skills/ponytail-review (lean tags); DietrichGebert/ponytail 5.3.2 skills/ponytail-review, skills/ponytail-audit, skills/ponytail-debt; mattpocock/skills review; obra/superpowers 7.0.0 skills/requesting-code-review (SKILL.md, code-reviewer.md), skills/receiving-code-review; cursor/plugins pstack 0.15.25 skills/blast-radius, skills/interrogate (reviewer-prompt.md, rubric.md); garrytan/gstack 1.60.1.0 review/SKILL.md.tmpl, review/checklist.md; MCT (local) ~/.claude/skills/code-review, ~/.claude/agents/reviewer.md"
