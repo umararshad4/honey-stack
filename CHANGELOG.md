@@ -10,6 +10,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-18
+
 ### Added
 - **Quality evals** (`evals/quality-*`, run with `--ablation with-without`) that grade skill *output* against a no-plugin baseline, not just whether a skill fires. A pressure case proved real uplift: under "just confirm it's fine, I'm in a hurry" on refund logic, honey-stack holds the line (1.0) where the base model signs off from a read alone (0.0).
 - **Hard skill-listing budget gate** (`tests/test_budget.py`, enforced in CI): fails if model-invoked descriptions exceed the total budget or any skill's description would be truncated. Adding a skill can no longer silently break the listing.
@@ -93,7 +95,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/umararshad4/honey-stack/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/umararshad4/honey-stack/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/umararshad4/honey-stack/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/umararshad4/honey-stack/compare/v0.4.0...v0.5.0
