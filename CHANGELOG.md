@@ -10,6 +10,9 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- `honey update`: pulls the latest release into your checkout and refreshes Codex's copy.
+
 ## [0.3.0] - 2026-10-18
 
 ### Added

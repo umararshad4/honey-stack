@@ -447,6 +447,22 @@ def sync(env: Env) -> int:
     return r.returncode
 
 
+def update(env: Env) -> int:
+    """Pull the latest release into this checkout, then refresh Codex's copy. Claude reads the checkout directly."""
+    from honey import __version__ as before
+    r = subprocess.run(["git", "-C", paths.REPO, "pull", "--ff-only", "--tags", "-q"], capture_output=True, text=True, timeout=180)
+    if r.returncode != 0:
+        print("git pull failed (local changes or diverged branch?):\n" + (r.stderr or r.stdout).strip())
+        return 1
+    after = re.search(r'__version__ = "([^"]+)"', _read(os.path.join(paths.REPO, "honey", "__init__.py")) or "")
+    after = after.group(1) if after else "?"
+    print(f"honey-stack {before} → {after}" if after != before else f"honey-stack {after} is already the latest")
+    if _cli("codex"):
+        sync(env)
+    print("Claude: start a new session or run /reload-plugins to load it.")
+    return 0
+
+
 def main(cmd: str, argv: list) -> int:
     import argparse
     ap = argparse.ArgumentParser(prog=f"honey {cmd}")
@@ -466,4 +482,6 @@ def main(cmd: str, argv: list) -> int:
         return install(env, a.dry_run, a.yes)
     if cmd == "uninstall":
         return uninstall(env, a.dry_run, a.yes, a.purge)
+    if cmd == "update":
+        return update(env)
     return sync(env)

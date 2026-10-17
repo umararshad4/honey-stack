@@ -134,6 +134,19 @@ Useful commands: `/rsi review` · `/rsi coach` · `/rsi status` · `/rsi why <id
 
 ---
 
+## Update
+
+```bash
+honey update          # full install: pulls the latest release and refreshes Codex; then /reload-plugins in Claude
+```
+
+Plugin-only install:
+
+```bash
+claude plugin marketplace update honey-stack && claude plugin update honey@honey-stack
+codex plugin marketplace upgrade honey-stack && codex plugin add honey@honey-stack
+```
+
 ## Uninstall
 
 ```bash

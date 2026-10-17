@@ -28,7 +28,7 @@ def statusline() -> int:
 
 def main(argv: list) -> int:
     if not argv or argv[0] in ("-h", "--help"):
-        print("usage: honey install | uninstall | doctor | sync | rsi … | statusline | --version | hook --agent claude|codex")
+        print("usage: honey install | uninstall | update | doctor | sync | rsi … | statusline | --version | hook --agent claude|codex")
         return 0
     cmd, rest = argv[0], argv[1:]
     if cmd in ("--version", "-V", "version"):
@@ -44,7 +44,7 @@ def main(argv: list) -> int:
         return rsi_cli.main(rest)
     if cmd == "statusline":
         return statusline()
-    if cmd in ("install", "uninstall", "sync"):
+    if cmd in ("install", "uninstall", "sync", "update"):
         from honey import install
         return install.main(cmd, rest)
     if cmd == "doctor":
