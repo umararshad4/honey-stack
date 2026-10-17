@@ -96,15 +96,17 @@ def _git_is_destructive(args: list[str]) -> str | None:
         if "f" in flags and "d" in flags:
             return "Refuses destructive git clean -fd[x] without explicit human approval."
     if sub[0] == "push":
-        if "--force" in sub or any(a.startswith("-") and not a.startswith("--") and "f" in a[1:] for a in sub):
+        if ("--force" in sub or any(a.startswith("-") and not a.startswith("--") and "f" in a[1:] for a in sub)
+                or any(a.startswith("+") and len(a) > 1 for a in sub[1:])):  # +refspec is a force push
             return "Refuses git push --force without explicit human approval (use --force-with-lease)."
-    if sub[0] == "checkout" and "--" in sub and any(a in (".", "*", ":/") for a in sub[sub.index("--") + 1:]):
+    if sub[0] == "checkout" and any(a in (".", "*", ":/") for a in sub[1:]):
         return "Refuses discarding all working-tree changes (git checkout -- .)."
     if sub[0] == "restore" and "--staged" not in sub and any(a in (".", "*", ":/") for a in sub[1:]):
         return "Refuses discarding all working-tree changes (git restore .)."
     if sub[0] == "stash" and len(sub) > 1 and sub[1] in ("drop", "clear"):
         return "Refuses dropping stashed work (git stash drop/clear)."
-    if sub[0] == "branch" and any(a in ("-D", "--delete --force") or (a.startswith("-") and not a.startswith("--") and "D" in a[1:]) for a in sub[1:]):
+    flags = "".join(a[1:] for a in sub[1:] if a.startswith("-") and not a.startswith("--"))
+    if sub[0] == "branch" and ("D" in flags or (("d" in flags or "--delete" in sub) and ("f" in flags or "--force" in sub))):
         return "Refuses force-deleting a branch (git branch -D)."
     return None
 
@@ -138,14 +140,12 @@ def dangerous_reason(command) -> str | None:
         return "Refuses fork bomb."
 
     # Redirects to a raw device or a protected system file (reliable on raw text).
-    redirect = re.search(r"(?:>\||>>?)\s*(\S+)", compact)
-    while redirect:
+    for redirect in re.finditer(r"(?:>\||>>?)\s*(\S+)", compact):
         target = redirect.group(1)
         if DEVICE_RE.search(target):
             return "Refuses writing directly to a raw block device."
         if PROTECTED_WRITE_RE.search(target):
             return "Refuses overwriting a protected system file."
-        redirect = re.search(r"(?:>\||>>?)\s*(\S+)", compact[redirect.end():])
 
     try:
         lexer = shlex.shlex(command, posix=True, punctuation_chars=True)
@@ -204,9 +204,10 @@ def dangerous_reason(command) -> str | None:
                 reason = _git_is_destructive(args)
                 if reason:
                     return reason
-            if base == "terraform" and args[:1] == ["destroy"]:
+            operands = [a for a in args if not a.startswith("-")]  # global options may precede the subcommand
+            if base == "terraform" and ("destroy" in operands or any(a in ("-destroy", "--destroy") for a in args)):
                 return "Refuses terraform destroy without explicit human approval."
-            if base == "kubectl" and args[:1] == ["delete"]:
+            if base == "kubectl" and "delete" in operands:
                 return "Refuses kubectl delete without explicit human approval."
             if base in ("psql", "mysql", "sqlite3", "mongosh") and any(_SQL_DESTRUCTIVE.search(a) for a in args):
                 return f"Refuses destructive SQL (DROP/TRUNCATE) via {base}."

@@ -61,13 +61,16 @@ def _ignored(path: str, cwd: str) -> bool:
 
 def scan(payload: dict):
     """Reason string if newly written text contains a likely secret (never echoes the secret), else None."""
+    ignored = {}
     for path, text in new_text(payload):
         for lineno, line in enumerate(str(text).splitlines() or [str(text)], 1):
             for kind, rx in PATTERNS:
                 m = rx.search(line)
                 if m and not _PLACEHOLDER.search(m.group(0)):
-                    if _ignored(path, payload.get("cwd", "")):
-                        return None  # gitignored files (.env) are where secrets belong
+                    if path not in ignored:
+                        ignored[path] = _ignored(path, payload.get("cwd", ""))
+                    if ignored[path]:
+                        continue  # gitignored files (.env) are where secrets belong; keep scanning the others
                     where = os.path.basename(path) if path else "the edited content"
                     return (f"honey: possible {kind} written to {where} (line ~{lineno}). "
                             "Move it to an env var or a gitignored file, or confirm it is a test fixture.")
