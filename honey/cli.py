@@ -28,9 +28,13 @@ def statusline() -> int:
 
 def main(argv: list) -> int:
     if not argv or argv[0] in ("-h", "--help"):
-        print("usage: honey hook --agent claude|codex | rsi … | install | uninstall | doctor | sync | statusline")
+        print("usage: honey install | uninstall | doctor | sync | rsi … | statusline | --version | hook --agent claude|codex")
         return 0
     cmd, rest = argv[0], argv[1:]
+    if cmd in ("--version", "-V", "version"):
+        from honey import __version__
+        print(f"honey-stack {__version__}")
+        return 0
     if cmd == "hook":
         agent = rest[rest.index("--agent") + 1] if "--agent" in rest else ("codex" if os.environ.get("PLUGIN_DATA") else "claude")
         from honey import dispatch

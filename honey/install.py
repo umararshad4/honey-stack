@@ -47,7 +47,8 @@ class Env:
         self.localbin = os.path.join(h, ".local", "bin")
         self.honey = os.path.join(h, ".honey") if self.sandbox else paths.home()
         self.only = only
-        self.phase1_only = False
+        self.slim = False      # opt-in: replace CLAUDE.md / AGENTS.md with migrate/ templates (author's personal prefs by default)
+        self.retire = False    # opt-in: move absorbed MCT / Matt Pocock / duplicate skills to backups
         self.stamp = time.strftime("%Y%m%dT%H%M%S")
         self.backups = os.path.join(self.honey, "backups", self.stamp)
         self.manifest = os.path.join(self.honey, "install-manifest.json")
@@ -207,9 +208,10 @@ def plan(env: Env) -> list:
                           "undo_cmds": [["plugin", "uninstall", PLUGIN], ["plugin", "marketplace", "remove", "honey-stack"]]})
         _plan_settings(env, steps)
         _plan_broken_links(steps, os.path.join(env.claude, "skills"))
-        _plan_instruction(env, steps, os.path.join(env.claude, "CLAUDE.md"), "CLAUDE.md")
+        if env.slim:
+            _plan_instruction(env, steps, os.path.join(env.claude, "CLAUDE.md"), "CLAUDE.md")
         mct = os.path.join(env.claude, "MCT.md")
-        if os.path.exists(mct):
+        if env.retire and os.path.exists(mct):
             steps.append({"kind": "move", "src": mct, "dst": os.path.join(env.backups, "claude", "MCT.md"),
                           "summary": f"retire {mct} (moved to backups)"})
         link = os.path.join(env.localbin, "honey")
@@ -222,11 +224,12 @@ def plan(env: Env) -> list:
                           "cmds": [["plugin", "marketplace", "add", paths.REPO], ["plugin", "add", PLUGIN]],
                           "undo_cmds": [["plugin", "remove", PLUGIN], ["plugin", "marketplace", "remove", "honey-stack"]]})
         _plan_toml(env, steps)
-        _plan_instruction(env, steps, os.path.join(env.codex, "AGENTS.md"), "AGENTS.md")
+        if env.slim:
+            _plan_instruction(env, steps, os.path.join(env.codex, "AGENTS.md"), "AGENTS.md")
         _plan_broken_links(steps, os.path.join(env.agents, "skills"))
         if os.path.isdir(os.path.join(paths.REPO, "agents")):
             _plan_codex_agents(env, steps)
-    if not env.phase1_only:
+    if env.retire:
         _plan_retire(env, steps)
     return steps
 
@@ -452,10 +455,13 @@ def main(cmd: str, argv: list) -> int:
     ap.add_argument("--only", choices=["claude", "codex"])
     ap.add_argument("--home", help="sandbox home dir for a full rehearsal (no agent CLIs are called)")
     ap.add_argument("--purge", action="store_true")
-    ap.add_argument("--phase1-only", action="store_true", help="skip retiring absorbed MCT/Matt/Codex duplicates")
+    ap.add_argument("--slim-instructions", action="store_true",
+                    help="replace ~/.claude/CLAUDE.md and ~/.codex/AGENTS.md with migrate/ templates (edit them first; originals backed up)")
+    ap.add_argument("--retire-legacy", action="store_true",
+                    help="move skills/commands/agents honey-stack absorbs (MCT, Matt Pocock duplicates) to backups")
     a = ap.parse_args(argv)
     env = Env(a.home, a.only)
-    env.phase1_only = a.phase1_only
+    env.slim, env.retire = a.slim_instructions, a.retire_legacy
     if cmd == "install":
         return install(env, a.dry_run, a.yes)
     if cmd == "uninstall":

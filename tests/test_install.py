@@ -32,7 +32,8 @@ os.symlink(os.path.join(a, "skills", "grilling"), os.path.join(c, "skills", "gri
 
 
 def run(*args):
-    r = subprocess.run(HONEY + list(args) + ["--home", home, "--yes"], capture_output=True, text=True)
+    extra = ["--slim-instructions", "--retire-legacy"] if args[0] == "install" else []
+    r = subprocess.run(HONEY + list(args) + extra + ["--home", home, "--yes"], capture_output=True, text=True)
     assert r.returncode == 0, r.stdout + r.stderr
     return r.stdout
 

@@ -1,0 +1,26 @@
+name: release
+on:
+  push:
+    tags: ["v*.*.*"]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: git config --global user.email ci@example.com && git config --global user.name ci
+      - run: python scripts/release.py --check
+        env:
+          GITHUB_REF_NAME: ${{ github.ref_name }}
+      - run: python tests/run.py
+      - name: Publish GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          python scripts/release.py --notes "$v" > notes.md
+          gh release create "$GITHUB_REF_NAME" --title "honey-stack $GITHUB_REF_NAME" --notes-file notes.md --verify-tag

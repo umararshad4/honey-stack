@@ -10,7 +10,7 @@ The user runs a pile of overlapping toolkits:
 
 Today a Claude session injects roughly 25 KB of competing "YOU MUST / ACTIVE EVERY RESPONSE" text. MCT's prompt router misfires on background task notifications: it injected a 13 KB contract four times in this planning session alone.
 
-**Goal:** build **honey-stack** at `/Users/m1pro/saas open source/honey-stack`. The dir exists and is empty; the path contains a space.
+**Goal:** build **honey-stack** at `<repo>`. The dir exists and is empty; the path contains a space.
 - One always-on layer that distills the best of all these toolkits with the user's taste, for **Claude Code + Codex**.
 - A top-level **RSI** engine, active whenever honey-stack is. It observes every session; learns where the user progresses, makes mistakes and gains skills, and which toolkit skills work; auto-promotes small learnings; proposes evidence-backed, eval-gated skill edits; coaches the user; and watches upstream toolkits for ideas that match the friction it actually observed.
 - Target always-on size is about 4.7 KB per session: bootstrap ~2.3 KB, RSI brief ≤1.5 KB, slim CLAUDE.md ~0.9 KB.
@@ -23,7 +23,7 @@ Today a Claude session injects roughly 25 KB of competing "YOU MUST / ACTIVE EVE
 
 ### Machine facts that shape the design (verified)
 - **Python.** `/usr/bin/python3` is 3.9.6 and starts in ~80 ms; GUI-launched agents may use it. Homebrew python3 is 3.14 (~25 ms). All hook code must be **3.9-compatible and stdlib-only**.
-- **Permissions are bypassed.** `claude` is aliased with `--dangerously-skip-permissions`, and Codex runs `approval_policy="never"`. The honey guard is the only safety net, so it **denies** (never asks) under bypass. Subprocesses use the absolute path `/Users/m1pro/.local/bin/claude`.
+- **Permissions are bypassed.** `claude` is aliased with `--dangerously-skip-permissions`, and Codex runs `approval_policy="never"`. The honey guard is the only safety net, so it **denies** (never asks) under bypass. Subprocesses use the absolute path `~/.local/bin/claude`.
 - **Claude loads the plugin in place.** A local-path marketplace runs the plugin straight from the repo checkout, so edits go live at the next session or after `/reload-plugins`.
 - **Codex copies the plugin.** It copies into `~/.codex/plugins/cache/...`, so `honey sync` is needed after changes.
 - **Codex trust.** Codex trusts each hook entry by hash, so **hook command strings are frozen** after Phase 1 and all logic lives behind them.
@@ -298,7 +298,7 @@ Plus **Coach** and the **Upstream radar**.
 - sk-ant / sk- / gh*_ / github_pat / xox* / AKIA / AIza / JWT tokens
 - key=value secrets and URL credentials
 - emails, long hex and base64 strings
-- `/Users/m1pro` → `~`
+- `~` → `~`
 
 Snippets are ≤300 chars and taken only around signals. An injection scan runs before anything becomes a bullet or a proposal.
 
@@ -448,7 +448,7 @@ Any result with n<5 is reported as "insufficient data".
 ## Verification
 
 ```bash
-R="/Users/m1pro/saas open source/honey-stack"; export HONEY_HOME="$(mktemp -d)"
+R="<repo>"; export HONEY_HOME="$(mktemp -d)"
 claude plugin validate "$R" --strict
 python3 "$R/tests/run.py" && /usr/bin/python3 "$R/tests/run.py"             # 3.14 + 3.9
 for f in "$R"/tests/fixtures/{claude,codex}/*.json; do python3 "$R/bin/honey" hook --agent "$(basename "$(dirname "$f")")" < "$f" | python3 -m json.tool >/dev/null || echo "BAD $f"; done
