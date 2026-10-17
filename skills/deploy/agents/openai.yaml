@@ -1,0 +1,5 @@
+interface:
+  display_name: "deploy"
+  short_description: "Deploy to cloud/PaaS, write Docker/K8s/IaC, fix failing deploys"
+policy:
+  allow_implicit_invocation: true

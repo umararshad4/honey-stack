@@ -1,0 +1,5 @@
+interface:
+  display_name: "tooling"
+  short_description: "Set up monorepo, micro-frontend, microservices, hooks, lint/format, CI"
+policy:
+  allow_implicit_invocation: true

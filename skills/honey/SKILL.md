@@ -42,6 +42,9 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | About to say done, fixed, or passing | `verify` |
 | Diff or PR ready for a second look; self-review | `review` |
 | Commit, push, PR, release, changelog | `ship` |
+| Deploy to a cloud/PaaS, write Docker/K8s/IaC, fix a failing deploy or pipeline | `deploy` |
+| Design the test matrix and hard edge cases for a feature before writing tests | `test-design` |
+| Set up a monorepo, micro-frontend, microservices, pre-commit hooks, lint/format/CI | `tooling` |
 | A skill misfired or a lesson should stick; improve honey-stack itself | `rsi` |
 | UI, layout, styling, responsive, design-system work | `frontend` |
 | Drive the real app to find bugs before users do | `qa` |

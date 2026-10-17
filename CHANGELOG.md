@@ -10,6 +10,11 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- **`deploy` skill** — platform-aware deploys and infrastructure: AWS (ECS/Lambda), GCP Cloud Run, Azure Container Apps, Vercel/Netlify/Fly/Railway/Render/Cloudflare, plus Docker, Kubernetes/Helm, Terraform/OpenTofu/Pulumi/CDK, and GitHub Actions OIDC CI/CD. Reference files per platform with the top real errors and fixes, a production/destructive-op confirmation gate, and a failed-deploy diagnosis loop.
+- **`test-design` skill** — derives the full test matrix and hard edge cases for a feature (equivalence/boundary/decision-table/state/pairwise, data-type and systemic edge-case checklists, property-based tests, mutation-testing as the real coverage signal, level/double choices), then hands concrete cases to `tdd`.
+- **`tooling` skill** — monorepo (Turborepo/Nx/pnpm workspaces + Changesets), micro-frontends (Module Federation 2), microservices + Pact contracts, pre-commit hooks (Husky v9/Lefthook/pre-commit), lint/format/typecheck (Biome 2, ESLint 10 flat config, Ruff), test wiring (Vitest 3) and a GitHub Actions pipeline, each with current configs and honest "is this overkill?" guidance.
+
 ## [0.5.0] - 2026-10-18
 
 ### Added

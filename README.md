@@ -91,7 +91,7 @@ Slash commands: Claude uses `/honey`, `/rsi …`, `/honey:<skill>`. Codex uses `
 
 | The agent picks these itself | You invoke these |
 |---|---|
-| `grill` (pin down intent) · `plan` · `execute` (work through a queue) · `debug` · `tdd` · `verify` · `review` · `ship` (commit/PR) · `frontend` · `qa` (real browser) · `security` · `docs` | `honey` (router + modes) · `rsi` · `unslop` (cut AI tells from any text) · `reverse` (study a shipped app via REA) · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` |
+| `grill` (pin down intent) · `plan` · `execute` (work through a queue) · `debug` · `tdd` · `verify` · `review` · `ship` (commit/PR) · `deploy` (cloud/Docker/K8s/IaC/CI) · `test-design` (edge-case matrix) · `tooling` (monorepo/hooks/lint/CI) · `frontend` · `qa` (real browser) · `security` · `docs` | `honey` (router + modes) · `rsi` · `unslop` (cut AI tells from any text) · `reverse` (study a shipped app via REA) · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` |
 
 Main flow: **grill → plan → execute → verify → review → ship**. Bugs go through **debug** first.
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: "test-design"
+  short_description: "Design the test matrix and edge cases for a feature"
+policy:
+  allow_implicit_invocation: true
