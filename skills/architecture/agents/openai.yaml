@@ -1,0 +1,5 @@
+interface:
+  display_name: "architecture"
+  short_description: "Deepen modules, design an interface twice, or plan a safe refactor"
+policy:
+  allow_implicit_invocation: false

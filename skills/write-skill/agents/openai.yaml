@@ -1,0 +1,5 @@
+interface:
+  display_name: "write-skill"
+  short_description: "Write or patch a honey-stack skill, with evals"
+policy:
+  allow_implicit_invocation: false

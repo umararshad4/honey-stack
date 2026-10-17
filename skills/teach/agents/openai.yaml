@@ -1,0 +1,5 @@
+interface:
+  display_name: "teach"
+  short_description: "Teach a concept, explain how or why code works, or zoom out"
+policy:
+  allow_implicit_invocation: false

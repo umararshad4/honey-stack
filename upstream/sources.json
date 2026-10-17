@@ -1,0 +1,11 @@
+{
+  "_comment": "Upstream radar sources. sha = the commit honey-stack's distilled skills were last compared against; the radar fetches weekly and only proposes changes that match friction RSI observed.",
+  "sources": [
+    {"name": "superpowers", "repo": "https://github.com/obra/superpowers.git", "paths": ["skills"], "sha": null, "maps": {"brainstorming": "grill", "writing-plans": "plan", "subagent-driven-development": "execute", "systematic-debugging": "debug", "test-driven-development": "tdd", "verification-before-completion": "verify", "requesting-code-review": "review", "receiving-code-review": "review", "finishing-a-development-branch": "ship", "using-git-worktrees": "ship", "writing-skills": "write-skill"}},
+    {"name": "mattpocock-skills", "repo": "https://github.com/mattpocock/skills.git", "paths": ["skills"], "sha": null, "maps": {"grilling": "grill", "ask-matt": "honey", "to-spec": "plan", "to-tickets": "plan", "implement": "execute", "diagnosing-bugs": "debug", "tdd": "tdd", "review": "review", "handoff": "handoff", "prototype": "prototype", "domain-modeling": "domain", "teach": "teach", "writing-for-agents": "write-skill", "improve-codebase-architecture": "architecture"}},
+    {"name": "ponytail", "repo": "https://github.com/DietrichGebert/ponytail.git", "paths": ["skills", "hooks"], "sha": null, "maps": {"ponytail": "bootstrap", "ponytail-review": "review", "ponytail-audit": "review", "ponytail-debt": "review"}},
+    {"name": "pstack", "repo": "https://github.com/cursor/plugins.git", "paths": ["pstack/skills"], "sha": null, "maps": {"poteto-mode": "honey", "swarm": "execute", "prove-it-works": "verify", "blast-radius": "review", "reflect": "rsi", "correct": "rsi", "automate-me": "rsi"}},
+    {"name": "gstack", "repo": "https://github.com/garrytan/gstack.git", "paths": ["."], "sha": null, "maps": {"office-hours": "grill", "plan-ceo-review": "plan", "plan-eng-review": "plan", "review": "review", "investigate": "debug", "ship": "ship", "qa": "qa", "cso": "security", "learn": "rsi", "retro": "rsi"}},
+    {"name": "compound-engineering", "repo": "https://github.com/EveryInc/compound-engineering-plugin.git", "paths": ["."], "sha": null, "maps": {"ce-compound": "rsi", "ce-plan": "plan", "ce-code-review": "review"}}
+  ]
+}

@@ -1,0 +1,5 @@
+interface:
+  display_name: "domain"
+  short_description: "Sharpen domain terms in CONTEXT.md and record ADRs"
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,15 @@
+{
+  "name": "honey-stack",
+  "description": "honey-stack: one always-on agent toolkit that learns from every session",
+  "owner": {
+    "name": "King Umar",
+    "email": "mumararshad4444@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "honey",
+      "source": "./",
+      "description": "honey-stack always-on toolkit with RSI self-improvement"
+    }
+  ]
+}

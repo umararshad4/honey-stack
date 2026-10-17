@@ -1,0 +1,74 @@
+---
+name: verify
+description: "Use before saying done, fixed or passing, before a commit or PR, or when asked 'have I missed something?'"
+license: MIT
+metadata:
+  sources: "obra/superpowers 7.0.0 skills/verification-before-completion; cursor/plugins pstack 0.15.25 skills/principle-prove-it-works, skills/principle-sequence-verifiable-units; garrytan/gstack 1.60.1.0 review/checklist.md (enum completeness), ship/SKILL.md.tmpl (verification gate); MCT (local) ~/.claude/MCT.md (Check Selection, Post-Task Verification, Completion Receipt), skills/have-i-missed-something, skills/testing-strategy, agents/test-runner.md"
+---
+
+# Verify
+
+This is the gate between "I changed it" and "it's done". Prove the claim itself, not a proxy for it.
+
+## 1. Match each claim to its evidence
+
+| Claim | Evidence that proves it | Not enough |
+|---|---|---|
+| Tests pass | Test command output: 0 failures, exit 0 | An earlier run, "should pass" |
+| Types or lint clean | `tsc` / linter output: 0 errors | One passing (lint doesn't compile) |
+| Build succeeds | Build command exits 0 | Lint passing, logs look fine |
+| Bug fixed | The original symptom, reproduced, now gone | Code changed, assumed fixed |
+| Regression test guards it | Revert fix: fails. Restore: passes | Passes once |
+| Subagent finished | The diff shows the change and you ran its check | "Success" in its report |
+| Requirements met | Each requirement line checked against the change | Tests passing |
+| UI works | Browser run with tool, URL, viewport or flow, result | Screenshot from before the last edit |
+
+Read the actual value and run the actual feature. File mtimes, cached output and "it compiles" are proxies. When a check fails strangely, suspect the way you observed it before the system. Where you can, script the comparison so it re-runs, and keep its output visible.
+
+Re-run after any edit. Evidence describes the tree it ran on, so a fix made after the test run needs a fresh run.
+
+Done when: every claim you are about to make has fresh evidence from this turn.
+
+## 2. Pick checks by changed surface
+
+Match the weight of the checks to the risk. Use the repo's own scripts (package.json, Makefile, justfile, CI config) rather than inventing commands.
+
+| Changed surface | Minimum checks |
+|---|---|
+| Copy or style only | Inspect the diff. Add a browser check if layout could shift. |
+| React component or hook | `npx -y react-doctor@latest . --verbose --diff`, plus a targeted test if behavior changed |
+| Shared logic, routing, data fetching | Typecheck and targeted tests |
+| Auth, payments, permissions, user data | Typecheck, targeted tests including negative and permission cases, and a security read of the diff |
+| Broad refactor | Typecheck, relevant tests, the `review` skill, and React Doctor if React changed |
+| PR-ready | The lint, typecheck and test commands the repo defines |
+
+Run a full build only for a broad or risky change, or when asked. For multi-step work such as sweeps, migrations or runs of similar edits, check each unit before starting the next. A break caught at the unit that caused it is cheap to find.
+
+Done when: each applicable row has run and you have read its output, or it is listed as skipped with the concrete blocker.
+
+## 3. Finish audit ("have I missed something?")
+
+Go line by line:
+
+- **Reach.** Every caller, test, fixture, mock, type, config and doc that references a changed symbol was updated. Grep for it, including string and dynamic references.
+- **Completeness.** A new enum value, status or flag is handled by every consumer that switches on its siblings (allowlists, `switch`/`case` chains, UI dropdowns, persistence).
+- **Clean-up.** Debug logs, temporary tags, `.only`/`.skip`, commented-out code and scratch files are gone. `git diff` shows only intended changes.
+- **UI proof.** A visible UI change was exercised in a browser through the `qa` skill, with the tool, URL, viewport or flow, and result.
+- **TODO.md.** An item is ticked only after its proof exists. Blocked items stay unchecked with the blocker written under them.
+- **Docs.** README, help text, examples and comments match the new behavior, setup, commands or API.
+- **Scope.** Re-read the request. Everything asked for is present and nothing unasked was added.
+- **Shortcuts.** Every `shortcut:` you added names its limit and its upgrade trigger.
+
+Fix what you can before replying. Anything you can't fix goes into Skipped or Risk with its reason.
+
+Done when: every line is true or recorded.
+
+## 4. Report
+
+Close with the receipt line:
+
+```
+Checks run: <cmd> pass, <cmd> fail (<n>). Skipped: <check> (<concrete reason>). Risk: <thing>.
+```
+
+Name failures as failures, including pre-existing ones you saw. Leave out empty parts.

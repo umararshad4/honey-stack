@@ -1,0 +1,5 @@
+interface:
+  display_name: "rsi"
+  short_description: "Review what honey RSI learned, coach, save or forget learnings"
+policy:
+  allow_implicit_invocation: false

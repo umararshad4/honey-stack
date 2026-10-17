@@ -1,0 +1,5 @@
+interface:
+  display_name: "opensrc"
+  short_description: "Build or refresh opensrc/ library context from package.json"
+policy:
+  allow_implicit_invocation: false

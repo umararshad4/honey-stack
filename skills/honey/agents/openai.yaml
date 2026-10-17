@@ -1,0 +1,5 @@
+interface:
+  display_name: "honey"
+  short_description: "Route to a honey-stack skill or switch modes"
+policy:
+  allow_implicit_invocation: false

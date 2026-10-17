@@ -1,0 +1,41 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["session_summary", "candidates", "bullet_labels", "skill_feedback", "toolkit_misfires", "progress", "project_facts_dropped", "none_reason"],
+  "properties": {
+    "session_summary": {"type": "string", "maxLength": 240},
+    "candidates": {"type": "array", "maxItems": 5, "items": {
+      "type": "object", "additionalProperties": false,
+      "required": ["op", "target_id", "when", "then", "kind", "scope", "applicability", "severity", "evidence", "counterfactual", "non_obvious", "durable", "material"],
+      "properties": {
+        "op": {"type": "string", "enum": ["new", "update", "supersede", "noop"]},
+        "target_id": {"type": "string", "maxLength": 12},
+        "when": {"type": "string", "maxLength": 140},
+        "then": {"type": "string", "maxLength": 220},
+        "kind": {"type": "string", "enum": ["preference", "pitfall", "pattern", "tool", "workflow", "environment", "toolkit-misfire", "skill-usage"]},
+        "scope": {"type": "string", "maxLength": 70},
+        "applicability": {"type": "string", "maxLength": 180},
+        "severity": {"type": "integer", "minimum": 1, "maximum": 3},
+        "evidence": {"type": "array", "maxItems": 6, "items": {"type": "string", "maxLength": 6}},
+        "counterfactual": {"type": "string", "maxLength": 180},
+        "non_obvious": {"type": "boolean"}, "durable": {"type": "boolean"}, "material": {"type": "boolean"}}}},
+    "bullet_labels": {"type": "array", "maxItems": 25, "items": {
+      "type": "object", "additionalProperties": false, "required": ["id", "label", "evidence"],
+      "properties": {"id": {"type": "string", "maxLength": 12}, "label": {"type": "string", "enum": ["helpful", "violated", "harmful"]},
+                     "evidence": {"type": "array", "maxItems": 4, "items": {"type": "string", "maxLength": 6}}}}},
+    "skill_feedback": {"type": "array", "maxItems": 8, "items": {
+      "type": "object", "additionalProperties": false, "required": ["skill", "outcome", "issue", "evidence"],
+      "properties": {"skill": {"type": "string", "maxLength": 60}, "outcome": {"type": "string", "enum": ["worked", "failed", "misfired", "missed"]},
+                     "issue": {"type": "string", "maxLength": 180}, "evidence": {"type": "array", "maxItems": 4, "items": {"type": "string", "maxLength": 6}}}}},
+    "toolkit_misfires": {"type": "array", "maxItems": 4, "items": {
+      "type": "object", "additionalProperties": false, "required": ["component", "issue", "evidence"],
+      "properties": {"component": {"type": "string", "maxLength": 60}, "issue": {"type": "string", "maxLength": 180},
+                     "evidence": {"type": "array", "maxItems": 4, "items": {"type": "string", "maxLength": 6}}}}},
+    "progress": {"type": "array", "maxItems": 6, "items": {
+      "type": "object", "additionalProperties": false, "required": ["domain", "direction", "evidence"],
+      "properties": {"domain": {"type": "string", "maxLength": 40}, "direction": {"type": "string", "enum": ["growing", "repeating", "new"]},
+                     "evidence": {"type": "array", "maxItems": 4, "items": {"type": "string", "maxLength": 6}}}}},
+    "project_facts_dropped": {"type": "integer", "minimum": 0},
+    "none_reason": {"type": "string", "maxLength": 180}
+  }
+}

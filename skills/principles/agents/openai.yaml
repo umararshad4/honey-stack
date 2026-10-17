@@ -1,0 +1,5 @@
+interface:
+  display_name: "principles"
+  short_description: "Engineering principles index; read the leaf before citing"
+policy:
+  allow_implicit_invocation: false
