@@ -1,0 +1,5 @@
+interface:
+  display_name: "upgrade"
+  short_description: "Safely upgrade dependencies, patch CVEs, handle breaking changes/EOL"
+policy:
+  allow_implicit_invocation: true

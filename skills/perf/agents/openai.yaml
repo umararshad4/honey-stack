@@ -1,0 +1,5 @@
+interface:
+  display_name: "perf"
+  short_description: "Profile, fix the hot path, cache, load-test with before/after numbers"
+policy:
+  allow_implicit_invocation: true

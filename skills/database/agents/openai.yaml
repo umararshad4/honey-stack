@@ -1,0 +1,5 @@
+interface:
+  display_name: "database"
+  short_description: "Schema, migrations, indexing, query perf, transactions (Postgres-first)"
+policy:
+  allow_implicit_invocation: true

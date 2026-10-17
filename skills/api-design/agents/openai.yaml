@@ -1,0 +1,5 @@
+interface:
+  display_name: "api-design"
+  short_description: "Design/version REST/GraphQL/gRPC APIs, error contracts, pagination"
+policy:
+  allow_implicit_invocation: true

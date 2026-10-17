@@ -10,6 +10,15 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+Six production-engineering skills, each with current (2026) reference files, decision rules, and confirmation gates for risky actions:
+- **`database`** — schema design, safe/online (expand-contract) migrations, indexing, slow-query and N+1 fixes, transactions and isolation levels. Postgres-first. Confirms before any production migration.
+- **`perf`** — profile-first performance work (per-stack profilers, USE/RED), hot-path fixes, caching layers and invalidation, and load testing with p50/p95/p99. Confirms before load-testing anything live.
+- **`observability`** — structured logging, metrics (RED/USE, cardinality traps), distributed tracing, error tracking, SLOs and burn-rate alerting, OpenTelemetry-first.
+- **`api-design`** — REST/GraphQL/gRPC/tRPC choice, resource modeling, RFC 9457 error contracts, cursor pagination, idempotency keys, versioning without breaking, schema-first OpenAPI/proto/GraphQL.
+- **`upgrade`** — safe dependency upgrades (one major per PR, gated by tests), CVE triage with reachability (osv-scanner, govulncheck), forcing patched transitive deps, framework codemods, runtime EOL, lockfile hygiene.
+- **`incident`** — production outage response: severity, mitigate-first (rollback/flag/scale), safe live investigation with the four golden signals, communication, and a blameless postmortem. The agent recommends but never executes a prod mitigation without human approval.
+
 ## [0.6.0] - 2026-10-18
 
 ### Added

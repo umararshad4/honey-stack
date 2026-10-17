@@ -1,0 +1,5 @@
+interface:
+  display_name: "observability"
+  short_description: "Logs, metrics, traces, error tracking, SLOs and alerting (OTel-first)"
+policy:
+  allow_implicit_invocation: true

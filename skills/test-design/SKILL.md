@@ -1,6 +1,6 @@
 ---
 name: test-design
-description: "Design the test matrix and the hard edge cases for a feature before writing tests: equivalence/boundary/decision-table/state/pairwise derivation, data-type and systemic edge-case checklists, property-based tests, and level/double choices. Hands concrete cases to tdd."
+description: "Design the test matrix and hard edge cases for a feature before writing tests: equivalence/boundary/decision-table/state/pairwise, data-type and systemic edge-case checklists, property-based tests. Feeds tdd."
 license: MIT
 metadata:
   sources: "honey-stack research 2026-10-18 (ISTQB-style derivation, Meszaros test doubles, Pact, property-based and mutation-testing practice). Checklists in references/."

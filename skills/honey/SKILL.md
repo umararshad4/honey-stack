@@ -45,6 +45,12 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Deploy to a cloud/PaaS, write Docker/K8s/IaC, fix a failing deploy or pipeline | `deploy` |
 | Design the test matrix and hard edge cases for a feature before writing tests | `test-design` |
 | Set up a monorepo, micro-frontend, microservices, pre-commit hooks, lint/format/CI | `tooling` |
+| Schema design, migrations, indexing, slow queries, N+1, transactions | `database` |
+| Profiling, hot paths, caching, load testing, backend perf with before/after numbers | `perf` |
+| Logging, metrics, tracing, error tracking, SLOs, alerting, instrument a service | `observability` |
+| Design or version a REST/GraphQL/gRPC API, error contracts, pagination, idempotency | `api-design` |
+| Safely upgrade dependencies, patch a CVE, handle a breaking change or EOL | `upgrade` |
+| A production outage: triage, mitigate, roll back, communicate, postmortem | `incident` |
 | A skill misfired or a lesson should stick; improve honey-stack itself | `rsi` |
 | UI, layout, styling, responsive, design-system work | `frontend` |
 | Drive the real app to find bugs before users do | `qa` |

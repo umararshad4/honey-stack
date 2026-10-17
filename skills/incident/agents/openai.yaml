@@ -1,0 +1,5 @@
+interface:
+  display_name: "incident"
+  short_description: "Production outage: mitigate first, investigate safely, postmortem"
+policy:
+  allow_implicit_invocation: true
