@@ -10,6 +10,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-10-18
+
 ### Added
 Six production-engineering skills, each with current (2026) reference files, decision rules, and confirmation gates for risky actions:
 - **`database`** — schema design, safe/online (expand-contract) migrations, indexing, slow-query and N+1 fixes, transactions and isolation levels. Postgres-first. Confirms before any production migration.
@@ -76,7 +78,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/umararshad4/honey-stack/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/umararshad4/honey-stack/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/umararshad4/honey-stack/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/umararshad4/honey-stack/compare/v0.3.1...v0.4.0
