@@ -10,6 +10,9 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- `reverse` skill (`/honey:reverse`, `$reverse`): drives the [REA](https://github.com/morluto/rea) toolchain to reverse-engineer a shipped target (binary, APK, JS/Electron, .NET, website, firmware, network capture) without its source, with an authorized-use gate and evidence discipline. REA is a separate MCP server the skill installs on approval; honey-stack doesn't bundle it.
+
 ## [0.4.0] - 2026-10-18
 
 ### Added
