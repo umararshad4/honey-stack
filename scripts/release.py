@@ -72,7 +72,7 @@ def main(argv):
     if not m or not m.group(1).strip():
         sys.exit("CHANGELOG.md has nothing under ## [Unreleased]")
     today = datetime.date.today().isoformat()
-    log = log.replace(m.group(0), f"## [Unreleased]\n\n## [{new}] - {today}\n{m.group(1)}", 1)
+    log = log.replace(m.group(0), f"## [Unreleased]\n\n## [{new}] - {today}\n\n{m.group(1)}", 1)
     base = "https://github.com/umararshad4/honey-stack"
     log = re.sub(r"^\[Unreleased\]: .*$", f"[Unreleased]: {base}/compare/v{new}...HEAD\n[{new}]: {base}/compare/v{cur}...v{new}", log, count=1, flags=re.M)
     write("CHANGELOG.md", log)

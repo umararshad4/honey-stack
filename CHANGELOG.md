@@ -10,6 +10,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-17
+
 ### Added
 - `honey --version`.
 - Release tooling: `scripts/release.py` (bumps every version field, rolls the changelog, tests, tags), CI on macOS and Linux with Python 3.9 and 3.12, and GitHub releases published automatically from tags.
@@ -34,5 +36,6 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/umararshad4/honey-stack/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/umararshad4/honey-stack/releases/tag/v0.1.0

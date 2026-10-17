@@ -1,8 +1,10 @@
 {
   "name": "honey",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "honey-stack: one always-on layer — smallest complete change, proof before done, decisions over questions — plus RSI, which learns from every session.",
-  "author": {"name": "King Umar"},
+  "author": {
+    "name": "King Umar"
+  },
   "license": "MIT",
   "skills": "./skills/",
   "hooks": "./hooks/codex-hooks.json",
@@ -11,6 +13,9 @@
     "shortDescription": "Always-on toolkit that learns from your sessions",
     "developerName": "King Umar",
     "category": "Productivity",
-    "capabilities": ["Instructions", "Lifecycle hooks"]
+    "capabilities": [
+      "Instructions",
+      "Lifecycle hooks"
+    ]
   }
 }
