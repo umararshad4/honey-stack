@@ -10,6 +10,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-10-18
+
 ### Added
 - `unslop` skill (`/honey:unslop` in Claude, `$unslop` in Codex), adapted from pstack. It removes AI tells and filler from any text you pass it: messages, posts, prompts or docs. The `docs` skill now uses it as the single source of its writing rules.
 
@@ -53,7 +55,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.3.1...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/umararshad4/honey-stack/compare/v0.3.1...v0.4.0
 [0.3.1]: https://github.com/umararshad4/honey-stack/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/umararshad4/honey-stack/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/umararshad4/honey-stack/compare/v0.1.0...v0.2.0
