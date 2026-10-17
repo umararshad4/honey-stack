@@ -47,6 +47,7 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Drive the real app to find bugs before users do | `qa` |
 | Auth, sessions, secrets, payments, user data, webhooks | `security` |
 | Behavior, setup, commands, or APIs changed; docs drift | `docs` |
+| Text reads like AI wrote it; tighten a message, post, prompt or doc | `unslop` |
 | Thread is long or branching; carry state to a fresh session | `handoff` |
 | Codebase hard to change or test; deepen modules, find seams | `architecture` |
 | Name the domain terms, keep `CONTEXT.md` and ADRs | `domain` |

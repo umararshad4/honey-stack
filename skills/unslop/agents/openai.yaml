@@ -1,0 +1,5 @@
+interface:
+  display_name: "unslop"
+  short_description: "Cut AI tells and filler from any text"
+policy:
+  allow_implicit_invocation: false
