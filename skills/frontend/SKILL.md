@@ -4,7 +4,7 @@ description: "Use for UI, styling, layout, components, responsive or interaction
 license: MIT
 metadata:
   reviewed: "2026-10-18"
-  sources: "MCT (local) ~/.claude/skills/frontend-ui-ux-harness, ~/.claude/skills/ui-system, ~/.claude/skills/design-consistency, ~/.claude/skills/frontend-architecture, ~/.claude/skills/react-quality, ~/.claude/skills/nextjs-app-router, ~/.claude/skills/performance-audit, ~/.claude/skills/react-doctor"
+  sources: "MCT (local) ~/.claude/skills/frontend-ui-ux-harness, ~/.claude/skills/ui-system, ~/.claude/skills/design-consistency, ~/.claude/skills/frontend-architecture, ~/.claude/skills/react-quality, ~/.claude/skills/nextjs-app-router, ~/.claude/skills/performance-audit, ~/.claude/skills/react-doctor; emilkowalski/skills (MIT) emil-design-eng/SKILL.md + performance-cheatsheet.md (references/animation.md)"
 ---
 
 # Frontend
@@ -30,7 +30,7 @@ Done when: you can name the components, tokens and icon set the change will reus
 - Operational screens (dashboards, settings, tables) stay dense and plain. Hero sections, big gradients and decorative motion belong on marketing pages.
 - Use the project's icon set (lucide when it's already installed).
 - Text fits its container at mobile and desktop widths, including long names, empty values and translated strings.
-- Motion serves a state change (enter, exit, feedback), stays subtle on product screens and respects `prefers-reduced-motion`. Drop effects that cost readability or frame rate.
+- Motion serves a state change (enter, exit, feedback), stays subtle on product screens and respects `prefers-reduced-motion`. Drop effects that cost readability or frame rate. Default to `ease-out` and never `ease-in` for UI, keep it under 300ms, and animate only `transform`/`opacity`. For anything beyond a simple transition — easing by action frequency, durations, springs, entry/popover/stagger patterns, the review checklist — read `references/animation.md`.
 
 Done when: every visual value in the diff traces to an existing token, component or variant, or carries its one-line reason.
 

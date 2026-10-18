@@ -4,7 +4,7 @@ description: "Use to check a change in a real browser, QA a page or user flow, o
 license: MIT
 metadata:
   reviewed: "2026-10-18"
-  sources: "garrytan/gstack 1.60.1.0 qa/SKILL.md.tmpl (test, fix, re-verify loop; regression test per fix; self-regulation), qa/SKILL.md (Modes: diff-aware; Workflow phases 2-5; Framework-Specific Guidance; Important Rules), qa/references/issue-taxonomy.md, qa/templates/qa-report-template.md; MCT (local) ~/.claude/MCT.md (Post-Task Verification, Strict Proof And Audit), ~/.claude/policies/automation-policy.json (postTaskVerification)"
+  sources: "garrytan/gstack 1.60.1.0 qa/SKILL.md.tmpl (test, fix, re-verify loop; regression test per fix; self-regulation), qa/SKILL.md (Modes: diff-aware; Workflow phases 2-5; Framework-Specific Guidance; Important Rules), qa/references/issue-taxonomy.md, qa/templates/qa-report-template.md; MCT (local) ~/.claude/MCT.md (Post-Task Verification, Strict Proof And Audit), ~/.claude/policies/automation-policy.json (postTaskVerification); tester.army/e2e docs (deterministic vs agentic steps, selector strategy, verified-step caching, explore→regression; references/e2e.md)"
 ---
 
 # QA
@@ -62,7 +62,7 @@ When fixing, work through issues in severity order:
 
 1. **Locate.** Grep for the error text, component name or route. A cause that isn't obvious goes through the `debug` skill.
 2. **Fix minimally.** Touch only files tied to this issue.
-3. **Add a regression test** at the closest seam, matching the repo's existing test style. Logic or console errors get a unit or integration test. Broken forms and API flows get an integration test on the request and response. Interactive component bugs get a component or end-to-end test. Pure CSS fixes rely on the browser re-run. Where the seam allows, watch the test fail before the fix and pass after.
+3. **Add a regression test** at the closest seam, matching the repo's existing test style. Logic or console errors get a unit or integration test. Broken forms and API flows get an integration test on the request and response. Interactive component bugs get a component or end-to-end test. Pure CSS fixes rely on the browser re-run. Where the seam allows, watch the test fail before the fix and pass after. When the fix needs an end-to-end test — selector strategy (role/name/test id), what to keep deterministic vs agent-driven, flaky-test and secret handling — read `references/e2e.md`.
 4. **Re-run in the browser.** Same flow, both viewports, console clean.
 5. **Classify** the fix as verified, best-effort (state what couldn't be checked) or reverted (it made things worse: undo it and defer the issue).
 

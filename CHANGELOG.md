@@ -10,6 +10,10 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- **Animation guidance** in the `frontend` skill (`references/animation.md`, distilled from Emil Kowalski's design-engineering skills, MIT): animate by action frequency, `ease-out`/never `ease-in` for UI, sub-300ms durations, `transform`/`opacity`-only performance rules, entry/popover/stagger/spring patterns, and a review checklist. The inline motion rule now carries the headline law.
+- **End-to-end test guidance** in the `qa` skill (`references/e2e.md`, distilled from the e2e framework docs): split steps into deterministic (`expect`) vs agent-driven, select by role→name→test id, verify locators before asserting, cache only verified steps, explore→pin as regression tests with a repro per finding, and secret/flaky/CI handling.
+
 ## [0.8.0] - 2026-10-18
 
 ### Added
