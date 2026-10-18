@@ -10,6 +10,9 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Changed
+- The `qa` skill now routes to `references/e2e.md` from its exploration phase, not only the fix loop: reach controls by role→name→test id and confirm a locator is unique while exploring, and treat explore-then-pin-with-a-repro as the heart of e2e. e2e discipline now guides how `qa` drives the app, not just how it writes a regression test afterward.
+
 ## [0.9.0] - 2026-10-18
 
 ### Added

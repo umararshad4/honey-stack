@@ -43,7 +43,7 @@ Done when: you have a list of URLs and flows, each tied to a changed file or to 
 Run every flow at **1440x900** and **390x844**. On each page:
 
 1. Load it, take a snapshot or screenshot, and read the console and failed network requests.
-2. Use every control in the changed area. Each one does what its label says.
+2. Use every control in the changed area. Each one does what its label says. Reach controls by role, then accessible name, then test id — the order in `references/e2e.md` — and confirm a locator resolves to exactly one element before you act on it. A control you can't reach by an accessible handle is itself an accessibility finding.
 3. Submit forms empty, invalid, with long text and unicode, and twice quickly.
 4. Navigate in and out: click links (client-side navigation), back and forward, deep link, reload. State that should persist survives a reload.
 5. Reach the loading, empty, error and overflow states.
@@ -52,7 +52,7 @@ Run every flow at **1440x900** and **390x844**. On each page:
 
 **Console errors count as failures,** even when the page looks right: uncaught exceptions, unintended 4xx or 5xx responses, hydration warnings, CORS and CSP violations.
 
-Retry each bug once to confirm it reproduces. Spend depth on core flows (sign-up, checkout, the main dashboard, search) over secondary pages. For severity levels, issue categories and framework-specific checks, read `references/checklist.md`.
+Retry each bug once to confirm it reproduces. Spend depth on core flows (sign-up, checkout, the main dashboard, search) over secondary pages. For severity levels, issue categories and framework-specific checks, read `references/checklist.md`. This explore-then-pin loop is the heart of e2e: a flow worth checking twice is worth a regression test, and a finding isn't confirmed until a repro reproduces it — `references/e2e.md` has the discipline.
 
 Done when: every flow on the list ran at both viewports and each finding has repro steps plus a screenshot or snapshot.
 
