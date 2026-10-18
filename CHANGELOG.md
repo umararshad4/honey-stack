@@ -10,6 +10,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-18
+
 ### Added
 - **Animation guidance** in the `frontend` skill (`references/animation.md`, distilled from Emil Kowalski's design-engineering skills, MIT): animate by action frequency, `ease-out`/never `ease-in` for UI, sub-300ms durations, `transform`/`opacity`-only performance rules, entry/popover/stagger/spring patterns, and a review checklist. The inline motion rule now carries the headline law.
 - **End-to-end test guidance** in the `qa` skill (`references/e2e.md`, distilled from the e2e framework docs): split steps into deterministic (`expect`) vs agent-driven, select by role→name→test id, verify locators before asserting, cache only verified steps, explore→pin as regression tests with a repro per finding, and secret/flaky/CI handling.
@@ -99,7 +101,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/umararshad4/honey-stack/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/umararshad4/honey-stack/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/umararshad4/honey-stack/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/umararshad4/honey-stack/compare/v0.5.0...v0.6.0
