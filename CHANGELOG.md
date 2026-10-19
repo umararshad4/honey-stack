@@ -10,6 +10,9 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- Auto-update: each new session starts a throttled background job (`honey autoupdate`) that moves a git checkout to the newest `vX.Y.Z` release tag, or refreshes plugin-only installs through the agents' plugin CLIs. Dirty or diverged checkouts are skipped, the next session shows a one-line notice, and `{"autoupdate": false}` in `~/.honey/config.json` turns it off.
+
 ## [0.10.0] - 2026-10-19
 
 ### Added

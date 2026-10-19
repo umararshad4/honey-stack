@@ -118,8 +118,10 @@ Instruction edits have conflict-checked `honey rsi revert <id>` snapshots; toolk
 
 ## Update · Uninstall
 
+honey updates itself. At each new session start a background job (checked at most once an hour) moves to the newest `vX.Y.Z` release; the session after the update opens with a one-line notice. It follows release tags only, never raw `main`, and leaves a checkout untouched if it has local edits, its own commits, or sits on a branch other than `main`. Turn it off with `{"autoupdate": false}` in `~/.honey/config.json`. A major release can change hook commands, so Codex may ask you to re-trust them (`/hooks`).
+
 ```bash
-honey update                                   # then /reload-plugins in Claude
+honey update                                   # update now; then /reload-plugins in Claude
 honey uninstall --dry-run && honey uninstall   # keeps ~/.honey; add --purge to delete it
 ```
 

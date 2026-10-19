@@ -11,7 +11,7 @@ import re
 import time
 import traceback
 
-from honey import hookio, modes, paths, receipt
+from honey import autoupdate, hookio, modes, paths, receipt
 from honey.rsi import curate, observe, review, signals, store, text
 
 EDIT_TOOLS = {"Write", "Edit", "MultiEdit", "NotebookEdit", "apply_patch", "ApplyPatch"}
@@ -62,8 +62,16 @@ def session_start(ctx) -> dict:
     notice = review.notice()
     if notice:
         parts.append(notice)
+    updated = autoupdate.notice()
+    if updated:
+        parts.append(updated)
     out = "\n\n".join(parts)
     observe.record(ctx, "inject", by="honey", hook="SessionStart", chars=len(out))
+    if src == "startup" and autoupdate.due():
+        try:
+            observe.spawn(["autoupdate"])  # detached; takes effect next session
+        except Exception:
+            pass  # an update job must never cost the user their SessionStart context
     if src == "startup" and not ctx.state.get("rsi_off"):
         _prune_states()
         if os.path.exists(paths.path("events")):
