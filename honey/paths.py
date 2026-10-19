@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import subprocess
@@ -15,6 +16,42 @@ def home() -> str:
 
 def path(*parts: str) -> str:
     return os.path.join(home(), *parts)
+
+
+def source_repo() -> str:
+    """Resolve the editable checkout even when this runtime is an installed cache."""
+    def checkout(candidate, own=False):
+        if not isinstance(candidate, str) or not os.path.isabs(candidate):
+            return None
+        root = os.path.realpath(candidate)
+        parts = root.split(os.sep)
+        if any(parts[i:i + 2] == ["plugins", "cache"] for i in range(len(parts) - 1)):
+            return None  # plugin caches can include .git; they are never editable source
+        if not os.path.exists(os.path.join(root, ".git")):
+            return None
+        if not own:
+            try:
+                with open(os.path.join(root, ".codex-plugin", "plugin.json"), encoding="utf-8") as f:
+                    marker = json.load(f)
+                if marker.get("name") != "honey" or not os.path.isfile(os.path.join(root, "honey", "__init__.py")):
+                    return None
+            except (OSError, ValueError, AttributeError):
+                return None
+        result = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, text=True, timeout=5)
+        return root if result.returncode == 0 and os.path.realpath(result.stdout.strip()) == root else None
+
+    own = checkout(REPO, own=True)
+    if own:
+        return own
+    try:
+        with open(path("synced.json"), encoding="utf-8") as f:
+            metadata = json.load(f)
+        source = checkout(metadata.get("source_repo"))
+    except (OSError, ValueError, AttributeError):
+        source = None
+    if not source:
+        raise RuntimeError("Honey source checkout is unavailable; run honey sync from the source checkout first")
+    return source
 
 
 def safe_id(raw: str) -> str:

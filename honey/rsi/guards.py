@@ -1,4 +1,4 @@
-"""Tier 3: a learned rule that keeps being violated becomes an enforced PreToolUse guard (after /rsi review).
+"""Tier 3: a learned rule that keeps being violated becomes an enforced PreToolUse guard (after replay validation).
 
 Text rules are followed ~55% of the time; hook checks far more. A guard is only proposed if it fires on a replay of the
 commands from the violating sessions and on ≤1% of 200 recent commands from other sessions.
@@ -110,3 +110,29 @@ def set_status(gid: str, status: str) -> None:
         if g["id"] == gid:
             g["status"] = status
     save(gs)
+
+
+def activate(gid: str) -> str:
+    """Activate only a guard with valid syntax and stored replay evidence."""
+    gs = load()
+    matches = [g for g in gs if g.get("id") == gid]
+    if len(matches) != 1:
+        raise ValueError(f"guard {gid} was not found uniquely")
+    g = matches[0]
+    if g.get("action") not in ("warn", "block") or not isinstance(g.get("message"), str) or not g["message"].strip():
+        raise ValueError("guard must have an action and message")
+    for field in ("regex", "unless_prompt"):
+        value = g.get(field, "")
+        if not isinstance(value, str) or (field == "regex" and not value):
+            raise ValueError(f"invalid guard {field}")
+        try:
+            re.compile(value)
+        except re.error as exc:
+            raise ValueError(f"invalid guard {field}: {exc}") from exc
+    v = g.get("verify") or {}
+    hits, fp, n = v.get("replay_hits"), v.get("fp"), v.get("fp_n")
+    if (any(type(x) is not int for x in (hits, fp, n)) or hits <= 0 or n <= 0 or fp < 0 or fp > n or fp / n > FP_MAX):
+        raise ValueError("guard lacks passing replay and false-positive evidence")
+    g.update(status="active", activated=text.now())
+    save(gs)
+    return f"activated guard {gid}"

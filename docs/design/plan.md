@@ -18,7 +18,7 @@ Today a Claude session injects roughly 25 KB of competing "YOU MUST / ACTIVE EVE
 ### Decisions (made by user)
 - **One layer, absorb all.** honey-stack replaces the always-on hooks of MCT, Superpowers and Ponytail. They are disabled at install with a backup, and uninstall is reversible. The other toolkits' ideas are distilled into curated, attributed skills.
 - **Always on once installed.** `honey off` pauses for the current session.
-- **RSI autonomy.** Learnings auto-promote when they have ≥2 sessions of evidence; they are budgeted, git-versioned and decay over time. Edits to skills, CLAUDE.md, AGENTS.md or hooks go through `/rsi review` with a diff, the evidence and an eval result, and the user approves.
+- **RSI autonomy.** Learnings auto-promote when they have ≥2 sessions of evidence; they are budgeted, git-versioned and decay over time. Review mode sends instruction edits, skill patches, toolkit repairs and guards through `/rsi review`. Opt-in `rsi.autonomous=true` applies supported proposals automatically after their existing validation gates; see [the autonomous RSI plan](../plans/2026-10-18-autonomous-rsi.md).
 - **Targets: Claude Code + Codex CLI from v1.** One agent-neutral data dir, so learnings carry across both agents.
 
 ### Machine facts that shape the design (verified)
@@ -51,7 +51,7 @@ Codex CLI ───┘  --agent X      └─ rsi.observe (events, signals, note
                                         │
             ~/.honey/  ledger · brief · scorecards · proposals · guards · profile  (local git)
                                         │
-           /rsi review (Tier1-3, user approves) · /rsi coach · weekly: patches+evals, radar
+           /rsi review or autonomous validated application (Tier1-3) · /rsi coach · weekly: patches+evals, radar
 ```
 
 ## Repo layout
@@ -340,11 +340,11 @@ Snippets are ≤300 chars and taken only around signals. An injection scan runs 
 
 ### Gates
 - **Tier 0 (auto):** the ledger, brief, keyword reminders and skill notes.
-- **Tier 1, `/rsi review`.**
+- **Tier 1, review or autonomous application.**
   - Decisions are Apply / Edit / Skip / Never. On Claude they are asked in AskUserQuestion batches of 4; on Codex as numbered replies.
   - Edits go only inside a managed `<!-- honey:rsi:begin/end -->` block of `~/.claude/CLAUDE.md` or `~/.codex/AGENTS.md`.
   - It favours **pruning** lines that active bullets contradict. Bootstrap items and toolkit-misfire fixes also land here.
-  - `/rsi revert <id>` undoes a decision.
+  - `/rsi revert <id>` restores a verifiable snapshot only while the instruction file remains unchanged. Legacy random hashes require manual recovery.
 - **Tier 2, skill patches** (weekly, ≤2 per week).
   - Per-skill thresholds over 30 days:
     - patch-candidate: ≥4 invocations, neg rate ≥0.4, neg ≥2
@@ -355,7 +355,7 @@ Snippets are ≤300 chars and taken only around signals. An injection scan runs 
   - The patch goes onto an `rsi/<skill>-<date>` **worktree branch of the honey-stack repo**, never the plugin cache.
   - `honey validate` runs, then `claude plugin eval` old vs new with `--max-cost-usd 0.50`.
   - Accept only if new ≥ old on every case **and** new passes a regression case that old fails.
-  - Then the user approves, the branch is fast-forward merged, and `honey sync` updates both agents.
+  - After manual approval or under configured autonomous policy, the branch is fast-forward merged and `honey sync` updates Codex. Failed sync remains retryable; Claude reloads next session.
 - **Tier 3, enforcement.** An active bullet violated ≥2 times in distinct sessions is fixed at the highest level that works. Order, from pstack `correct`: remove the cause in the toolkit > a PreToolUse rule in `guards.json` > a Stop check > text. A guard must fire on a replay of the stored violation, with ≤1% false positives over the last 200 same-tool events. It is disabled if the user overrides it ≥2 times.
 
 ### Coach (`/rsi coach`): evidence only, no flattery

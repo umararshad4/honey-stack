@@ -1,12 +1,14 @@
-"""Tier 1: proposals that edit ~/.claude/CLAUDE.md or ~/.codex/AGENTS.md. Applied only after /rsi review approval.
+"""Tier 1: proposals that edit ~/.claude/CLAUDE.md or ~/.codex/AGENTS.md. Applied after evidence validation under the configured review policy.
 
 Additions go inside a managed block; removals of the user's own lines must match the line exactly. Every apply stores the
 file's previous text in the proposal so `honey rsi revert <id>` restores it.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
+import re
 
 from honey import paths
 from honey.rsi import curate, review, store, text
@@ -17,6 +19,8 @@ GRADUATE_DAYS, GRADUATE_HELPFUL = 30, 3
 
 
 def target(which: str) -> str:
+    if which not in ("claude", "codex"):
+        raise ValueError("instruction target must be claude or codex")
     return os.path.join(paths.codex_dir(), "AGENTS.md") if which == "codex" else os.path.join(paths.claude_dir(), "CLAUDE.md")
 
 
@@ -37,7 +41,7 @@ def add_to_block(doc: str, line: str) -> str:
             lines.append(line)
         return head + BEGIN + "\n" + "\n".join(lines) + "\n" + END + tail
     sep = "" if doc.endswith("\n") or not doc else "\n"
-    return doc + sep + f"\n## Learned by honey RSI (approved in /rsi review)\n{BEGIN}\n{line}\n{END}\n"
+    return doc + sep + f"\n## Learned by honey RSI\n{BEGIN}\n{line}\n{END}\n"
 
 
 def graduate() -> list:
@@ -80,6 +84,9 @@ def llm_audit() -> list:
     store.append_jsonl(paths.path("costs.jsonl"), {"ts": text.now(), "job": "audit", "engine": eng, "usd": usd, "ok": True})
     out = []
     for it in (result or {}).get("items", []):
+        bullet_ids = it.get("bullet_ids") or []
+        if not bullet_ids or any(ident not in {b["id"] for b in active} for ident in bullet_ids):
+            continue
         line = it.get("line", "").rstrip("\n")
         doc = docs.get(it.get("file"), "")
         if not line or doc.count(line) != 1 or text.injection_hit(it.get("replacement", "")):
@@ -89,26 +96,47 @@ def llm_audit() -> list:
                        [{"q": f"contradicted by {', '.join(it.get('bullet_ids', []))}"}], f"audit:{it['file']}:{line}")
         if "edit" not in p:
             p["edit"] = {"file": it["file"], "action": it["action"], "line": line, "replacement": it.get("replacement", "")}
+        if p.get("status") == "pending" and (p.get("edit") or {}).get("action") == it["action"]:
+            p["bullet_ids"] = bullet_ids
             store.write_json(paths.path("proposals", p["id"] + ".json"), p)
         out.append(p)
     return out
 
 
 def apply(p: dict) -> str:
-    e = p.get("edit") or {}
-    fp = target(e.get("file", "claude"))
+    if not isinstance(p, dict) or not isinstance(p.get("id"), str) or not re.fullmatch(r"[A-Za-z0-9_-]+", p["id"]):
+        raise ValueError("instruction proposal has no valid id")
+    e = p.get("edit")
+    if not isinstance(e, dict) or e.get("action") not in ("add", "edit", "remove"):
+        raise ValueError("proposal has no supported instruction edit")
+    fp = target(e.get("file"))
+    line = e.get("line")
+    if not isinstance(line, str) or not line.strip() or "\n" in line or "\r" in line or line in (BEGIN, END):
+        raise ValueError("instruction must quote a nonempty single line")
+    replacement = e.get("replacement")
+    if e["action"] == "edit" and (not isinstance(replacement, str) or not replacement.strip()
+                                  or "\n" in replacement or "\r" in replacement):
+        raise ValueError("instruction replacement must be a nonempty single line")
+    if text.injection_hit(line if e["action"] == "add" else replacement or ""):
+        raise ValueError("instruction rejected by injection scan")
     doc = _read(fp)
-    if e.get("action") == "add":
-        new = add_to_block(doc, "- " + e["line"].lstrip("- "))
-    elif e.get("action") in ("remove", "edit"):
-        if doc.count(e["line"]) != 1:
-            raise SystemExit(f"the line no longer appears exactly once in {fp}; skipping")
-        new = doc.replace(e["line"] + "\n", (e.get("replacement", "") + "\n") if e["action"] == "edit" and e.get("replacement") else "", 1) \
-            if e["line"] + "\n" in doc else doc.replace(e["line"], e.get("replacement", "") if e["action"] == "edit" else "", 1)
+    if e["action"] == "add":
+        if not line.lstrip("- ").strip():
+            raise ValueError("instruction bullet must have text")
+        if doc.count(BEGIN) != doc.count(END) or doc.count(BEGIN) > 1 or (BEGIN in doc and doc.index(END) < doc.index(BEGIN)):
+            raise ValueError("instruction managed block is malformed")
+        new = add_to_block(doc, "- " + line.lstrip("- "))
     else:
-        raise SystemExit("proposal has no edit")
+        lines = doc.splitlines(keepends=True)
+        matches = [i for i, existing in enumerate(lines) if existing.rstrip("\r\n") == line]
+        if len(matches) != 1:
+            raise ValueError(f"the line no longer appears exactly once in {fp}; skipping")
+        i = matches[0]
+        ending = lines[i][len(line):]
+        lines[i] = replacement + ending if e["action"] == "edit" else ""
+        new = "".join(lines)
     p["before"] = doc
-    p["after_sha"] = text.short_id("x", new)
+    p["after_sha"] = hashlib.sha256(new.encode("utf-8")).hexdigest()
     store.write_text(fp, new)
     store.write_json(paths.path("proposals", p["id"] + ".json"), p)
     if e.get("bullet"):
@@ -125,7 +153,11 @@ def revert(pid: str) -> str:
     p = store.read_json(fp_p)
     if not p or "before" not in p:
         raise SystemExit(f"{pid} has nothing to revert")
-    fp = target((p.get("edit") or {}).get("file", "claude"))
+    fp = target((p.get("edit") or {}).get("file"))
+    if not p.get("after_sha") or hashlib.sha256(_read(fp).encode("utf-8")).hexdigest() != p["after_sha"]:
+        p["revert_conflict"] = {"ts": text.now(), "reason": "instruction file changed after application"}
+        store.write_json(fp_p, p)
+        raise ValueError(f"{fp} changed after {pid}; refusing to overwrite later edits")
     store.write_text(fp, p["before"])
     p.update(status="reverted", decided=text.now())
     store.write_json(fp_p, p)

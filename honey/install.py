@@ -450,17 +450,23 @@ def uninstall(env: Env, dry: bool, yes: bool, purge: bool) -> int:
 
 
 def sync(env: Env) -> int:
-    """Re-copy the plugin into Codex's cache after repo changes (Claude loads it in place)."""
+    """Refresh Codex's cache and record the source checkout only after success."""
     exe = _cli("codex")
     if not exe:
         print("codex CLI not found")
         return 1
+    source = paths.source_repo()
+    head = subprocess.run(["git", "-C", source, "rev-parse", "HEAD"], capture_output=True, text=True, timeout=10)
+    if head.returncode != 0 or not head.stdout.strip():
+        print("cannot resolve Honey source HEAD")
+        return 1
     r = subprocess.run([exe, "plugin", "add", PLUGIN], capture_output=True, text=True, timeout=180)
     print((r.stdout or r.stderr).strip())
-    head = subprocess.run(["git", "-C", paths.REPO, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
-    store.write_json(os.path.join(env.honey, "synced.json"), {"ts": env.stamp, "head": head})
+    if r.returncode != 0:
+        return r.returncode
+    store.write_json(os.path.join(env.honey, "synced.json"), {"ts": env.stamp, "head": head.stdout.strip(), "source_repo": source})
     print("Claude picks up changes at the next session or /reload-plugins.")
-    return r.returncode
+    return 0
 
 
 def update(env: Env) -> int:

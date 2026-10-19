@@ -64,7 +64,7 @@ def session_start(ctx) -> dict:
         parts.append(notice)
     out = "\n\n".join(parts)
     observe.record(ctx, "inject", by="honey", hook="SessionStart", chars=len(out))
-    if src == "startup":
+    if src == "startup" and not ctx.state.get("rsi_off"):
         _prune_states()
         if os.path.exists(paths.path("events")):
             jobs = store.read_json(paths.path("state", "jobs.json"), {}) or {}
@@ -215,7 +215,7 @@ def stop(ctx) -> dict:
 def session_end(ctx) -> dict:
     _init_state(ctx)
     observe.record(ctx, "end", reason=ctx.payload.get("reason"))
-    if not ctx.state.get("off"):
+    if not ctx.state.get("off") and not ctx.state.get("rsi_off"):
         observe.spawn(["rsi", "session-end", ctx.key])
     return {}
 

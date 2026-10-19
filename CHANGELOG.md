@@ -10,8 +10,14 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- Opt-in autonomous RSI applies validated instruction edits, known toolkit repairs, evaluated skill patches and replay-verified guards through existing background jobs. `honey rsi autonomy on|off|status` controls the policy; status and review show automatic results and blocked reasons.
+
 ### Changed
 - `reverse` skill renamed to `reverse-engineer` (`/honey:reverse-engineer`). It now vendors REA's complete official workflow and all six target guides verbatim (morluto/rea v6.7.0, skill v42) behind honey's authorization gate, so it routes and recovers exactly like REA's own skill.
+
+### Fixed
+- Proposal application no longer marks unsupported fixes or uncompleted upstream ports as applied. Forgotten learning sources, stale edits, missing evaluations and failed syncs block or defer changes. Instruction revert preserves later edits; queued failures no longer starve other work.
 
 ## [0.9.1] - 2026-10-18
 

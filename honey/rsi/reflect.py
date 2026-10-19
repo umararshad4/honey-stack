@@ -113,6 +113,9 @@ def due_sessions() -> list:
     out = []
     for fp in sorted(glob.glob(paths.path("events", "*", "*.jsonl")), key=os.path.getmtime):
         key = os.path.basename(fp)[:-6]
+        state = store.read_json(paths.path("state", "sessions", key + ".json"), {}) or {}
+        if state.get("off") or state.get("rsi_off"):
+            continue
         if key in [k for k, _ in out]:
             continue
         rows = digest.load_events(key)
@@ -165,5 +168,7 @@ def run_pending() -> None:
             except Exception as e:  # one bad session must not block the rest
                 _mark(key, "error:" + str(e)[:60].replace("\t", " "), 0)
         curate.maintain()
+        from honey.rsi import autonomy
+        autonomy.run()
         curate.write_brief_md()
         store.git_commit("rsi: reflect + curate")

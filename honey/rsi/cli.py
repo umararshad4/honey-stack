@@ -14,6 +14,7 @@ def _print(obj, as_json):
 
 
 def status(as_json=False):
+    from honey.rsi import autonomy
     rows = curate.load()
     by = {}
     for b in rows:
@@ -24,13 +25,20 @@ def status(as_json=False):
     ev_dir = paths.path("events")
     n_sessions = sum(len(fs) for _, _, fs in os.walk(ev_dir)) if os.path.isdir(ev_dir) else 0
     out = {"home": paths.home(), "bullets": by, "pending_review": len(review.pending()), "brief_chars": len(txt),
-           "brief_ids": ids, "sessions_observed": n_sessions, "usd_this_month": round(month, 4)}
+           "brief_ids": ids, "sessions_observed": n_sessions, "usd_this_month": round(month, 4),
+           "autonomous": autonomy.enabled(),
+           "recent_autonomy": store.read_json(paths.path("state", "autonomy-last.json"), {}) or {}}
     if as_json:
         return _print(out, True)
     print(f"honey RSI · {out['home']}")
+    print("  autonomy: " + ("enabled" if out["autonomous"] else "disabled (manual review)"))
     print(f"  learnings: {by or 'none yet'}")
-    print(f"  pending review: {out['pending_review']}   brief: {out['brief_chars']} chars ({len(ids)} lines)")
+    print(f"  pending items: {out['pending_review']}   brief: {out['brief_chars']} chars ({len(ids)} lines)")
     print(f"  sessions observed: {n_sessions}   spend this month: ${out['usd_this_month']}")
+    recent = out["recent_autonomy"]
+    if recent:
+        print(f"  last automatic pass: {len(recent.get('applied', []))} applied, "
+              f"{len(recent.get('blocked', []))} blocked, {len(recent.get('deferred', []))} deferred")
 
 
 def why(bid, as_json=False):
@@ -49,15 +57,24 @@ def why(bid, as_json=False):
 
 
 def list_review(as_json=False):
+    from honey.rsi import autonomy
     review.audit()
     items = review.pending()
     proposed = [b for b in curate.load() if b.get("status") == "proposed"]
     if as_json:
-        return _print({"proposals": items, "proposed_learnings": proposed}, True)
+        return _print({"proposals": items, "proposed_learnings": proposed, "autonomous": autonomy.enabled(),
+                       "recent_autonomy": store.read_json(paths.path("state", "autonomy-last.json"), {}) or {},
+                       "recent_changes": sorted((p for p in review.all_proposals() if p.get("decision_source") == "automatic"),
+                                                key=lambda p: p.get("decided", ""), reverse=True)[:10]}, True)
+    if autonomy.enabled():
+        print("Autonomy enabled; pending items are retried automatically when eligible.")
     if not items and not proposed:
         print("Nothing to review.")
     for p in items:
-        print(f"[{p['id']}] tier {p['tier']} {p['type']}: {p['title']}\n    why: {p['rationale']}\n    fix: {p['fix']}")
+        print(f"[{p['id']}] tier {p.get('tier', '?')} {p.get('type', 'invalid')}: {p.get('title', '')}\n"
+              f"    why: {p.get('rationale', '')}\n    fix: {p.get('fix', '')}")
+        if p.get("last_error"):
+            print(f"    {p.get('attempt_state', 'blocked')}: {p['last_error']}")
     for b in proposed:
         print(f"[{b['id']}] learning: {curate.line(b)[2:]}  (sessions={len(b.get('sessions', []))})")
 
@@ -89,29 +106,27 @@ def decide(item_id, action, note=""):
         print(f"{item_id} → {b['status']}")
         store.git_commit(f"rsi: {action} {item_id}")
         return
-    p = store.read_json(paths.path("proposals", item_id + ".json"))
+    with store.lock():
+        return _decide_proposal(item_id, action, note)
+
+
+def _decide_proposal(item_id, action, note):
+    p = store.read_json(paths.path("proposals", paths.safe_id(item_id) + ".json"))
     if not p:
         raise SystemExit(f"no proposal {item_id}")
     kind, msg = p.get("type", ""), ""
     if action in ("apply", "edit"):
-        if kind.startswith("instr_"):
-            from honey.rsi import instructions
-            if action == "edit" and note and p.get("edit"):
-                p["edit"]["line" if p["edit"]["action"] == "add" else "replacement"] = text.redact(note, 400)
-            msg = instructions.apply(p)
-        elif kind == "skill_patch":
-            from honey.rsi import patch
-            msg = patch.accept(p)
-        elif kind == "guard":
-            from honey.rsi import guards
-            guards.set_status(p["guard"], "active")
-            msg = f"guard {p['guard']} active"
-        elif kind == "upstream_port":
-            from honey.rsi import patch
-            res = patch.propose(p["skill"], "upstream", p.get("upstream", ""))
-            msg = f"drafted eval-gated patch: {res}"
-        else:
-            msg = f"To apply: {p['fix']}"
+        from honey.rsi import autonomy
+        if p.get("status") == "applied":
+            print(f"{item_id} already applied")
+            return
+        if kind.startswith("instr_") and action == "edit" and note and p.get("edit"):
+            p["edit"]["line" if p["edit"]["action"] == "add" else "replacement"] = text.redact(note, 400)
+        try:
+            msg = autonomy.apply(p)
+        except autonomy.Deferred as exc:
+            print(f"{item_id} pending: {exc}")
+            return
     elif kind == "skill_patch":
         from honey.rsi import patch
         patch.discard(p)
@@ -126,6 +141,9 @@ def decide(item_id, action, note=""):
 def session_end(key):
     """Detached after SessionEnd. Phase 1: refresh brief.md and commit; Phase 2 adds reflection."""
     from honey.rsi import reflect
+    state = store.read_json(paths.path("state", "sessions", paths.safe_id(key) + ".json"), {}) or {}
+    if state.get("off") or state.get("rsi_off"):
+        return
     reflect.run_pending()
 
 
@@ -133,6 +151,8 @@ def main(args) -> int:
     import argparse
     ap = argparse.ArgumentParser(prog="honey rsi")
     sub = ap.add_subparsers(dest="cmd")
+    s = sub.add_parser("autonomy")
+    s.add_argument("action", choices=["on", "off", "status"], default="status", nargs="?")
     for name in ("status", "review", "brief", "audit"):
         s = sub.add_parser(name)
         s.add_argument("--json", action="store_true")
@@ -160,7 +180,13 @@ def main(args) -> int:
     s = sub.add_parser("reflect")
     s.add_argument("--session", required=True)
     a = ap.parse_args(args)
-    if a.cmd in (None, "status"):
+    if a.cmd == "autonomy":
+        from honey.rsi import autonomy
+        with store.lock():
+            if a.action != "status":
+                autonomy.configure(a.action == "on")
+            print("honey RSI autonomy " + ("enabled" if autonomy.enabled() else "disabled"))
+    elif a.cmd in (None, "status"):
         status(getattr(a, "json", False))
     elif a.cmd == "review":
         list_review(a.json)
@@ -220,15 +246,17 @@ def main(args) -> int:
         print(golden.run(a.dry_run))
     elif a.cmd == "revert":
         from honey.rsi import instructions
-        print(instructions.revert(a.id))
+        with store.lock():
+            print(instructions.revert(a.id))
     elif a.cmd == "catchup":
         from honey.rsi import reflect
         reflect.run_pending()
     elif a.cmd == "reflect":
-        from honey.rsi import digest, reflect
+        from honey.rsi import autonomy, digest, reflect
         with store.lock():
             print(reflect.reflect_session(a.session, digest.load_events(a.session)))
             curate.maintain()
+            autonomy.run()
             curate.write_brief_md()
             store.git_commit(f"rsi: reflect {a.session}")
     return 0
