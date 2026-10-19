@@ -6,127 +6,96 @@
 [![release](https://img.shields.io/github/v/release/umararshad4/honey-stack)](https://github.com/umararshad4/honey-stack/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-honey-stack distills the best of [Superpowers](https://github.com/obra/superpowers), [Ponytail](https://github.com/DietrichGebert/ponytail), [Matt Pocock's skills](https://github.com/mattpocock/skills), [pstack](https://github.com/cursor/plugins/tree/main/pstack) and [gstack](https://github.com/garrytan/gstack) into **one layer** instead of five competing ones. On top sits **RSI** (recursive self-improvement): it notices where the agent gets corrected, learns your preferences, and proposes fixes to its own skills, which you approve.
+The best of [Superpowers](https://github.com/obra/superpowers), [Ponytail](https://github.com/DietrichGebert/ponytail), [Matt Pocock's skills](https://github.com/mattpocock/skills), [pstack](https://github.com/cursor/plugins/tree/main/pstack) and [gstack](https://github.com/garrytan/gstack) in **one layer**, plus **RSI**: it learns from your corrections and can apply validated improvements autonomously.
 
-- **Small.** About 2 KB of always-on rules instead of ~25 KB of stacked prompts.
-- **Opinionated.** It sizes each task, takes the smallest complete change, proves it before saying done, and decides instead of asking.
-- **Self-improving, with you in charge.** Small learnings apply automatically; anything bigger waits for your yes.
-- **Local and reversible.** Your data stays in `~/.honey/`, and `honey uninstall` restores everything.
-
----
+- **Small:** ~2 KB of always-on rules, not ~25 KB of stacked prompts.
+- **Opinionated:** sizes each task, makes the smallest complete change, proves it before "done".
+- **You choose:** learned rules apply on their own; enable autonomous RSI to apply validated improvements across all tiers.
+- **Local and reversible:** data lives in `~/.honey/`; `honey uninstall` restores everything.
 
 ## Install
 
-**Requires:** Claude Code and/or Codex CLI, `python3` (3.9+) and `git`.
-
-### Option A: full install (recommended)
-
-One line (clones + shows a dry run; you approve the apply):
+Needs Claude Code and/or Codex, `python3` 3.9+ and `git`.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/umararshad4/honey-stack/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/umararshad4/honey-stack/main/install.sh | bash   # clones + dry run; then run the install command it prints
+# or by hand:
+git clone https://github.com/umararshad4/honey-stack.git && cd honey-stack
+bin/honey install --dry-run && bin/honey install
 ```
 
-Or by hand:
+Installs into both agents, puts `honey` on PATH, and turns off competing always-on plugins. Every change is reversible.
+
+<details><summary>Plugin only</summary>
 
 ```bash
-git clone https://github.com/umararshad4/honey-stack.git
-cd honey-stack
-bin/honey install --dry-run     # shows every change it would make
-bin/honey install               # applies them (asks first)
+claude plugin marketplace add umararshad4/honey-stack && claude plugin install honey@honey-stack
+codex plugin marketplace add umararshad4/honey-stack && codex plugin add honey@honey-stack   # pin: marketplace add … --ref v0.2.0
 ```
 
-This installs the plugin in both agents, puts `honey` on your PATH, and switches off competing always-on plugins (Superpowers, Ponytail, pstack). Each change is recorded so `honey uninstall` can reverse it.
+`honey` isn't on PATH here: run it as `python3 <plugin dir>/bin/honey doctor` (same for `uninstall`).
+</details>
 
-### Option B: plugin only
+**Then:** Claude → `/reload-plugins`. Codex → `/hooks`, trust the honey entries. Check with `honey doctor`.
+It's on when replies start with **`🍯 HONEY`**.
 
-```bash
-# Claude Code
-claude plugin marketplace add umararshad4/honey-stack
-claude plugin install honey@honey-stack
+## Modes
 
-# Codex
-codex plugin marketplace add umararshad4/honey-stack          # add --ref v0.2.0 to pin a release
-codex plugin add honey@honey-stack
-```
+Send as the **whole message**. Add `default` to save it (`honey ultra strict default`).
 
-### Then, once
+| Mode | Does | Use when |
+|---|---|---|
+| `honey lite` | Builds what you asked, offers a smaller option in one line | The spec is fixed and isn't yours to question |
+| `honey full` *(default)* | Smallest complete change; skips unrequested extras | Everyday features and fixes |
+| `honey ultra` | Pushes back on anything the need doesn't justify; prefers deleting | Vague asks, cleanup, or you suspect overbuilding |
+| `honey light` *(default)* | Test-first where it's easy; one runnable check per non-trivial change | Normal work |
+| `honey strict` | Failing test first, plan before multi-file work, reviewer before done | Payments, auth, migrations, anything costly to break |
+| `honey terse` *(default)* | No preamble, no recap, short sentences | You know the domain |
+| `honey normal` | Claude's usual voice | Learning, or you want the reasoning |
+| `honey off` · `honey on` | Pause or resume for this session (safety guard stays on) | A task where honey's rules get in the way |
 
-| Agent | Do this |
-|---|---|
-| Claude Code | Start a new session, or run `/reload-plugins`. |
-| Codex | Run `codex`, then `/hooks`, and **trust the honey entries** (Codex asks once per hook). |
-| Both | `honey doctor` checks that everything is wired. After Option B, run it as `python3 <plugin dir>/bin/honey doctor`. |
+Also: `remember: when X, Y` teaches a rule now. Scopes: `(project)` `(claude)` `(codex)` `(skill:<name>)`, e.g. `remember (project): …`. `rsi off` · `rsi on` pauses learning for this session.
 
-You'll know it's active when every reply starts with **`🍯 HONEY`** (plus any non-default mode, e.g. `🍯 HONEY · ultra · strict`). Claude's statusline also shows `[HONEY]`.
+## Skills
 
----
+The agent picks these itself:
+`grill` · `plan` · `execute` · `debug` · `tdd` · `verify` · `review` · `ship` · `deploy` · `test-design` · `tooling` · `database` · `perf` · `observability` · `api-design` · `upgrade` · `incident` · `frontend` · `qa` · `security` · `docs`
 
-## Use it
+You call these: `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc`
 
-Type these **as the whole message**. Hooks catch them before the model runs.
+Flow: **grill → plan → execute → verify → review → ship**. Bugs start at **debug**.
+Claude: `/honey:<skill>`. Codex: `$<skill>`.
 
-| Type | Effect |
-|---|---|
-| `honey ultra` · `honey lite` · `honey full` | Scope: push back on extras · build what's asked · smallest complete change (default) |
-| `honey strict` · `honey light` | Process: test first, plan before multi-file work, reviewer before done · lighter |
-| `honey terse` · `honey normal` | Voice |
-| `honey default ultra strict` | Save as your default |
-| `honey off` · `honey on` | Pause or resume for this session (the safety guard stays on) |
-| `remember: when X, Y` | Teach a rule now. Scopes: `remember (project): …`, `(claude)`, `(codex)`, `(skill:debug)` |
-| `rsi off` · `rsi on` | Pause or resume learning for this session |
+## RSI: how it learns
 
-Slash commands: Claude uses `/honey`, `/rsi …`, `/honey:<skill>`. Codex uses `$honey`, `$rsi …`, `$<skill>`.
+1. **Observe:** hooks log corrections, "still broken" and which skills fired. Everything is redacted.
+2. **Reflect:** after a session with signal, a small model (Haiku via Claude, ~$0.002; else Codex) proposes evidence-backed WHEN → THEN rules.
+3. **Curate:** a rule goes live once 2 sessions back it; it goes stale after 30 days and is archived after 90.
+4. **Apply:** review mode queues changes for `/rsi review`. Autonomous mode applies supported changes after validation:
 
----
-
-## How it works
-
-```
- you ──▶ Claude Code / Codex ──hooks──▶ bin/honey (one dispatcher)
-                                          ├─ bootstrap + your learned brief   (session start)
-                                          ├─ mode switches, remember: notes   (each prompt)
-                                          ├─ destructive-command guard        (before shell)
-                                          ├─ secret scan, skill tracking      (after tools)
-                                          └─ receipt gate, session log        (stop / end)
-                                                   │
-                                session end ──▶ RSI reflects (cheap, no tools, budget-capped)
-                                                   │
-                         ~/.honey: learnings · scorecards · proposals · coach reports (local git)
-```
-
-### Skills: one per job
-
-| The agent picks these itself | You invoke these |
-|---|---|
-| `grill` (pin down intent) · `plan` · `execute` (work through a queue) · `debug` · `tdd` · `verify` · `review` · `ship` (commit/PR) · `deploy` (cloud/Docker/K8s/IaC/CI) · `test-design` (edge-case matrix) · `tooling` (monorepo/hooks/lint/CI) · `database` (schema/migrations/queries) · `perf` (profiling/caching/load) · `observability` (logs/metrics/traces/SLOs) · `api-design` (REST/GraphQL/gRPC) · `upgrade` (deps/CVEs/EOL) · `incident` (outage response) · `frontend` · `qa` (real browser) · `security` · `docs` | `honey` (router + modes) · `rsi` · `unslop` (cut AI tells from any text) · `reverse` (study a shipped app via REA) · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` |
-
-Main flow: **grill → plan → execute → verify → review → ship**. Bugs go through **debug** first.
-
-### RSI: how it learns
-
-1. **Observe.** Hooks log corrections ("no, I said…"), "still broken", acceptance, and which skill fired and how it went. Everything is redacted before it's stored.
-2. **Reflect.** After a session with real signal, a small model (Haiku, about $0.002 per session) proposes WHEN → THEN rules. Every rule must cite evidence and pass a "would a future agent get this wrong?" test.
-3. **Curate.** Plain code merges duplicates, promotes a rule once **2 sessions** back it, and retires rules that stop applying (stale after 30 days, archived after 90).
-4. **Gate.** Changes are tiered by how much they can affect:
-
-| Tier | Changes | Decided by |
+| Tier | Changes | Who decides |
 |---|---|---|
 | 0 | Learned rules in each session's brief (≤1.5 KB) | Automatic |
-| 1 | Lines in your `CLAUDE.md` / `AGENTS.md` (managed block, revertible) | You, in `/rsi review` |
-| 2 | Skill files. A patch is kept only if a regression eval built from the real failure fails before and passes after | You |
-| 3 | An enforced guard for a rule that keeps being broken, replay-verified with ≤1% false positives | You |
+| 1 | Instruction edits and known toolkit repairs, with backups | You, or autonomous RSI |
+| 2 | Skill patches that pass a regression eval | You, or autonomous RSI |
+| 3 | Enforced guards (≤1% false positives on replay) | You, or autonomous RSI |
 
-5. **Coach.** `/rsi coach` shows where you're improving, where mistakes repeat, which skills help, and up to 3 suggestions, each citing its evidence.
-6. **Radar.** Every week it checks the upstream toolkits and surfaces only the changes that match friction you actually had.
+| Command | Use when |
+|---|---|
+| `/rsi autonomy on / off / status` | Enable, disable, or inspect automatic application |
+| `/rsi status` | Check it's running and what's queued |
+| `/rsi review` | Claude's statusline shows `rsi:N`; decide on proposals |
+| `/rsi coach` | You want an evidence-based report on what's improving or repeating |
+| `/rsi bootstrap` | Fresh install; seed rules from your existing agent memories |
+| `/rsi why <id>` · `forget <id>` | Inspect a rule, or reject it for good |
 
-Useful commands: `/rsi review` · `/rsi coach` · `/rsi status` · `/rsi why <id>` · `/rsi forget <id>` · `/rsi bootstrap` (seed rules from your existing agent memories).
+Codex: `$rsi …` instead of `/rsi …`.
 
----
+A weekly job also checks upstream toolkits and surfaces only the changes that match friction you had.
 
 ## Configure
 
-`~/.honey/config.json`. Every key is optional.
+`~/.honey/config.json`. All keys optional:
 
 ```json
 {
@@ -136,68 +105,40 @@ Useful commands: `/rsi review` · `/rsi coach` · `/rsi status` · `/rsi why <id
 }
 ```
 
-`holdout_rate: 0.1` leaves the brief out of 10% of sessions, so the coach can measure whether the learned rules actually help.
+- `holdout_rate: 0.1` leaves the brief out of 10% of sessions, so `/rsi coach` can measure whether rules help.
+- Many other skills installed? `honey install --skill-budget 0.02` gives skill descriptions more room (Claude only).
+- **Privacy:** no telemetry. Only redacted snippets of ≤300 characters are stored. Network use is limited to your model provider and the radar's public `git fetch`.
+- **Platforms:** macOS and Linux. Windows isn't supported yet.
 
-**Skill-listing room.** honey keeps its model-invoked skill descriptions under a hard budget (CI fails if they exceed it). Those descriptions share ~1% of the context window with every other skill you have installed. If you run many other skills and want more room, `honey install --skill-budget 0.02` raises Claude's `skillListingBudgetFraction` (reversible via `honey uninstall`).
+Enable autonomous application with `honey rsi autonomy on`. It persists in `~/.honey/config.json`; other installations keep review mode until enabled. Session-end catchup and the weekly job apply up to 20 pending proposals per pass. `honey rsi autonomy off` returns to manual review. `rsi off` still pauses observation and jobs for the current session.
 
-**Freshness.** Each skill carries a `reviewed:` date; `honey doctor` warns when a skill's version-specific facts are over a year old so you can refresh them.
+Use `honey rsi status` for the latest automatic result and `honey rsi review --json` for recent changes and blocked reasons. Unsupported diagnoses remain pending; RSI never executes a proposal's free-form fix text. Upstream ports complete only after their evaluated child patch is applied. Dirty or diverged source checkouts block skill changes, and existing cost limits still apply. Run `honey sync` from the source checkout once to refresh Codex and record the editable source location; the plugin cache is never an editable source.
 
-**Platform.** Built and tested on macOS and Linux (CI runs both, Python 3.9 and 3.12). Windows is not yet supported — the hooks and installer assume a POSIX shell and paths.
+Instruction edits have conflict-checked `honey rsi revert <id>` snapshots; toolkit repairs retain installer undo records. Guard IDs remain inspectable with `honey rsi guards`. A failed skill sync records `sync_pending` for retry. Legacy instruction snapshots used random short hashes, so automatic revert refuses those; the original text remains in the proposal's `before` field for manual recovery. Automatic decisions do not count as user feedback.
 
-**Privacy.** No telemetry. Prompts are stored only as redacted snippets (≤300 characters) around signals. Sessions that pulled in web or MCP content can't auto-promote rules. Network use is limited to your model provider and anonymous `git fetch`es of public repos (the radar).
-
----
-
-## Update
+## Update · Uninstall
 
 ```bash
-honey update          # full install: pulls the latest release and refreshes Codex; then /reload-plugins in Claude
+honey update                                   # then /reload-plugins in Claude
+honey uninstall --dry-run && honey uninstall   # keeps ~/.honey; add --purge to delete it
 ```
 
-Plugin-only install:
+Plugin-only installs:
 
 ```bash
 claude plugin marketplace update honey-stack && claude plugin update honey@honey-stack
 codex plugin marketplace upgrade honey-stack && codex plugin add honey@honey-stack
 ```
 
-## Uninstall
-
-```bash
-honey uninstall --dry-run && honey uninstall    # restores every changed file and link; keeps ~/.honey
-honey uninstall --purge                         # …and deletes ~/.honey
-```
-
-Opt-in extras, for migrating from MCT or Matt Pocock skills: `honey install --slim-instructions` replaces CLAUDE.md and AGENTS.md with `migrate/` templates (edit those first), and `--retire-legacy` moves absorbed skills to backups. Both are reversible.
-
----
-
-## Versions & releases
-
-honey-stack follows [SemVer](https://semver.org/) and [Keep a Changelog](CHANGELOG.md).
-
-- **MAJOR**: breaking changes to hook commands, data layout or the CLI
-- **MINOR**: new skills or RSI features
-- **PATCH**: fixes
-
-```bash
-honey --version
-git checkout v0.2.0                                  # pin a release (Option A)
-codex plugin marketplace add umararshad4/honey-stack --ref v0.2.0
-python3 scripts/release.py 0.3.0 --push              # maintainers: bump, test, tag; CI publishes the release
-```
-
 ## Develop
 
 ```bash
-python3 tests/run.py && /usr/bin/python3 tests/run.py          # stdlib self-checks, Python 3.9+
+python3 tests/run.py                    # stdlib self-checks
 claude plugin validate .
 claude plugin eval . --tag smoke --runs 1 --ablation none --max-cost-usd 2 --no-publish --allow-tools Bash Write Edit
-claude plugin eval . --tag quality --ablation with-without --no-publish --allow-tools Bash   # does honey improve output vs no plugin?
+python3 scripts/release.py 0.3.0 --push # bump, test, tag; CI publishes
 ```
 
-Style guide for skills: [docs/skill-style.md](docs/skill-style.md). Design: [docs/design/plan.md](docs/design/plan.md).
+[SemVer](https://semver.org/) + [CHANGELOG](CHANGELOG.md). Skill style: [docs/skill-style.md](docs/skill-style.md). Design: [docs/design/plan.md](docs/design/plan.md).
 
-## Credits
-
-MIT © King Umar. Built on ideas and trimmed text from the projects listed in [THIRD_PARTY.md](THIRD_PARTY.md), whose licenses are in `licenses/`.
+MIT © King Umar. Credits and licenses: [THIRD_PARTY.md](THIRD_PARTY.md).
