@@ -65,7 +65,7 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Write or edit a skill | `write-skill` |
 | A design call needs a named principle (root cause, idempotency, boundaries) | `principles` |
 | Need a library's real source or docs for a declared dependency | `opensrc` |
-| Understand a shipped app, binary, APK or site you don't have source for (authorized) | `reverse` |
+| Understand a shipped app, binary, APK or site you don't have source for (authorized) | `reverse-engineer` |
 
 When two rows fit, take the earlier one in the main flow: settle intent before planning, plan before executing.
 

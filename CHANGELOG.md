@@ -10,6 +10,9 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Changed
+- `reverse` skill renamed to `reverse-engineer` (`/honey:reverse-engineer`). It now vendors REA's complete official workflow and all six target guides verbatim (morluto/rea v6.7.0, skill v42) behind honey's authorization gate, so it routes and recovers exactly like REA's own skill.
+
 ## [0.9.1] - 2026-10-18
 
 ### Changed

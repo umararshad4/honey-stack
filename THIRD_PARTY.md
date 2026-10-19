@@ -10,7 +10,7 @@ honey-stack distills ideas, structure and some trimmed text from the projects be
 | pstack | 0.15.25 | https://github.com/cursor/plugins/tree/main/pstack | MIT (`licenses/pstack.MIT`) | Lauren Tan |
 | gstack | 1.60.1.0 | https://github.com/garrytan/gstack | MIT (`licenses/gstack.MIT`) | Garry Tan |
 | skill-creator | d4226d0 | https://github.com/anthropics/skills | Apache-2.0 (`licenses/skill-creator.Apache-2.0`); modified | Anthropic |
-| REA (reverse-engineer-anything) | v6.5.0 | https://github.com/morluto/rea | MIT | morluto |
+| REA (reverse-engineer-anything) — vendored in skills/reverse-engineer/references/rea/ @ 39275420 | v6.7.0 | https://github.com/morluto/rea | MIT (`licenses/rea.MIT`) | morluto |
 | MCT toolkit | 3.2.0 | https://github.com/umararshad4/skills-hub | the author's own | King Umar |
 | Emil Kowalski skills | 2026 snapshot | https://github.com/emilkowalski/skills | MIT (`licenses/emilkowalski-skills.MIT`) | Emil Kowalski |
 | e2e (tester.army) | docs, 2026-10 | https://tester.army/e2e | docs distilled, ideas only | e2e-dev |

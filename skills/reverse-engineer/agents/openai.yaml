@@ -1,5 +1,5 @@
 interface:
-  display_name: "reverse"
+  display_name: "reverse-engineer"
   short_description: "Reverse-engineer authorized targets via the REA toolchain"
 policy:
   allow_implicit_invocation: false
