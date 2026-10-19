@@ -10,6 +10,8 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-19
+
 ### Added
 - Opt-in autonomous RSI applies validated instruction edits, known toolkit repairs, evaluated skill patches and replay-verified guards through existing background jobs. `honey rsi autonomy on|off|status` controls the policy; status and review show automatic results and blocked reasons.
 
@@ -115,7 +117,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.10.0...HEAD
+[0.10.0]: https://github.com/umararshad4/honey-stack/compare/v0.9.1...v0.10.0
 [0.9.1]: https://github.com/umararshad4/honey-stack/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/umararshad4/honey-stack/compare/v0.8.0...v0.9.0
 [0.8.0]: https://github.com/umararshad4/honey-stack/compare/v0.7.0...v0.8.0
