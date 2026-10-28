@@ -30,6 +30,16 @@ def configure(value: bool) -> None:
 def apply(proposal: dict) -> str:
     """Perform an effect or raise; never interpret free-form fix text as code."""
     from honey.rsi import instructions
+    if proposal.get("type") in ("toolkit_fix", "skill_new") and proposal.get("child"):
+        child = proposal["child"]
+        if not isinstance(child, str) or paths.safe_id(child) != child:
+            raise ValueError("invalid linked skill patch ID")
+        saved = store.read_json(paths.path("proposals", child + ".json"))
+        if not saved or saved.get("id") != child or saved.get("type") != "skill_patch":
+            raise ValueError("linked skill patch is missing")
+        if saved.get("status") == "applied":
+            return "linked skill patch applied: " + child
+        raise Deferred("waiting for linked skill patch " + child + " (" + str(saved.get("status")) + ")")
     if proposal.get("type") in ("instr_line", "instr_remove", "instr_edit"):
         return instructions.apply(proposal)
     if proposal.get("type") == "toolkit_fix":
@@ -152,6 +162,16 @@ def run() -> dict:
     for proposal in queue[:MAX_PER_RUN]:
         try:
             validate_sources(proposal)
+            if proposal.get("type") == "upstream_port" and not proposal.get("child"):
+                raise Deferred("upstream patch awaits the daily improvement pass")
+            preparation = proposal.get("preparation") or {}
+            if not proposal.get("child") and not proposal.get("repair") and (
+                    proposal.get("type") == "skill_new" or
+                    proposal.get("type") == "toolkit_fix" and preparation):
+                if preparation.get("blocked"):
+                    raise ValueError(preparation["blocked"])
+                reason = preparation.get("skipped") or preparation.get("error") or "awaiting daily skill preparation"
+                raise Deferred(str(reason))
             result = apply(proposal)
             saved = review.decide(proposal["id"], "apply", result)
             saved.update(decision_source="automatic", last_error=None, last_attempt=text.now(),

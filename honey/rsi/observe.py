@@ -64,9 +64,13 @@ def attribute(ctx, sig: list) -> None:
 
 
 def user_prompt(ctx, prompt: str, sig: list) -> None:
-    q = text.redact(prompt, 300) if sig else None
+    origin = signals.origin(prompt)
+    if origin == "system":
+        return
+    q = text.redact(prompt, 300) if origin == "user" else None
     prev = ctx.state.get("tail") if sig and set(sig) & (signals.NEGATIVE | {"error_paste"}) else None
-    record(ctx, "prompt", origin="user", len=len(prompt or ""), sig=sig, q=q, prev=prev, kw=text.keywords(prompt))
+    record(ctx, "prompt", origin=origin, len=len(prompt or ""), sig=sig, q=q, prev=prev,
+           kw=text.keywords(q or ""), xc=True if origin == "user" and text.injection_hit(prompt) else None)
     attribute(ctx, sig)
     for m in re.finditer(r"(?:^|\s)\$([a-z][\w-]{1,40})\b", prompt or ""):
         if ctx.agent == "codex":

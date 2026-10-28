@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 
 from honey import paths
-from honey.rsi import coach, curate, guards, instructions, patch, radar, reflect, review, store
+from honey.rsi import autonomy, coach, curate, guards, instructions, patch, radar, reflect, review, store
 
 
 def run() -> dict:
@@ -15,7 +15,9 @@ def run() -> dict:
             return {"skipped": "locked"}
         steps = (("maintain", curate.maintain), ("audit", lambda: len(review.audit())),
                  ("graduate", lambda: len(instructions.graduate())), ("instructions", lambda: len(instructions.llm_audit())),
-                 ("guards", lambda: len(guards.propose_all())), ("patches", patch.run_weekly), ("radar", lambda: len(radar.run())))
+                 ("guards", lambda: len(guards.propose_all())),
+                 ("patches", lambda: {"skipped": "handled by daily improvement pass"} if autonomy.enabled() else patch.run_weekly()),
+                 ("radar", lambda: len(radar.run())))
         for name, fn in steps:
             try:
                 out[name] = fn()

@@ -89,6 +89,7 @@ class ApplyValidation(unittest.TestCase):
         commit = git('rev-parse', 'HEAD')
         git('checkout', '-q', '-')
         mock('honey.install.sync', return_value=0).start()
+        mock.object(paths, 'source_repo', return_value=repo).start()
         real_git = patch.git
         mock.object(patch, 'git', side_effect=lambda *a, **k: real_git(*a, **dict(k, cwd=repo))).start()
         return repo, git, {'id': 'p-patch', 'branch': 'rsi/test', 'worktree': os.path.join(repo, 'absent'),
@@ -138,14 +139,32 @@ class ApplyValidation(unittest.TestCase):
         instructions.apply(p)
         self.assertEqual(Path(self.fp).read_text(), '')
 
-    def test_patch_dirty_and_diverged(self):
+    def test_patch_dirty_target_and_diverged(self):
         repo, git, p, commit = self.repo()
-        store.write_text(os.path.join(repo, 'unrelated'), 'user edit')
+        store.write_text(os.path.join(repo, 'skill'), 'user edit')
         self.rejects(patch.accept, p)
         git('add', '.'); git('commit', '-qm', 'diverged')
         start = git('rev-parse', 'HEAD')
         self.rejects(patch.accept, p)
         self.assertEqual(git('rev-parse', 'HEAD'), start)
+
+    def test_patch_preserves_unrelated_uncommitted_work(self):
+        repo, git, p, commit = self.repo()
+        store.write_text(os.path.join(repo, 'unrelated'), 'user edit')
+        patch.accept(p)
+        self.assertEqual(Path(repo, 'unrelated').read_text(), 'user edit')
+        self.assertEqual(Path(repo, 'skill').read_text(), 'after\n')
+        self.assertEqual(git('rev-parse', 'HEAD'), commit)
+
+    def test_patch_cooldown_begins_after_successful_application(self):
+        repo, git, p, commit = self.repo()
+        git('branch', 'rsi/debug-123', p['branch'])
+        p['branch'] = 'rsi/debug-123'
+        with mock('honey.install.sync', return_value=1):
+            self.rejects(patch.accept, p)
+        self.assertFalse(store.read_json(paths.path('scorecards.json'), {}).get('debug', {}).get('patched_at'))
+        patch.accept(p)
+        self.assertTrue(store.read_json(paths.path('scorecards.json'))['debug']['patched_at'])
 
 
 if __name__ == '__main__':
