@@ -8,8 +8,8 @@ import calendar
 import re
 import time
 
-from honey import paths
-from honey.rsi import store, text
+from honey import metrics, paths
+from honey.rsi import signals, store, text
 
 BRIEF_MAX = 1500
 MAX_ACTIVE_GLOBAL, MAX_ACTIVE_PROJECT, MAX_SKILL_LINES = 25, 10, 12
@@ -186,10 +186,30 @@ def _evidence(ids_used, ids_map, key, quarantined):
             # correction. Tool output and unknown provenance stay quarantined.
             direct_user = (r.get("e") == "prompt" and r.get("origin") == "user"
                            and not r.get("xc") and not text.injection_hit(quote))
-            ev.append({"sid": key, "ts": r.get("ts", text.now()), "ev": i, "q": text.redact(r.get("q") or r.get("reason") or r.get("name") or "", 300),
+            item = {"sid": key, "ts": r.get("ts", text.now()), "ev": i, "q": text.redact(r.get("q") or r.get("reason") or r.get("name") or "", 300),
                        "quarantined": not direct_user, "sig": r.get("sig", []),
-                       "event": r.get("e"), "origin": r.get("origin")})
+                       "event": r.get("e"), "origin": r.get("origin")}
+            for field in ("task", "feedback_kind", "attribution", "attributed_skill"):
+                if field in r:
+                    item[field] = r[field]
+            ev.append(item)
     return ev
+
+
+def skill_evidence_matches(evidence: dict, skill: str, outcome: str = "failed") -> bool:
+    """Reflection cannot upgrade uncertain observations into confident skill feedback."""
+    if (evidence.get("event") != "prompt" or evidence.get("origin") != "user"
+            or evidence.get("quarantined") is not False or text.injection_hit(evidence.get("q", ""))):
+        return False
+    category = "accept" if outcome == "worked" else "behavior"
+    name = (skill or "").split(":")[-1]
+    if "attribution" in evidence or "feedback_kind" in evidence:
+        return (evidence.get("attribution") in ("explicit", "single-task")
+                and evidence.get("feedback_kind") == category
+                and (evidence.get("attributed_skill") or "").split(":")[-1] == name)
+    # Old logs lack task contracts. Only a direct, named assessment is sufficient.
+    quote = evidence.get("q", "")
+    return signals.mentions_skill(quote, name) and signals.feedback_kind(quote) == category
 
 
 def revalidate_evidence(evidence: dict, events: dict | None = None) -> bool:
@@ -236,7 +256,13 @@ def observe_only(key: str, rows: list) -> None:
         if r.get("e") == "skill":
             _bump_scorecard(r.get("name", ""), "inv_user" if r.get("by") == "user" else "inv_model", agent)
         elif r.get("e") == "skill_outcome":
-            _bump_scorecard(r.get("name", ""), r.get("outcome", "neutral"), agent)
+            outcome = r.get("outcome", "neutral")
+            if outcome not in ("pos", "neg", "neutral", "cont", "uncertain"):
+                continue
+            if outcome in ("pos", "neg") and (r.get("attribution") not in ("explicit", "single-task")
+                    or r.get("feedback_kind") != ("accept" if outcome == "pos" else "behavior")):
+                outcome = "uncertain"
+            _bump_scorecard(r.get("name", ""), outcome, agent)
     prof = store.read_json(paths.path("profile.json"), {}) or {}
     week = time.strftime("%G-W%V", time.gmtime())
     w = prof.setdefault("weekly", {}).setdefault(f"{week}:{agent}", {"sessions": 0, "user_turns": 0, "correction": 0, "still": 0,
@@ -255,7 +281,8 @@ def observe_only(key: str, rows: list) -> None:
             if holdout:
                 w["holdout_turns"] = w.get("holdout_turns", 0) + 1
                 w["holdout_correction"] = w.get("holdout_correction", 0) + ("correction" in sig)
-            if last_stop and last_stop.get("done") and sig & {"correction", "still", "error_paste"}:
+            if (last_stop and last_stop.get("done") and sig & {"correction", "still", "error_paste"}
+                    and r.get("feedback_kind", "behavior") == "behavior"):
                 w["false_done"] += 1
             if last_stop and last_stop.get("ends_q") and "continue" in sig:
                 w["unneeded_q"] += 1
@@ -267,6 +294,11 @@ def observe_only(key: str, rows: list) -> None:
             w["compact"] += 1
         elif e == "note":
             w["notes"] += 1
+        elif e == "tool":
+            for field, value in (r.get("metrics") or {}).items():
+                if field in metrics.FIELDS and type(value) in (int, float) and value >= 0:
+                    name = "eff_" + field
+                    w[name] = w.get(name, 0) + value
     if holdout:
         w["holdout_sessions"] = w.get("holdout_sessions", 0) + 1
     store.write_json(paths.path("profile.json"), prof, sort=True)
@@ -328,7 +360,8 @@ def apply_reflection(result: dict, key: str, ids_map: dict, meta: dict) -> dict:
             stats["labels"] += 1
     save(rows)
     for f in (result or {}).get("skill_feedback", [])[:8]:
-        ev = _evidence(f.get("evidence"), ids_map, key, quar)
+        ev = [ev for ev in _evidence(f.get("evidence"), ids_map, key, quar)
+              if skill_evidence_matches(ev, f.get("skill", ""), f.get("outcome"))]
         if ev and f.get("outcome") in ("worked", "failed", "misfired", "missed"):
             _bump_scorecard(f.get("skill", ""), {"misfired": "misfire"}.get(f["outcome"], f["outcome"]), agent)
             store.append_jsonl(paths.path("skill-feedback.jsonl"), {

@@ -1,5 +1,7 @@
 """Apply-time evidence and conflict checks, with disposable instruction and git files."""
 import os
+import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -9,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from honey import paths
-from honey.rsi import guards, instructions, patch, store
+from honey.rsi import behavioral, guards, instructions, patch, store
 
 
 class ApplyValidation(unittest.TestCase):
@@ -82,6 +84,13 @@ class ApplyValidation(unittest.TestCase):
             return subprocess.run(['git', '-C', repo, *args], check=True, capture_output=True, text=True).stdout.strip()
         git('init', '-q'); git('config', 'user.email', 'test@example.com'); git('config', 'user.name', 'Test')
         store.write_text(os.path.join(repo, 'skill'), 'before\n')
+        fixture_root = Path(__file__).resolve().parents[1] / 'evals'
+        for name in ['behavioral.json', *json.loads((fixture_root / 'behavioral.json').read_text())['cases']]:
+            source, target = fixture_root / name, Path(repo, 'evals', name)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(source, target) if source.is_dir() else shutil.copy2(source, target)
+        store.write_text(os.path.join(repo, 'evals/prior/prompt.md'), 'Neighboring skill fixture')
+
         git('add', '.'); git('commit', '-qm', 'before')
         git('checkout', '-qb', 'rsi/test')
         store.write_text(os.path.join(repo, 'skill'), 'after\n')
@@ -92,8 +101,16 @@ class ApplyValidation(unittest.TestCase):
         mock.object(paths, 'source_repo', return_value=repo).start()
         real_git = patch.git
         mock.object(patch, 'git', side_effect=lambda *a, **k: real_git(*a, **dict(k, cwd=repo))).start()
-        return repo, git, {'id': 'p-patch', 'branch': 'rsi/test', 'worktree': os.path.join(repo, 'absent'),
-                           'eval': {'before': {'case': 0, 'prior': 1}, 'after': {'case': 1, 'prior': 1}, 'case': 'case'}}, commit
+        maintained = behavioral.snapshot(repo)
+        digests = dict(maintained['cases'], prior=behavioral.case_digest(repo, 'prior'))
+        digests['rsi-case'] = '0' * 64
+        before = {name: 1 for name in digests}; before['rsi-case'] = 0
+        after = {name: 1 for name in digests}
+        return repo, git, {'id': 'p-patch', 'branch': 'rsi/test', 'patch_sha': commit,
+                           'worktree': os.path.join(repo, 'absent'),
+                           'eval': {'before': before, 'after': after, 'case': 'rsi-case',
+                                    'behavioral': maintained, 'case_sha256': digests,
+                                    'generated_cases': ['rsi-case']}}, commit
 
     def test_patch_evidence_before_merge(self):
         repo, git, p, commit = self.repo()
@@ -103,6 +120,41 @@ class ApplyValidation(unittest.TestCase):
                          {'before': {'case': 0, 'prior': 1}, 'after': {'case': 1, 'prior': 0}, 'case': 'case'}):
             self.rejects(patch.accept, dict(p, eval=evidence))
             self.assertEqual(git('rev-parse', 'HEAD'), start)
+
+    def test_patch_missing_or_failed_maintained_evidence_is_rejected(self):
+        repo, git, p, commit = self.repo()
+        start = git('rev-parse', 'HEAD')
+        for change in ('legacy', 'missing', 'failed'):
+            candidate = json.loads(json.dumps(p))
+            evidence = candidate['eval']
+            if change == 'legacy':
+                evidence.pop('behavioral')
+            elif change == 'missing':
+                evidence['after'].pop('behavior-preserve-readonly')
+            else:
+                evidence['after']['behavior-preserve-readonly'] = 0
+            self.rejects(patch.accept, candidate)
+            self.assertEqual(git('rev-parse', 'HEAD'), start)
+
+    def test_candidate_cannot_change_maintained_grader(self):
+        repo, git, p, commit = self.repo()
+        start = git('rev-parse', 'HEAD')
+        git('checkout', '-q', p['branch'])
+        Path(repo, 'evals/behavior-preserve-readonly/graders/state.md').write_text('tampered')
+        git('commit', '-qam', 'change grader')
+        p['patch_sha'] = git('rev-parse', 'HEAD')
+        git('checkout', '-q', '-')
+        with self.assertRaisesRegex(ValueError, 'cannot modify maintained'):
+            patch.accept(p)
+        self.assertEqual(git('rev-parse', 'HEAD'), start)
+
+    def test_neighboring_case_drift_blocks_application(self):
+        repo, git, p, commit = self.repo()
+        start = git('rev-parse', 'HEAD')
+        Path(repo, 'evals/prior/prompt.md').write_text('different behavior')
+        with self.assertRaisesRegex(ValueError, 'fixture changed'):
+            patch.accept(p)
+        self.assertEqual(git('rev-parse', 'HEAD'), start)
 
     def test_patch_sync_failure_is_retryable(self):
         repo, git, p, commit = self.repo()

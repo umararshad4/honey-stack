@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import glob
+import argparse
 import hashlib
 import json
 import os
@@ -68,6 +69,25 @@ def smoke() -> tuple:
 
 
 def main(argv: list) -> int:
+    if argv:
+        from honey import health
+        parser = argparse.ArgumentParser(description='Inspect delivery and coverage for one actual session.')
+        parser.add_argument('--agent', choices=('claude', 'codex'), default='codex')
+        parser.add_argument('--session', help='Session ID; defaults to the selected agent session environment variable.')
+        parser.add_argument('--json', action='store_true', help='Print machine-readable session health.')
+        args = parser.parse_args(argv)
+        sid = args.session or os.environ.get('CODEX_THREAD_ID' if args.agent == 'codex' else 'CLAUDE_SESSION_ID')
+        result = health.report(args.agent, sid)
+        if args.json:
+            print(json.dumps(result, sort_keys=True))
+        else:
+            print(f"honey doctor: {args.agent} session {sid or '(not supplied)'}")
+            print(f"  installed={result['installed']} enabled={result['enabled']} delivery={result['delivery']} paused={result['paused']}")
+            print(f"  adapter coverage={result['coverage']['status']} runtime={result['runtime_version'] or 'unobserved'}")
+            if result['coverage']['unsupported_tools']:
+                print('  unsupported tools: ' + ', '.join(result['coverage']['unsupported_tools']))
+            print('  Coverage describes observed payloads; policy enforcement is not established by a heartbeat.')
+        return 0 if result['healthy'] else 1
     rep = Report()
     cdir, xdir = paths.claude_dir(), paths.codex_dir()
     print("honey doctor")

@@ -37,7 +37,7 @@ codex plugin marketplace add umararshad4/honey-stack && codex plugin add honey@h
 </details>
 
 **Then:** Claude → `/reload-plugins`. Codex → `/hooks`, trust the honey entries. Check with `honey doctor`.
-It's on when replies start with **`🍯 HONEY`**.
+The **`🍯 HONEY`** prefix indicates injected rules. To check whether the current session actually receives hooks, use `honey doctor --agent codex --session <session-id> --json` (or `--agent claude`). Installation, enablement, recent delivery and payload coverage are reported separately; a prefix or smoke test is not proof of enforcement.
 
 ## Modes
 
@@ -49,12 +49,31 @@ Send as the **whole message**. Add `default` to save it (`honey ultra strict def
 | `honey full` *(default)* | Smallest complete change; skips unrequested extras | Everyday features and fixes |
 | `honey ultra` | Pushes back on anything the need doesn't justify; prefers deleting | Vague asks, cleanup, or you suspect overbuilding |
 | `honey light` *(default)* | Test-first where it's easy; one runnable check per non-trivial change | Normal work |
-| `honey strict` | Failing test first, plan before multi-file work, reviewer before done | Payments, auth, migrations, anything costly to break |
+| `honey strict` | Code: failing test first, plan before multi-file work, reviewer before done. System tasks: resulting-state checks | Payments, auth, migrations, anything costly to break |
 | `honey terse` *(default)* | No preamble, no recap, short sentences | You know the domain |
 | `honey normal` | Claude's usual voice | Learning, or you want the reasoning |
 | `honey off` · `honey on` | Pause or resume for this session (safety guard stays on) | A task where honey's rules get in the way |
 
 Also: `remember: when X, Y` teaches a rule now. Scopes: `(project)` `(claude)` `(codex)` `(skill:<name>)`, e.g. `remember (project): …`. `rsi off` · `rsi on` pauses learning for this session.
+
+## Task scope and evidence
+
+Hooks retain a bounded task record: inspection or execution, workspace, targets and required checks. “Continue” and status questions retain the task. Explicit inspection stays read-only for recognized edit operations until the user asks for changes. This is an evidence aid, not a permission grant or a complete sandbox; natural-language classification and command recognition are conservative heuristics.
+
+```bash
+honey task status --json
+honey task set --mode execute --operation code --cwd /actual/project --check tests --check lint
+honey task verify --check tests --tool-call <actual-test-call-id>
+honey task verify --check lint --tool-call <actual-lint-call-id>
+```
+
+Replace paths and call IDs with the actual values. Codex uses `CODEX_THREAD_ID`; otherwise add `--agent claude --session <session-id>` to each command. Bind the project before running its checks. `task set` starts a new bounded contract; it cannot promote an existing inspection task to execution without a user request.
+
+The default code check recognizes direct test/lint commands. Explicit checks link a fresh successful result; the agent must still check that the command proves the named requirement. Later edits, potentially mutating shell commands, failed reruns and incomplete results invalidate proof. When start events are delivered, checks started before a mutation or in a previous task cannot verify the new state. Completion claims without evidence trigger one reminder per evidence cycle; honest unresolved reports and inspection answers are allowed.
+
+For `--operation uninstall`, required checks are `application`, `helpers`, `startup` and `preserved-data`. Declare concrete targets with `--target`; `task verify --check application --absent /Applications/Example.app` measures and rechecks absence. `--present` checks existence. Helpers and startup require checks of their actual registrations, and preserved data requires an explicit check of what should remain. `--operation startup` requires its resulting registration to be checked.
+
+Known shell/read/edit payloads, including `exec_command` with `cmd`, are normalized. JavaScript wrappers remain opaque unless the host delivers supported inner events. Missing hooks, unobserved external edits and concurrent last-writer-wins session updates limit the evidence; `doctor` reports delivery and coverage without claiming runtime enforcement.
 
 ## Skills
 
@@ -68,7 +87,7 @@ Claude: `/honey:<skill>`. Codex: `$<skill>`.
 
 ## RSI: how it learns
 
-1. **Observe:** hooks log bounded, redacted user requests, corrections, "still broken" and which skills fired. Everything is redacted.
+1. **Observe:** hooks log bounded, redacted user requests, corrections, "still broken" and which skills fired. Feedback distinguishes behavior, requirements, preferences and environment failures. Task identity and explicit skill references guide attribution; ambiguous feedback remains uncertain instead of blaming every recent skill.
 2. **Reflect:** after a session with signal, a small model (Haiku via Claude, ~$0.002; else Codex) proposes evidence-backed WHEN → THEN rules.
 3. **Curate:** a rule goes live once 2 sessions back it; it goes stale after 30 days and is archived after 90.
 4. **Apply:** review mode queues changes for `/rsi review`. Autonomous mode applies supported changes after validation:
@@ -117,7 +136,9 @@ With autonomy enabled, session-end and startup catchup jobs attempt one evidence
 
 Skill diagnoses are routed to the existing patcher using verified user quotes. Repeated requests can produce a new skill only with actual requests from at least two sessions and positive/negative trigger evaluations. Keyword-only suggestions and unsupported runtime diagnoses remain pending. Genuine user evidence is evaluated separately from external tool output; older quarantined records are recovered only against their original user events.
 
-The patcher reserves the draft and both evaluations against the existing weekly/monthly budgets before starting. Per-call limits are $0.15 for drafting and $0.35 for each evaluation. Unknown usage after a timeout retains the reserved cost; reported usage replaces it. Budget exhaustion defers work, not validation. Evaluator errors and incomplete results never count as successful tests. New-skill evaluation covers its generated positive/negative cases; it does not prove every other skill's behavior.
+The patcher reserves the draft and both evaluations against the existing weekly/monthly budgets before starting. Per-call limits are $0.15 for drafting and $0.35 for each evaluation. Unknown usage after a timeout retains the reserved cost; reported usage replaces it. Budget exhaustion defers work, not validation. Evaluator errors and incomplete results never count as successful tests. Each arm includes generated cases, existing name-matched skill cases and independently maintained behavior cases for read-only preservation, scoped edits and failed verification. Fixture hashes and exact candidate content are checked before a proposal can apply. Missing or changed fixtures require re-evaluation, including for older proposals. This evaluator supports Claude plugin eval; it does not establish Codex behavior or coverage of every other skill.
+
+`honey task status` exposes task/session tool counts, repeated reads/checks, failures, unknown results and reported durations. `/rsi coach` aggregates them with denominators. Repetition can be necessary, missing durations are not estimated, and these observations are not measured speedups. Uncertain feedback is visible but excluded from negative skill scores and patch evidence.
 
 Use `honey rsi status` for the latest automatic result and `honey rsi review --json` for recent changes and blocked reasons. Unsupported diagnoses remain pending; RSI never executes a proposal's free-form fix text. Diagnosis and new-skill parents complete only after their evaluated child patch is applied, as do upstream ports. Evaluation overlays the current runtime into its worktree and application checks that snapshot. Edited patch targets, runtime drift and diverged branches block application; unrelated documentation edits are preserved, and existing cost limits still apply. Run `honey sync` from the source checkout once to refresh Codex and record the editable source location; the plugin cache is never an editable source.
 
@@ -147,6 +168,8 @@ claude plugin validate .
 claude plugin eval . --tag smoke --runs 1 --ablation none --max-cost-usd 2 --no-publish --allow-tools Bash Write Edit
 python3 scripts/release.py 0.3.0 --push # bump, test, tag; CI publishes
 ```
+
+The runner gives every test script temporary state and a fake model provider. Direct imports through the test helper also use temporary state when `HONEY_HOME` is unset. Maintained fixture tests run offline; JavaScript regex compatibility is additionally checked when Node is installed. These tests do not run paid model evaluations.
 
 [SemVer](https://semver.org/) + [CHANGELOG](CHANGELOG.md). Skill style: [docs/skill-style.md](docs/skill-style.md). Design: [docs/design/plan.md](docs/design/plan.md).
 

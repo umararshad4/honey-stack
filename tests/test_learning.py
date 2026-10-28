@@ -6,6 +6,7 @@ import sys
 import tempfile
 
 from helpers import REPO, hook
+from honey.rsi import digest
 
 H = os.environ["HONEY_HOME"]
 HONEY = [sys.executable, os.path.join(REPO, "bin", "honey")]
@@ -17,8 +18,18 @@ def session(sid, prompts):
     for p in prompts:
         hook("claude", dict(base, hook_event_name="UserPromptSubmit", prompt=p))
         hook("claude", dict(base, hook_event_name="Stop", last_assistant_message="Done, all set. Should I open a PR?"))
-    hook("claude", dict(base, hook_event_name="PostToolUse", tool_name="Skill", tool_input={"skill": "honey:ship"}))
-    hook("claude", dict(base, hook_event_name="UserPromptSubmit", prompt="no, I said don't open a PR, just push"))
+    hook("claude", dict(base, hook_event_name="PostToolUse", tool_name="Skill", tool_input={"skill": "honey:ship"}, tool_response={}))
+    hook("claude", dict(base, hook_event_name="UserPromptSubmit", prompt="No, the ship skill failed: I said don't open a PR, just push"))
+    # Hook instrumentation may add timeline entries; bind the fake reflector to the actual user evidence.
+    _, ids, _ = digest.build("claude-" + sid)
+    evidence = next(key for key, row in ids.items() if row.get("e") == "prompt" and "ship skill failed" in row.get("q", ""))
+    canned = json.loads(json.dumps(fake))
+    for group in ("candidates", "skill_feedback", "progress"):
+        for item in canned[group]:
+            if item.get("evidence"):
+                item["evidence"] = [evidence]
+    with open(ff, "w") as handle:
+        json.dump(canned, handle)
     hook("claude", {"session_id": sid, "hook_event_name": "SessionEnd", "reason": "other"})
 
 

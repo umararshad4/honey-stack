@@ -11,7 +11,7 @@ import re
 import time
 import traceback
 
-from honey import autoupdate, hookio, modes, paths, receipt
+from honey import autoupdate, health, hookio, modes, paths, receipt, tasks, tool_events
 from honey.rsi import curate, observe, review, signals, store, text
 
 EDIT_TOOLS = {"Write", "Edit", "MultiEdit", "NotebookEdit", "apply_patch", "ApplyPatch"}
@@ -124,6 +124,8 @@ def user_prompt(ctx) -> dict:
     ctx.state["last_prompt"] = text.redact(prompt, 300)
     sig = signals.classify(prompt) if org == "user" else []
     observe.user_prompt(ctx, prompt, sig)
+    tasks.advance(ctx, prompt)
+    observe.user_skill_mentions(ctx, prompt)
     out = []
     if "note" in sig:
         note = signals.parse_note(prompt)
@@ -153,11 +155,15 @@ def subagent_start(ctx) -> dict:
 
 
 def pre_tool(ctx) -> dict:
-    tool = ctx.payload.get("tool_name", "")
-    if tool not in ("Bash", "exec", "shell", "local_shell"):
+    event = tool_events.normalize(ctx.payload)
+    reason = tasks.protect(ctx.state, event)
+    if reason:
+        return hookio.pretool("deny", reason)
+    if not ctx.sub:
+        tasks.start_tool(ctx, event)
+    if event['kind'] != 'shell':
         return {}
-    ti = ctx.payload.get("tool_input") or {}
-    cmd = ti.get("command") if isinstance(ti, dict) else ti
+    cmd = event['command']
     from honey import guard
     reason, sev = guard.check(cmd)
     if not reason:
@@ -181,22 +187,30 @@ def pre_tool(ctx) -> dict:
 
 
 def post_tool(ctx) -> dict:
-    tool = ctx.payload.get("tool_name", "") or ""
+    event = tool_events.normalize(ctx.payload)
+    start = ctx.state.get('tool_starts', {}).get(event.get('call_id'))
+    if start:
+        event['task_id'] = start['task']
+    tool = event['tool']
     ti = ctx.payload.get("tool_input") or {}
-    is_patch = tool in ("Bash", "exec") and "*** Begin Patch" in json.dumps(ti)[:200000]
+    is_patch = "*** Begin Patch" in (event.get('command') or '')[:200000]
     out = {}
-    if tool in EDIT_TOOLS or is_patch:
+    if event['kind'] == 'edit' or is_patch or tasks.mutation(event):
         _init_state(ctx)
         if not ctx.sub:
             ctx.state["edited"] = True
             ctx.dirty = True
         from honey import secrets
-        reason = secrets.scan(ctx.payload)
+        scan_payload = dict(ctx.payload, tool_name=tool)
+        if is_patch:
+            scan_payload.update(tool_name='apply_patch', tool_input={'patch': event['command']})
+        reason = secrets.scan(scan_payload)
         if reason:
             out = hookio.block(reason)
     if not ctx.sub:
         _init_state(ctx)
-        observe.tool_used(ctx, ctx.payload)
+        tasks.record_tool(ctx, event)
+        observe.tool_used(ctx, ctx.payload, event)
         ctx.dirty = True
         if tool == "Skill" and isinstance(ti, dict) and not out:
             notes = curate.skill_notes(ti.get("skill", ""))
@@ -234,6 +248,12 @@ def passive(ctx) -> dict:
         name = {"PostToolUseFailure": "tool_fail", "PostCompact": "compact", "PreCompact": "compact", "Interrupt": "interrupt"}.get(ctx.event, ctx.event)
         extra = {}
         if ctx.event == "PostToolUseFailure":
+            event = tool_events.normalize(ctx.payload)
+            start = ctx.state.get('tool_starts', {}).get(event.get('call_id'))
+            if start:
+                event['task_id'] = start['task']
+            tasks.record_tool(ctx, event)
+            observe.tool_used(ctx, ctx.payload, event)
             extra = {"tool": ctx.payload.get("tool_name"), "err": text.redact(str(ctx.payload.get("error", "")), 160)}
         elif ctx.event in ("PostCompact", "PreCompact"):
             extra = {"trigger": ctx.payload.get("trigger")}
@@ -249,6 +269,7 @@ HANDLERS = {"SessionStart": session_start, "UserPromptSubmit": user_prompt, "Use
 def handle(agent: str, payload: dict) -> dict:
     ctx = Ctx(agent, payload)
     out = HANDLERS.get(ctx.event, passive)(ctx)
+    health.record(ctx)
     if ctx.dirty:
         # shortcut: last-writer-wins on concurrent hooks of one session; per-field merge if lost updates show up
         store.write_json(ctx.state_file, ctx.state)

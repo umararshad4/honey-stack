@@ -23,7 +23,7 @@ class Continuous(unittest.TestCase):
         autonomy.configure(True)
 
     def proposal(self, skill='verify', kind='toolkit_fix'):
-        quote = 'Please answer whether the complete screen works.'
+        quote = f'The {skill} skill failed to answer whether the complete screen works.'
         sid, ts = 'claude-' + skill, '2026-10-28T10:00:00Z'
         if kind == 'toolkit_fix':
             store.write_jsonl(paths.path('events', '2026-10', sid + '.jsonl'), [

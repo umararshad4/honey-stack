@@ -28,7 +28,7 @@ def statusline() -> int:
 
 def main(argv: list) -> int:
     if not argv or argv[0] in ("-h", "--help"):
-        print("usage: honey install | uninstall | update | autoupdate | doctor | sync | rsi … | statusline | --version | hook --agent claude|codex")
+        print("usage: honey install | uninstall | update | autoupdate | doctor | task status|set|verify | sync | rsi … | statusline | --version | hook --agent claude|codex")
         return 0
     cmd, rest = argv[0], argv[1:]
     if cmd in ("--version", "-V", "version"):
@@ -54,5 +54,8 @@ def main(argv: list) -> int:
     if cmd == "doctor":
         from honey import doctor
         return doctor.main(rest)
+    if cmd == "task":
+        from honey import tasks
+        return tasks.main(rest)
     print(f"unknown command {cmd}", file=sys.stderr)
     return 2
