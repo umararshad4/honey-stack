@@ -181,9 +181,39 @@ def _evidence(ids_used, ids_map, key, quarantined):
     for i in ids_used or []:
         r = ids_map.get(i)
         if r:
+            quote = r.get("q") or r.get("reason") or r.get("name") or ""
+            # An external tool in the session does not taint the user's own
+            # correction. Tool output and unknown provenance stay quarantined.
+            direct_user = (r.get("e") == "prompt" and r.get("origin") == "user"
+                           and not r.get("xc") and not text.injection_hit(quote))
             ev.append({"sid": key, "ts": r.get("ts", text.now()), "ev": i, "q": text.redact(r.get("q") or r.get("reason") or r.get("name") or "", 300),
-                       "quarantined": quarantined, "sig": r.get("sig", [])})
+                       "quarantined": not direct_user, "sig": r.get("sig", []),
+                       "event": r.get("e"), "origin": r.get("origin")})
     return ev
+
+
+def revalidate_evidence(evidence: dict, events: dict | None = None) -> bool:
+    """Recover legacy provenance only from the exact original user event."""
+    quote = evidence.get("q", "")
+    if not quote or text.injection_hit(quote):
+        return False
+    if evidence.get("event") or evidence.get("origin"):
+        return (evidence.get("event") == "prompt" and evidence.get("origin") == "user"
+                and evidence.get("quarantined") is False)
+    key = evidence.get("sid", "")
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", key) or not evidence.get("ts"):
+        return False
+    from honey.rsi import digest
+    cache = events if events is not None else {}
+    if key not in cache:
+        cache[key] = digest.load_events(key)
+    for row in cache[key]:
+        if (row.get("e") == "prompt" and row.get("origin") == "user" and not row.get("xc")
+                and row.get("ts") == evidence["ts"] and not text.injection_hit(row.get("q", ""))
+                and text.redact(row.get("q", ""), 300) == quote):
+            evidence.update(event="prompt", origin="user", quarantined=False)
+            return True
+    return False
 
 
 def _bump_scorecard(skill: str, field: str, agent: str) -> None:
@@ -298,8 +328,12 @@ def apply_reflection(result: dict, key: str, ids_map: dict, meta: dict) -> dict:
             stats["labels"] += 1
     save(rows)
     for f in (result or {}).get("skill_feedback", [])[:8]:
-        if _evidence(f.get("evidence"), ids_map, key, quar) and f.get("outcome") in ("worked", "failed", "misfired", "missed"):
+        ev = _evidence(f.get("evidence"), ids_map, key, quar)
+        if ev and f.get("outcome") in ("worked", "failed", "misfired", "missed"):
             _bump_scorecard(f.get("skill", ""), {"misfired": "misfire"}.get(f["outcome"], f["outcome"]), agent)
+            store.append_jsonl(paths.path("skill-feedback.jsonl"), {
+                "ts": text.now(), "sid": key, "skill": text.redact(f.get("skill", "").split(":")[-1], 60),
+                "outcome": f["outcome"], "issue": text.redact(f.get("issue", ""), 180), "evidence": ev})
     for m in (result or {}).get("toolkit_misfires", [])[:4]:
         ev = _evidence(m.get("evidence"), ids_map, key, quar)
         issue = text.redact(m.get("issue", ""), 180)
@@ -332,12 +366,20 @@ def maintain() -> dict:
     rows, now = load(), text.now()
     need = min_sessions()
     moved = {"activated": 0, "stale": 0, "archived": 0, "demoted": 0}
+    events = {}
     for b in rows:
         st = b.get("status")
         last = max(b.get("last_evidence") or "", b.get("last_relevant") or "") or b.get("created", now)
         age = _days(last)
         user = b.get("source") == "user-stated"
         if st == "candidate":
+            if never_hit(b.get("when", ""), b.get("then", "")):
+                b.update(status="archived", updated=now)
+                moved["archived"] += 1
+                continue
+            for evidence in b.get("evidence", []):
+                if evidence.get("quarantined"):
+                    revalidate_evidence(evidence, events)
             clean = any(not e.get("quarantined") for e in b.get("evidence", [])) or user
             corr3 = b.get("severity", 1) >= 3 and any("correction" in (e.get("sig") or []) for e in b.get("evidence", []))
             if (len(b.get("sessions", [])) >= need or user or corr3) and b.get("helpful", 0) >= b.get("harmful", 0) and clean:

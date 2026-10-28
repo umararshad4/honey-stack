@@ -8,7 +8,7 @@ from unittest.mock import patch as mock
 
 from helpers import REPO
 from honey import paths
-from honey.rsi import autonomy, curate, guards, review, store
+from honey.rsi import autonomy, curate, guards, improve, review, store
 
 agent_home = tempfile.mkdtemp()
 os.environ["CLAUDE_CONFIG_DIR"] = agent_home
@@ -103,7 +103,7 @@ def draft(*args):
 
 with mock("honey.rsi.patch.propose", side_effect=draft) as propose, mock("honey.rsi.patch.accept", return_value="synced") as accept:
     with store.lock():
-        autonomy.run()
+        improve.run()
     parent = store.read_json(paths.path("proposals", up["id"] + ".json"))
     assert parent.get("child") == child["id"] and parent["status"] == "pending", parent
     assert not accept.called

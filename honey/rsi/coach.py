@@ -6,7 +6,7 @@ import os
 import time
 
 from honey import paths
-from honey.rsi import curate, review, store, text
+from honey.rsi import curate, review, signals, store, text
 
 MIN_N = 5
 PATCH_MIN_INV, PATCH_NEG_RATE, PATCH_MIN_NEG, DESC_FIX_MIN = 4, 0.4, 2, 2
@@ -48,18 +48,28 @@ def request_clusters(days: int = 30) -> list:
         rows = store.read_jsonl(fp)
         skill_turns = {r.get("t") for r in rows if r.get("e") == "skill"}
         for r in rows:
-            if r.get("e") == "prompt" and r.get("ts", "") >= cutoff and len(r.get("kw", [])) >= 3 and r.get("t") not in skill_turns:
-                asks.append((os.path.basename(fp), set(r["kw"])))
+            quote = r.get("q", "")
+            if (r.get("e") == "prompt" and r.get("origin") == "user" and not r.get("xc")
+                    and r.get("ts", "") >= cutoff and len(r.get("kw", [])) >= 3 and r.get("t") not in skill_turns
+                    and quote and signals.origin(quote) == "user" and not text.injection_hit(quote)
+                    and len(text.keywords(quote)) >= 3 and not {"continue", "accept"} & set(signals.classify(quote))
+                    and not quote.strip().lower().startswith(("[attached image", "[attached file", "attached image:", "attached file:"))):
+                sid = os.path.basename(fp)[:-6]
+                evidence = {"sid": sid, "ts": r["ts"], "q": text.redact(r.get("q", ""), 300),
+                            "event": "prompt", "origin": r.get("origin"), "quarantined": bool(r.get("xc"))}
+                asks.append((sid, set(r["kw"]), evidence))
     clusters = []
-    for sess, kw in asks:
+    for sess, kw, evidence in asks:
         for c in clusters:
             if len(kw & c["kw"]) / len(kw | c["kw"]) >= 0.5:
                 c["n"] += 1
+                if sess not in c["sessions"]:
+                    c["evidence"].append(evidence)
                 c["sessions"].add(sess)
                 c["kw"] &= kw if len(c["kw"] & kw) >= 2 else c["kw"]
                 break
         else:
-            clusters.append({"kw": set(kw), "n": 1, "sessions": {sess}})
+            clusters.append({"kw": set(kw), "n": 1, "sessions": {sess}, "evidence": [evidence]})
     return sorted((c for c in clusters if c["n"] >= 3 and len(c["sessions"]) >= 2), key=lambda c: -c["n"])[:5]
 
 
@@ -102,12 +112,15 @@ def report(weeks: int = 4) -> str:
         out.append("- No skill use observed yet.")
     sugg = []
     for c in request_clusters():
-        sugg.append(f"You asked for \"{' '.join(sorted(c['kw'])[:6])}\" {c['n']}× across {len(c['sessions'])} sessions with no skill helping → "
-                    "a small dedicated skill could make that one step (proposal queued).")
-        review.add(2, "skill_new", f"New skill for repeated ask: {' '.join(sorted(c['kw'])[:5])}",
+        proposal = review.add(2, "skill_new", f"New skill for repeated ask: {' '.join(sorted(c['kw'])[:5])}",
                    f"{c['n']} asks across {len(c['sessions'])} sessions with no skill invoked.",
                    "Draft it with the write-skill skill, plus a should-fire eval from these asks.",
-                   [{"q": " ".join(sorted(c["kw"]))}], "cluster:" + ",".join(sorted(c["kw"])))
+                   c["evidence"], "cluster:" + ",".join(sorted(c["kw"])))
+        if proposal.get("status") == "pending":
+            proposal["evidence"] = c["evidence"][:5]
+            store.write_json(paths.path("proposals", proposal["id"] + ".json"), proposal)
+            sugg.append(f"You asked for \"{' '.join(sorted(c['kw'])[:6])}\" {c['n']}× across {len(c['sessions'])} sessions with no skill helping → "
+                        "a small dedicated skill could make that one step (proposal queued).")
     for name, c in sc.items():
         st = skill_status(c)
         if st in ("patch-candidate", "desc-fix"):
