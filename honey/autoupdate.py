@@ -82,23 +82,129 @@ def _plugin_result(parent: str, current: str) -> dict:
 def _update_plugins(repo: str) -> dict:
     """Plugin-only install: no checkout to pull, so ask each agent's CLI to refresh the marketplace and plugin."""
     from honey import __version__, install
-    ran = False
+    ran, failed = False, []
     for agent, cmds in (("claude", [["plugin", "marketplace", "update", "honey-stack"], ["plugin", "update", install.PLUGIN]]),
                         ("codex", [["plugin", "marketplace", "upgrade", "honey-stack"], ["plugin", "add", install.PLUGIN]])):
+        if not _agent_enabled(agent, repo):
+            continue
         exe = install._cli(agent)
         if exe:
             ran = True
             for c in cmds:
                 if subprocess.run([exe, *c], capture_output=True, text=True, timeout=180, env=GIT_ENV).returncode != 0:
+                    failed.append(agent)
                     break
     if not ran:
         return {"status": "skipped", "reason": "no agent CLI"}
+    if failed:
+        return {"status": "skipped", "reason": f"{', '.join(failed)} plugin refresh failed"}
     return _plugin_result(os.path.dirname(os.path.realpath(repo)), __version__)
 
 
 def _in_plugin_cache(path: str) -> bool:
     parts = path.replace(os.sep, "/").split("/")
     return any(parts[i:i + 2] == ["plugins", "cache"] for i in range(len(parts) - 1))
+
+
+def _codex_sections():
+    """Read the relevant simple config sections without requiring a TOML dependency."""
+    try:
+        with open(os.path.join(paths.codex_dir(), "config.toml"), encoding="utf-8") as f:
+            config = f.read()
+    except OSError:
+        return {}
+    sections = re.split(r"(?m)^\s*\[([^\]]+)\]\s*(?:#.*)?$", config)
+    return {name.strip(): body for name, body in zip(sections[1::2], sections[2::2])}
+
+
+def _codex_marketplace_type(sections):
+    for name, body in sections.items():
+        if name.strip() in ("marketplaces.honey-stack", 'marketplaces."honey-stack"', "marketplaces.'honey-stack'"):
+            match = re.search(r'''(?m)^\s*source_type\s*=\s*["'](local|git)["']\s*(?:#.*)?$''', body)
+            return match.group(1) if match else None
+    return None
+
+
+def _agent_enabled(agent: str, repo: str) -> bool:
+    """Do not install or enable Honey in another agent that does not use it."""
+    from honey import install
+    if agent == "claude":
+        settings = store.read_json(os.path.join(paths.claude_dir(), "settings.json"), {}) or {}
+        enabled = (settings.get("enabledPlugins") or {}).get(install.PLUGIN)
+        cache = os.path.join(paths.claude_dir(), "plugins", "cache")
+    else:
+        sections = _codex_sections()
+        plugin = sections.get('plugins."honey@honey-stack"', sections.get("plugins.'honey@honey-stack'", ""))
+        flag = re.search(r"(?m)^\s*enabled\s*=\s*(true|false)\s*(?:#.*)?$", plugin)
+        enabled = flag.group(1) == "true" if flag else None
+        cache = os.path.join(paths.codex_dir(), "plugins", "cache")
+    if enabled is not None:
+        return bool(enabled)
+    return os.path.commonpath([os.path.realpath(repo), os.path.realpath(cache)]) == os.path.realpath(cache)
+
+
+def _local_install():
+    """Find configured local marketplaces and confirm they reference the same checkout."""
+    from honey import install
+    try:
+        recorded = paths.source_repo()
+    except RuntimeError:
+        recorded = None
+    roots = {}
+    codex = install._cli("codex")
+    sections = _codex_sections()
+    plugin = sections.get('plugins."honey@honey-stack"', sections.get("plugins.'honey@honey-stack'", ""))
+    disabled = re.search(r"(?m)^\s*enabled\s*=\s*false\s*(?:#.*)?$", plugin)
+    kind = _codex_marketplace_type(sections)
+    if codex and not disabled and (kind == "local" or (recorded and kind != "git")):
+        listing = subprocess.run([codex, "plugin", "marketplace", "list"], capture_output=True, text=True,
+                                 timeout=180, env=GIT_ENV)
+        if listing.returncode != 0:
+            raise RuntimeError("cannot inspect the Codex marketplace")
+        root = None
+        for line in listing.stdout.splitlines():
+            fields = line.strip().split(None, 1)
+            if len(fields) == 2 and fields[0] == "honey-stack":
+                root = os.path.realpath(fields[1])
+                break
+        if kind == "local":
+            if not paths.source_checkout(root):
+                raise RuntimeError("Codex local marketplace is not an available Honey checkout")
+            roots["codex"] = root
+        elif root and root == recorded:
+            roots["codex"] = recorded
+    marketplaces = store.read_json(os.path.join(paths.claude_dir(), "plugins", "known_marketplaces.json"), {}) or {}
+    entry = marketplaces.get("honey-stack") or {}
+    origin = entry.get("source") or {}
+    settings = store.read_json(os.path.join(paths.claude_dir(), "settings.json"), {}) or {}
+    if (install._cli("claude") and (settings.get("enabledPlugins") or {}).get(install.PLUGIN)
+            and origin.get("source") == "directory" and origin.get("path")):
+        source = paths.source_checkout(origin["path"])
+        if not source:
+            raise RuntimeError("Claude local marketplace is not an available Honey checkout")
+        roots["claude"] = source
+    if len(set(roots.values())) > 1:
+        raise RuntimeError("Claude and Codex marketplaces point to different local checkouts")
+    return (next(iter(roots.values())), list(roots)) if roots else (None, [])
+
+
+def _refresh_local(source: str, pending: dict, agents: list) -> dict:
+    """Finish a checkout update; retain pending state until all installed copies refresh."""
+    from honey import install
+    if _git(source, "rev-parse", "HEAD").stdout.strip() != pending["head"]:
+        return {"status": "skipped", "reason": "source checkout changed while plugin refresh was pending"}
+    if _git(source, "status", "--porcelain").stdout.strip():
+        return {"status": "skipped", "reason": "local changes block pending plugin refresh"}
+    for agent in pending["agents"]:
+        exe = install._cli(agent)
+        if agent not in agents or not exe:
+            return {"status": "skipped", "reason": f"{agent} local marketplace changed while refresh was pending"}
+        cmd = ["plugin", "add", install.PLUGIN] if agent == "codex" else ["plugin", "update", install.PLUGIN]
+        if subprocess.run([exe, *cmd], capture_output=True, text=True, timeout=180, env=GIT_ENV).returncode != 0:
+            return {"status": "skipped", "reason": f"{agent} plugin refresh failed; will retry"}
+    store.write_json(paths.path("synced.json"), {"ts": time.strftime("%Y%m%dT%H%M%S"),
+                                                 "head": pending["head"], "source_repo": source})
+    return {"status": "updated", "from": pending["from"], "to": pending["to"]}
 
 
 def run() -> dict:
@@ -108,14 +214,40 @@ def run() -> dict:
     state = store.read_json(_state_file(), {}) or {}
     if time.time() - state.get("checked", 0) < CHECK_EVERY:
         return {"status": "skipped", "reason": "checked recently"}
-    store.write_json(_state_file(), dict(state, checked=time.time()))  # stamp first so a crash cannot loop
+    state = dict(state, checked=time.time())
+    store.write_json(_state_file(), state)  # stamp first so a crash cannot loop
     try:
         repo = REPO_OVERRIDE or paths.REPO
-        result = _update_plugins(repo) if _in_plugin_cache(repo) else update_checkout(repo)
+        if _in_plugin_cache(repo):
+            source, agents = _local_install()
+        elif not REPO_OVERRIDE:
+            source, agents = _local_install()
+            if source and os.path.realpath(repo) != source:
+                raise RuntimeError("runtime and configured local marketplace use different checkouts")
+            source = source or repo
+        else:
+            source, agents = repo, []  # isolated checkout override used in tests
+        pending = state.get("pending_refresh")
+        if pending:
+            if not source or source != pending["source"]:
+                result = {"status": "skipped", "reason": "local marketplace changed while plugin refresh was pending"}
+            else:
+                result = _refresh_local(source, pending, agents)
+        elif not source:
+            result = _update_plugins(repo)
+        else:
+            result = update_checkout(source)
+            if result["status"] == "updated" and agents:
+                head = _git(source, "rev-parse", "HEAD").stdout.strip()
+                pending = dict(result, source=source, head=head, agents=agents)
+                state["pending_refresh"] = pending
+                store.write_json(_state_file(), state)  # survive interruption after checkout moves
+                result = _refresh_local(source, pending, agents)
     except Exception as e:  # network, git or CLI trouble must never break a session
         result = {"status": "skipped", "reason": f"{type(e).__name__}: {e}"}
     state = dict(store.read_json(_state_file(), {}) or {}, last=result)
     if result["status"] == "updated":
+        state.pop("pending_refresh", None)
         state["pending_notice"] = result
     store.write_json(_state_file(), state)
     return result

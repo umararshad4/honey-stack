@@ -125,7 +125,7 @@ Instruction edits have conflict-checked `honey rsi revert <id>` snapshots; toolk
 
 ## Update · Uninstall
 
-honey updates itself. At each new session start a background job (checked at most once an hour) moves to the newest `vX.Y.Z` release; the session after the update opens with a one-line notice. It follows release tags only, never raw `main`, and leaves a checkout untouched if it has local edits, its own commits, or sits on a branch other than `main`. Turn it off with `{"autoupdate": false}` in `~/.honey/config.json`. A major release can change hook commands, so Codex may ask you to re-trust them (`/hooks`).
+honey checks for updates at session start, at most once an hour. For local Git marketplaces it fetches the newest `vX.Y.Z` release tag reachable from `main`, fast-forwards the checkout, and refreshes the installed plugin copies. It leaves local changes and diverged checkouts untouched. If a plugin refresh fails, it retries on a later session; the update notice appears after the refresh succeeds. The new version loads in a subsequent session. Remote plugin marketplaces use the agent's own marketplace update commands and follow the marketplace's configured ref. Turn updates off with `{"autoupdate": false}` in `~/.honey/config.json`. A major release can change hook commands, so Codex may ask you to re-trust them (`/hooks`).
 
 ```bash
 honey update                                   # update now; then /reload-plugins in Claude
