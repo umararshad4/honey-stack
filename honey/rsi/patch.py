@@ -8,6 +8,7 @@ Validated application fast-forwards the source checkout and runs `honey sync`.
 from __future__ import annotations
 
 import glob
+import fnmatch
 import hashlib
 import json
 import os
@@ -17,7 +18,7 @@ import subprocess
 import time
 
 from honey import paths
-from honey.rsi import curate, review, store, text
+from honey.rsi import behavioral, curate, review, store, text
 from honey.rsi.coach import skill_status
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -61,8 +62,7 @@ def evidence_for(skill: str, limit: int = 6) -> list:
             continue
         for ev in feedback.get("evidence", []):
             q = ev.get("q", "")
-            if (ev.get("event") == "prompt" and ev.get("origin") == "user" and not ev.get("quarantined", True)
-                    and q and not text.injection_hit(q) and q not in out):
+            if q and q not in out and curate.skill_evidence_matches(ev, skill, feedback["outcome"]):
                 out.append(text.redact(q, 300))
         if len(out) >= limit:
             return out[:limit]
@@ -73,18 +73,19 @@ def evidence_for(skill: str, limit: int = 6) -> list:
                 or re.match(r"^(?:honey:)?" + re.escape(skill) + r"(?: skill)?:", proposal.get("title", ""))):
             continue
         for ev in proposal.get("evidence", []):
-            if curate.revalidate_evidence(ev, events) and ev["q"] not in out:
+            if (curate.revalidate_evidence(ev, events) and ev["q"] not in out
+                    and curate.skill_evidence_matches(ev, skill)):
                 out.append(text.redact(ev["q"], 300))
         if len(out) >= limit:
             return out[:limit]
     for fp in sorted(glob.glob(paths.path("events", "*", "*.jsonl")), key=os.path.getmtime, reverse=True):
         rows = store.read_jsonl(fp)
-        bad = {r.get("t") for r in rows if r.get("e") == "skill_outcome" and r.get("name", "").split(":")[-1] == skill
-               and r.get("outcome") in ("neg", "misfire")}
+        bad = {r.get("t") for r in rows if r.get("e") == "skill_outcome"
+               and r.get("name", "").split(":")[-1] == skill and r.get("outcome") in ("neg", "misfire")}
         for r in rows:
-            if (r.get("e") == "prompt" and r.get("origin") == "user" and r.get("q") and not r.get("xc")
-                    and not text.injection_hit(r["q"]) and r["q"] not in out
-                    and (r.get("t") in bad or any(t < r.get("t", 0) <= t + 3 for t in bad))):
+            evidence = dict(r, event=r.get("e"), quarantined=bool(r.get("xc")))
+            if (r.get("q") and r["q"] not in out and r.get("t") in bad
+                    and curate.skill_evidence_matches(evidence, skill)):
                 out.append(text.redact(r["q"], 300))
         if len(out) >= limit:
             break
@@ -131,15 +132,22 @@ def write_case(root: str, skill: str, case: dict) -> str:
     return name
 
 
-def run_eval(root: str, glob_: str, out: str) -> dict:
+def run_eval(root: str, glob_: str, out: str, eval_dir: str = "evals") -> dict:
     exe = shutil.which("claude") or os.path.expanduser("~/.local/bin/claude")
     env = dict(os.environ, RSI_CHILD="1")
     # A stale result file must never turn a crashed evaluation into success.
     if os.path.exists(out):
         os.unlink(out)
+    expected = {os.path.basename(os.path.dirname(p))
+                for pattern in ("*/prompt.md", "*/case.yaml")
+                for p in glob.glob(os.path.join(root, eval_dir, pattern))
+                if fnmatch.fnmatch(os.path.basename(os.path.dirname(p)), glob_)}
     reservation = _reserve("eval", EVAL_USD, "claude")
-    result = subprocess.run([exe, "plugin", "eval", root, "--case", glob_, "--runs", "1", "--ablation", "none", "--max-cost-usd", str(EVAL_USD),
-                             "--no-publish", "--trust-plugin", "--json", out], capture_output=True, text=True, timeout=900, env=env)
+    command = [exe, "plugin", "eval", root, "--case", glob_, "--runs", "1", "--ablation", "none", "--max-cost-usd", str(EVAL_USD),
+               "--no-publish", "--trust-plugin", "--json", out, "--output-dir", os.path.abspath(out) + "-artifacts"]
+    if eval_dir != "evals":
+        command += ["--eval-dir", eval_dir, "--scaffold", "--allow-tools", "Bash", "Write", "Edit"]
+    result = subprocess.run(command, capture_output=True, text=True, timeout=900, env=env)
     d = store.read_json(out, {}) or {}
     _settle(reservation, d.get("costUsd"), False)
     if result.returncode not in (0, 1) or d.get("partial") or not d.get("cases"):
@@ -154,7 +162,11 @@ def run_eval(root: str, glob_: str, out: str) -> dict:
         values = [r.get("score") for r in runs]
         if any(type(v) not in (int, float) or not 0 <= v <= 1 for v in values):
             raise ValueError("evaluation contains missing or invalid scores")
+        if case["name"] in scores:
+            raise ValueError("evaluation contains duplicate cases")
         scores[case["name"]] = min(values)
+    if expected and set(scores) != expected:
+        raise ValueError("evaluation case coverage is incomplete or unexpected")
     _settle(reservation, d.get("costUsd"), True)
     return scores
 
@@ -346,6 +358,7 @@ def _check_runtime_snapshot(proposal: dict, dirty: set) -> None:
 
 def _evaluate(skill, status, new_src, rationale, cases, evidence):
     source = paths.source_repo()
+    maintained = behavioral.snapshot(source)
     runtime = _runtime_files(source)
     target = f"skills/{skill}/SKILL.md"
     snapshot = {"target": target, "sha256": _runtime_digest(runtime, target)}
@@ -353,21 +366,37 @@ def _evaluate(skill, status, new_src, rationale, cases, evidence):
     branch, wt = f"rsi/{skill}-{date}", os.path.join(source, ".worktrees", f"rsi-{skill}-{date}")
     git("worktree", "add", "-q", wt, "-b", branch)
     kept = False
+    suite = None
     try:
         _overlay_runtime(wt, runtime)
         names = [write_case(wt, skill, case) for case in cases]
-        glob_ = "*" + skill + "*"
+        suite, case_digests, suite_digest = behavioral.prepare(source, wt, skill, maintained)
         res_dir = paths.path("evals", f"{skill}-{date}")
         os.makedirs(res_dir, exist_ok=True)
-        before = run_eval(wt, glob_, os.path.join(res_dir, "before.json"))
-        if _runtime_digest(_runtime_files(wt), target) != snapshot["sha256"]:
+        before = run_eval(wt, "*", os.path.join(res_dir, "before.json"), suite)
+        behavioral.verify_suite(wt, suite, suite_digest)
+        behavioral.verify_cases(wt, case_digests)
+        behavioral.verify(wt, maintained)
+        checked_runtime = _runtime_files(wt)
+        if checked_runtime.get(target) != runtime.get(target):
+            raise ValueError('evaluation target changed during the baseline arm')
+        if _runtime_digest(checked_runtime, target) != snapshot["sha256"]:
             raise ValueError("evaluation runtime changed from its source snapshot")
         store.write_text(os.path.join(wt, "skills", skill, "SKILL.md"), new_src)
-        after = run_eval(wt, glob_, os.path.join(res_dir, "after.json"))
-        if _runtime_digest(_runtime_files(wt), target) != snapshot["sha256"]:
+        expected_target = _runtime_files(wt).get(target)
+        after = run_eval(wt, "*", os.path.join(res_dir, "after.json"), suite)
+        behavioral.verify_suite(wt, suite, suite_digest)
+        behavioral.verify_cases(wt, case_digests)
+        behavioral.verify(wt, maintained)
+        behavioral.verify(source, maintained)
+        checked_runtime = _runtime_files(wt)
+        if checked_runtime.get(target) != expected_target:
+            raise ValueError('evaluation target changed during the candidate arm')
+        if _runtime_digest(checked_runtime, target) != snapshot["sha256"]:
             raise ValueError("evaluation runtime changed from its source snapshot")
         case = next((n for n, c in zip(names, cases) if c["should_fire"]), names[0])
-        evaluation = {"before": before, "after": after, "case": case}
+        evaluation = {"before": before, "after": after, "case": case, "behavioral": maintained,
+                      "case_sha256": case_digests, "generated_cases": names}
         try:
             _validate_eval({"eval": evaluation})
             if any(after.get(n) != 1 for n in names):
@@ -387,6 +416,8 @@ def _evaluate(skill, status, new_src, rationale, cases, evidence):
         kept = True
         return {"proposed": p["id"]}
     finally:
+        if suite:
+            shutil.rmtree(os.path.join(wt, suite), ignore_errors=True)
         if not kept:
             git("worktree", "remove", "--force", wt, check=False)
             git("branch", "-D", branch, check=False)
@@ -404,6 +435,19 @@ def _validate_eval(p: dict) -> None:
     for scores in (before, after):
         if any(type(v) not in (int, float) or not 0 <= v <= 1 for v in scores.values()):
             raise ValueError("patch eval contains missing or invalid scores")
+    behavioral.validate(evidence.get("behavioral"))
+    selected = evidence.get("case_sha256")
+    generated = evidence.get("generated_cases")
+    if (not isinstance(selected, dict) or not isinstance(generated, list) or case not in generated
+            or set(before) != set(selected) or set(after) != set(selected)
+            or not set(evidence["behavioral"]["cases"]).issubset(selected)
+            or any(not isinstance(name, str) or not re.fullmatch(r"[a-zA-Z0-9][a-zA-Z0-9_-]*", name)
+                   or not re.fullmatch(r"[0-9a-f]{64}", str(digest)) for name, digest in selected.items())
+            or any(selected.get(name) != digest for name, digest in evidence["behavioral"]["cases"].items())
+            or any(not isinstance(name, str) or not name.startswith("rsi-") or name not in selected for name in generated)):
+        raise ValueError("patch evaluation case coverage or fixture digests are incomplete")
+    if any(after[name] != 1 for name in evidence["behavioral"]["cases"]):
+        raise ValueError("maintained behavioral evaluation did not pass")
     if before[case] >= 1 or after[case] < 1 or any(after[c] < v for c, v in before.items()):
         raise ValueError("patch eval did not fix the regression without regressing prior cases")
 
@@ -423,6 +467,7 @@ def accept(p: dict) -> str:
     if (set(changed) & dirty) - {""}:
         raise ValueError("evaluated patch target has uncommitted changes; preserving user edits")
     _check_runtime_snapshot(p, dirty)
+    behavioral.verify_application(paths.source_repo(), p["eval"], changed)
     if state.get("state") == "sync_pending":
         if head != state.get("merged_sha") or patch_sha != head:
             raise ValueError("source checkout changed after the partial application; inspect it before retrying sync")

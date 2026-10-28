@@ -99,4 +99,4 @@ Done when: the spec exists and every ticket is published with its blocking edges
 
 ## 5. Hand off
 
-If the user asked for the plan itself, link it and stop. If they asked for the work, continue straight into the `execute` skill; the plan is the record, not a gate. Process `strict`: link it and wait for the user's go before executing.
+If the user asked for the plan itself, link it and stop. If they already asked for implementation, continue into `execute`; the plan records the authorized scope. In strict mode, ask only for an unresolved product decision or a scope expansion. Do not ask again for implementation already authorized.

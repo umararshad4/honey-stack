@@ -35,6 +35,66 @@ ENDS_Q = re.compile(r"(?:\?\s*\**\s*$)|\b(?:would you like|should i|do you want|
 
 NEGATIVE = {"correction", "still", "frustration", "revert"}
 
+# These are evidence categories, not diagnoses. Ambiguous corrections stay unassigned.
+FEEDBACK_REQUIREMENT = re.compile(
+    r"\b(?:i meant|other project|different project|changed? (?:the )?(?:requirement|scope)|"
+    r"new requirement|actually[,]? (?:i |we )?(?:want|need)|instead of|not what i (?:asked|meant))\b", re.I)
+FEEDBACK_PREFERENCE = re.compile(
+    r"\b(?:prefer|shorter|less verbose|too verbose|more concise|tone|wording|writing style|"
+    r"use (?:a )?(?:table|bullets)|make it (?:short|brief|longer))\b", re.I)
+FEEDBACK_ENVIRONMENT = re.compile(
+    r"\b(?:rate limit|quota|provider outage|network (?:error|failure|unavailable)|"
+    r"permission denied|credentials? (?:expired|missing|invalid)|(?:missing|expired) credentials?|"
+    r"disk (?:is )?full|no space left|enospc|dns|connection refused|service unavailable)\b", re.I)
+FEEDBACK_BEHAVIOR = re.compile(
+    r"\b(?:fail(?:s|ed|ing|ure)?|broken|wrong|incorrect|missed|misfired|regression|"
+    r"didn'?t (?:test|check|verify|work)|doesn'?t work|does not work|broke)\b", re.I)
+NEW_REQUEST = re.compile(
+    r"^\s*(?:please\s+|(?:can|could|would) you\s+)?(?:fix|debug|build|create|implement|investigate|"
+    r"review|explain|show|tell|add|remove|update|write|test)\b", re.I)
+
+
+def feedback_kind(prompt: str, sig=None) -> str:
+    """Conservatively distinguish task feedback from preferences and external failures."""
+    p = (prompt or "")[:2000]
+    if origin(p) != "user":
+        return "none"
+    sig = set(classify(p) if sig is None else sig)
+    if FEEDBACK_ENVIRONMENT.search(p):
+        return "environment"
+    if FEEDBACK_REQUIREMENT.search(p):
+        return "requirement"
+    if FEEDBACK_PREFERENCE.search(p):
+        return "preference"
+    if NEW_REQUEST.search(p) and not sig & {"correction", "still"}:
+        return "none"
+    if "still" in sig or FEEDBACK_BEHAVIOR.search(p):
+        return "behavior"
+    if "accept" in sig or re.search(r"\bskill (?:worked|was helpful)\b", p, re.I):
+        return "accept"
+    if "continue" in sig:
+        return "continue"
+    return "uncertain" if NEGATIVE & sig else "none"
+
+
+def mentions_skill(prompt: str, skill: str) -> bool:
+    """A named skill is stronger evidence than a keyword such as 'debugging'."""
+    name = re.escape((skill or "").split(":")[-1])
+    if not name:
+        return False
+    return bool(re.search(r"(?:[/$]|\bhoney:)" + name + r"\b|\b" + name + r"\s+skill\b|\bskill\s+" + name +
+                          r"\b|\b" + name + r"\s+(?:failed|missed|worked|misfired)\b", prompt or "", re.I))
+
+
+def referenced_skills(prompt: str) -> set:
+    """Strong references also include skills that were never observed in this task."""
+    names = set()
+    for pattern in (r'(?:[/$](?:honey:)?|\bhoney:)([a-z][\w-]*)',
+                    r'\b([a-z][\w-]*)\s+skill\b',
+                    r'\bskill\s+([a-z][\w-]*)(?=\s+(?:failed|missed|worked|misfired)\b|[.!?:,]|$)'):
+        names.update(re.findall(pattern, prompt or '', re.I))
+    return {n.lower() for n in names} - {'the', 'a', 'this', 'that', 'failed', 'worked', 'was', 'is', 'has'}
+
 
 def origin(prompt: str) -> str:
     if SYSTEM_ORIGIN.search(prompt or ""):

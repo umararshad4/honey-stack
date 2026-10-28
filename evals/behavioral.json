@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "runner": "claude-plugin-eval",
+  "cases": [
+    "behavior-preserve-readonly",
+    "behavior-scoped-config-edit",
+    "behavior-failed-verification"
+  ],
+  "clients": [
+    "claude"
+  ]
+}

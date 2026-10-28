@@ -42,6 +42,7 @@ hook("claude", dict(C, hook_event_name="UserPromptSubmit", prompt="fix the date 
 hook("claude", dict(C, hook_event_name="PostToolUse", tool_name="Edit", tool_input={"file_path": "/tmp/a.py", "new_string": "x = 1"}))
 assert hook("claude", dict(C, hook_event_name="Stop", last_assistant_message="Fixed it."))["decision"] == "block"
 assert hook("claude", dict(C, hook_event_name="Stop", last_assistant_message="Fixed it.", stop_hook_active=True)) == {}
+hook("claude", dict(C, hook_event_name="PostToolUse", tool_name="Bash", tool_input={"command": "pytest"}, tool_response={"exit_code": 0}))
 assert hook("claude", dict(C, hook_event_name="Stop", last_assistant_message="Fixed.\nChecks run: pytest pass.")) == {}
 
 # secret scan on new text only
@@ -52,7 +53,7 @@ assert hook("claude", dict(C, hook_event_name="PostToolUse", tool_name="Write",
                            tool_input={"file_path": "/tmp/cfg.py", "content": 'API_KEY = os.environ["API_KEY"]'})) == {}
 
 # skill attribution: model invokes a skill, the next user turn is a correction → neg outcome
-hook("claude", dict(C, hook_event_name="PostToolUse", tool_name="Skill", tool_input={"skill": "honey:ship"}))
+hook("claude", dict(C, hook_event_name="PostToolUse", tool_name="Skill", tool_input={"skill": "honey:ship"}, tool_response={}))
 hook("claude", dict(C, hook_event_name="UserPromptSubmit", prompt="no, that's wrong, I said don't push"))
 
 # the note is in the next session's brief — on Codex too (one agent-neutral ledger)

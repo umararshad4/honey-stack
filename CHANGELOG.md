@@ -10,8 +10,21 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 
 ## [Unreleased]
 
+### Added
+- Session-specific hook health separates installation, enablement, delivery and supported payload coverage.
+- Task contracts record scope, workspace and operation-specific checks; completion reminders use fresh observed results instead of receipt wording alone.
+- Bounded task/session tool metrics and coach denominators for repeated reads/checks, failures, unknown results and reported durations.
+- Maintained behavioral evaluation cases, fixture integrity checks and exact candidate checks before skill patches apply.
+
+### Changed
+- Feedback attribution uses task identity and explicit skill references, preserving uncertainty for ambiguous corrections, requirement changes, preferences and environment failures.
+- Strict test-first guidance applies to code; inspection stays read-only and system tasks use resulting-state checks.
+
 ### Fixed
 - Local marketplace auto-updates now fetch release tags into the source checkout and refresh installed plugins. Failed refreshes remain pending for retry and do not report a successful update.
+- Recognize modern shell/read/edit envelopes, reject conflicting success metadata, and preserve missing or opaque outcomes as unverified.
+- Keep failed, incomplete, stale and previous-task checks from verifying current work; permit explicit workspace binding for sessions started outside the project.
+- Isolate direct test-helper imports from real RSI state and paid providers.
 
 ## [0.11.0] - 2026-10-19
 

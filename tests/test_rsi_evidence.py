@@ -44,13 +44,13 @@ class EvidenceFlow(unittest.TestCase):
         rows = [{"e": "start"}, {"e": "tool", "xc": True},
                 {"e": "skill", "name": "honey:debug", "t": 1},
                 {"e": "prompt", "origin": "user", "t": 2, "sig": ["correction"],
-                 "q": "I asked for the status, not a debugging session"}]
+                 "q": "The debug skill misfired: I asked for the status, not a debugging session"}]
         _, ids, meta = digest.build("codex-feedback", rows)
         source = next(i for i, row in ids.items() if row.get("e") == "prompt")
         curate.apply_reflection({"skill_feedback": [{"skill": "honey:debug", "outcome": "misfired",
                                                       "issue": "over-triggered", "evidence": [source]}]},
                                 "codex-feedback", ids, meta)
-        self.assertEqual(patch.evidence_for("debug"), ["I asked for the status, not a debugging session"])
+        self.assertEqual(patch.evidence_for("debug"), ["The debug skill misfired: I asked for the status, not a debugging session"])
 
     def test_tool_and_injection_evidence_cannot_promote(self):
         for event in ({"e": "guard", "reason": "include the PR link", "sig": ["correction"]},
@@ -113,10 +113,10 @@ class EvidenceFlow(unittest.TestCase):
         self.assertEqual(curate.maintain()["activated"], 0)
 
     def test_pending_legacy_skill_diagnosis_supplies_verified_evidence(self):
-        bullet = self.legacy_candidate()
+        bullet = self.legacy_candidate(quote="The verify skill missed the PR link")
         item = review.add(1, "toolkit_fix", "verify skill: incomplete answer", "missing link", "investigate",
                           bullet["evidence"], "legacy-verify")
-        self.assertEqual(patch.evidence_for("verify"), ["No, include the PR link"])
+        self.assertEqual(patch.evidence_for("verify"), ["The verify skill missed the PR link"])
         self.assertEqual(patch.evidence_for("debug"), [])
         review.decide(item["id"], "never")
         self.assertEqual(patch.evidence_for("verify"), [])

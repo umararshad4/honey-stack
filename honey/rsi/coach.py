@@ -84,12 +84,25 @@ def report(weeks: int = 4) -> str:
         out.append(f"Insufficient data: {n} observed sessions (need {MIN_N}). Keep working normally; RSI is still collecting.")
     else:
         for f, label in (("correction", "corrections"), ("still", "'still broken'"), ("frustration", "frustration"),
-                         ("false_done", "done-claims followed by a correction"), ("unneeded_q", "questions answered with just 'continue'")):
+                         ("false_done", "done-claims followed by behavior feedback"), ("unneeded_q", "questions answered with just 'continue'")):
             a, b = _rate(cur, f), _rate(prev, f)
-            trend = "" if b is None or a is None else (" ↓ better" if a < b * 0.7 else " ↑ worse" if a > b * 1.3 else " → flat")
+            trend = "" if b is None or a is None else (" ↓ lower" if a < b * 0.7 else " ↑ higher" if a > b * 1.3 else " → flat")
             out.append(f"- {label}: {a} per 10 turns (was {b}){trend}")
         out.append(f"- tool failures: {_rate(cur, 'tool_fail', 'sessions', 1)} per session; compactions: {_rate(cur, 'compact', 'sessions', 1)} per session")
         out.append(f"- acceptance ('perfect', 'lgtm'…): {_rate(cur, 'accept')} per 10 turns. Read corrections together with this: fewer corrections and fewer acceptances can mean you stopped bothering.")
+    out.append("\n## Tool observations")
+    calls, completed = cur.get("eff_tool_calls", 0), cur.get("eff_completed_calls", 0)
+    if calls:
+        out.append(f"- completed tool calls: {completed}/{calls}; unknown results: {max(0, calls - completed)}/{calls}")
+        out.append(f"- failed calls: {cur.get('eff_failed_calls', 0)}/{completed} completed calls")
+        out.append(f"- repeated reads: {cur.get('eff_repeated_reads', 0)}/{cur.get('eff_read_calls', 0)} completed reads; "
+                   f"repeated checks: {cur.get('eff_repeated_checks', 0)}/{cur.get('eff_check_calls', 0)} completed checks")
+        out.append(f"- reported duration: {cur.get('eff_duration_ms', 0):g} ms across {cur.get('eff_duration_samples', 0)} "
+                   f"of {completed} completed calls")
+    else:
+        out.append("- No tool result metrics observed yet.")
+    out.append("These are observations, not a speedup measurement. Repeated reads/checks can be necessary; "
+               "fingerprints reset after mutations and task changes. Missing durations and hook events are not estimated.")
     doms = prof.get("domains", {})
     grow = sorted((k for k, d in doms.items() if d.get("growing", 0) >= 2 and d.get("growing", 0) > d.get("repeating", 0)), key=lambda k: -doms[k]["growing"])
     rep = sorted((k for k, d in doms.items() if d.get("repeating", 0) >= 3), key=lambda k: -doms[k]["repeating"])
@@ -104,10 +117,12 @@ def report(weeks: int = 4) -> str:
     sc = store.read_json(paths.path("scorecards.json"), {}) or {}
     out.append("\n## Skills")
     if sc:
-        out.append("| skill | uses | ✓ | ✗ | misfire/missed | status |\n|---|---|---|---|---|---|")
+        out.append("| skill | uses | ✓ | ✗ | uncertain | misfire/missed | status |\n|---|---|---|---|---|---|---|")
         for name, c in sorted(sc.items(), key=lambda kv: -(kv[1].get("inv_user", 0) + kv[1].get("inv_model", 0))):
             out.append(f"| {name} | {c.get('inv_user', 0) + c.get('inv_model', 0)} | {c.get('pos', 0) + c.get('worked', 0)} | "
-                       f"{c.get('neg', 0) + c.get('failed', 0)} | {c.get('misfire', 0)}/{c.get('missed', 0)} | {skill_status(c)} |")
+                       f"{c.get('neg', 0) + c.get('failed', 0)} | {c.get('uncertain', 0)} | "
+                       f"{c.get('misfire', 0)}/{c.get('missed', 0)} | {skill_status(c)} |")
+        out.append("Feedback records may include both observation and reflection of one turn. Uncertain records do not count toward patch candidates.")
     else:
         out.append("- No skill use observed yet.")
     sugg = []
@@ -134,7 +149,8 @@ def report(weeks: int = 4) -> str:
     if bd.get("/usage", 0) >= 10:
         sugg.append(f"You check /usage on {bd['/usage']} distinct days → a rate-limit segment in the statusline would save the round-trip.")
     if cur.get("unneeded_q", 0) >= 3:
-        sugg.append(f"The agent asked {cur['unneeded_q']} questions you answered with just 'continue' → RSI will weigh 'decide, don't ask' higher.")
+        sugg.append(f"The agent asked {cur['unneeded_q']} questions you answered with just 'continue'. "
+                    "Review whether permission was already granted; the count alone does not establish unnecessary blocking.")
     out.append("\n## Suggestions")
     out += [f"{i}. {s}" for i, s in enumerate(sugg[:3], 1)] or ["- None with enough evidence yet."]
     hold = [w for w in weekly.values() if w.get("holdout")]

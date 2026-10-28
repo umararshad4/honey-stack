@@ -11,6 +11,18 @@ metadata:
 
 This is the gate between "I changed it" and "it's done". Prove the claim itself, not a proxy for it.
 
+## Task evidence
+
+For non-trivial execution, inspect `honey task status --json`. Codex uses `CODEX_THREAD_ID`; on other hosts pass `--agent claude --session <session-id>` to every command. Replace `<session-id>` and `<call-id>` with the real host identifiers. When the task's project differs from the session directory, pass `--cwd /actual/project` to `task set` before running checks.
+
+- Code: `honey task set --mode execute --operation code`. The default `verification` check accepts a recognized successful test/lint command in this task's workspace after its latest observed mutation. For separate test and lint requirements, add `--check tests --check lint` and map each result explicitly.
+- Uninstall: `honey task set --mode execute --operation uninstall --target /Applications/Example.app`. Required checks are `application`, `helpers`, `startup`, and `preserved-data`. Name the real app path. Check registrations as well as files; record anything deliberately retained.
+- Startup change: `honey task set --mode execute --operation startup`; the `startup` check must inspect the resulting registration, not just the command that changed it.
+- Link a completed assertion/check using `honey task verify --check startup --tool-call <call-id>`. Only a successful observed call in the current task/workspace after the latest mutation is accepted. Choose a command whose assertion actually proves the named check; exit zero alone does not establish semantics.
+- For a declared file target, `honey task verify --check application --absent /Applications/Example.app` measures absence directly. `--present` measures existence. Neither executes a shell command.
+
+The task record is an evidence aid, not a permission grant or a complete sandbox. Opaque wrappers and unobserved external changes cannot be verified. State that limit; do not relabel unknown status as a pass. Recheck after changes. A failed or incomplete recognized check must be rerun successfully or explicitly reported as unresolved. Read-only answers need no execution contract or receipt.
+
 ## 1. Match each claim to its evidence
 
 | Claim | Evidence that proves it | Not enough |

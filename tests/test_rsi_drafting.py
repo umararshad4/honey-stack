@@ -1,5 +1,7 @@
 """Automatic skill drafts retain real git/evidence effects; providers are fixtures."""
 import os
+import json
+import shutil
 from pathlib import Path
 import subprocess
 import tempfile
@@ -19,6 +21,10 @@ class Drafting(unittest.TestCase):
         for args in [('init', '-q'), ('config', 'user.name', 'Test'), ('config', 'user.email', 'test@example.test')]:
             self.git(*args)
         store.write_text(str(self.root / 'skills/debug/SKILL.md'), '---\nname: debug\ndescription: Debug failures\n---\nReproduce first.\n')
+        for name in ['behavioral.json', *json.loads(Path(REPO, 'evals/behavioral.json').read_text())['cases']]:
+            source, target = Path(REPO, 'evals', name), self.root / 'evals' / name
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(source, target) if source.is_dir() else shutil.copy2(source, target)
         self.git('add', '.'); self.git('commit', '-qm', 'initial')
         self.proposal = {'id': 'p-new', 'type': 'skill_new', 'title': 'Repeated changelog task', 'evidence': [
             {'sid': 'claude-one', 'q': 'Write release notes from these changes', 'quarantined': False},
@@ -32,10 +38,12 @@ class Drafting(unittest.TestCase):
     def git(self, *args):
         return subprocess.run(['git', '-C', str(self.root), *args], check=True, capture_output=True, text=True).stdout.strip()
 
-    def evaluate(self, root, pattern, out):
+    def evaluate(self, root, pattern, out, eval_dir="evals"):
         has_skill = Path(root, 'skills/release-notes/SKILL.md').exists()
-        cases = list(Path(root, 'evals').glob('rsi-release-notes-*/graders/trigger.md'))
-        return {p.parent.parent.name: 1 if 'max: 0' in p.read_text() or has_skill else 0 for p in cases}
+        cases = list(Path(root, eval_dir).glob('rsi-release-notes-*/graders/trigger.md'))
+        scores = {p.parent.parent.name: 1 if 'max: 0' in p.read_text() or has_skill else 0 for p in cases}
+        scores.update({p.name: 1 for p in Path(root, eval_dir).glob('behavior-*')})
+        return scores
 
     def test_new_skill_becomes_evaluated_child_without_applying_parent(self):
         with mock('honey.rsi.reflect.call_llm', return_value=(self.draft, 0, 'fake')), mock.object(patch, 'run_eval', side_effect=self.evaluate):
@@ -45,7 +53,7 @@ class Drafting(unittest.TestCase):
         self.assertEqual(child['status'], 'pending')
         self.assertFalse((self.root / 'skills/release-notes/SKILL.md').exists())
         self.assertIn('release-notes', self.git('show', child['branch'] + ':skills/release-notes/SKILL.md'))
-        self.assertEqual(len(child['eval']['after']), 2)
+        self.assertEqual(len(child['eval']['after']), 5)
 
     def test_keyword_only_or_untrusted_requests_do_not_call_provider(self):
         for evidence in [[{'q': 'next one'}], [dict(e, quarantined=True) for e in self.proposal['evidence']]]:

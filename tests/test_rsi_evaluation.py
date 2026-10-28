@@ -57,6 +57,26 @@ class Evaluation(unittest.TestCase):
     def test_real_behavior_failure_remains_a_valid_baseline(self):
         self.assertEqual(self.eval_result({'cases': [{'name': 'case', 'arms': {'with': [{'score': 0}]}}]}, 1), {'case': 0})
 
+    def test_missing_selected_case_is_not_a_complete_evaluation(self):
+        for name in ('case', 'missing'):
+            directory = Path(self.root, 'evals', name)
+            directory.mkdir(parents=True)
+            (directory / 'prompt.md').write_text('A maintained behavior case.\n')
+        with self.assertRaisesRegex(ValueError, 'missing|coverage'):
+            self.eval_result({'cases': [{'name': 'case', 'arms': {'with': [{'score': 1}]}}]})
+
+    def test_maintained_runner_uses_scaffold_and_separate_results(self):
+        out = str(Path(self.root, 'result.json'))
+        def execute(command, **kwargs):
+            self.assertEqual(command[command.index('--eval-dir') + 1], '.suite')
+            self.assertIn('--scaffold', command)
+            self.assertEqual(command[command.index('--max-cost-usd') + 1], '0.35')
+            self.assertFalse(command[command.index('--output-dir') + 1].startswith(str(Path(self.root, '.suite'))))
+            store.write_json(out, {'costUsd': 0, 'cases': [{'name': 'case', 'arms': {'with': [{'score': 1}]}}]})
+            return subprocess.CompletedProcess(command, 0, '', '')
+        with mock.object(patch.subprocess, 'run', side_effect=execute):
+            self.assertEqual(patch.run_eval(self.root, '*', out, '.suite'), {'case': 1})
+
     def test_evaluation_rechecks_budget_after_previous_call(self):
         from honey.rsi import text
         store.append_jsonl(str(Path(self.root, 'costs.jsonl')), {'ts': text.now(), 'usd': 1.4})

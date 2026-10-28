@@ -37,7 +37,9 @@ Without a subagent tool, run every item inline in the same order.
 
 ## 3. Work each item
 
-1. Implement the smallest change that satisfies the item. Process `strict`: write the failing test first with the `tdd` skill.
+Keep the user's scope across turns. `continue` does not authorize new resources or destructive actions. For non-trivial work, use `honey task set` to name the operation, targets and required checks; `honey task status --json` shows the current evidence and diagnostic metrics. A new task starts without old proof. An inspection request stays read-only until the user asks for execution. These records never override host permissions.
+
+1. Implement the smallest change that satisfies the item. For code changes in process `strict`, write the failing test first with the `tdd` skill. For system tasks, check the resulting state; keep inspection tasks read-only.
 2. Run the `verify` skill with the item's check.
 3. **Pass**: tick it (`- [ ]` → `- [x]`) in the plan or `TODO.md`. For GitHub tickets, leave the issue open and list it in the report; closing is the `ship` skill's job.
 4. **Fail**: run the `debug` skill. Spend at most two fix rounds on one item, then write a blocker under it and move to the next item that doesn't depend on it:
