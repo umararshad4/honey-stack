@@ -145,7 +145,7 @@ def report(weeks: int = 4) -> str:
     bd = dict((k, v) for k, v in base)
     if bd.get("/model", 0) + bd.get("/effort", 0) >= 20:
         sugg.append(f"You switch /model ({bd.get('/model', 0)} days) and /effort ({bd.get('/effort', 0)} days) often → set per-task defaults "
-                    "(e.g. `honey strict` sessions on opus/high, quick fixes on sonnet) instead of switching by hand.")
+                    "(e.g. complex investigations on opus/high, quick fixes on sonnet) instead of switching by hand.")
     if bd.get("/usage", 0) >= 10:
         sugg.append(f"You check /usage on {bd['/usage']} distinct days → a rate-limit segment in the statusline would save the round-trip.")
     if cur.get("unneeded_q", 0) >= 3:

@@ -77,6 +77,19 @@ def write_text(file: str, text: str) -> None:
 
 
 @contextlib.contextmanager
+def session_lock(file):
+    """Serialize each session's read/modify/write without blocking other sessions."""
+    import fcntl
+    ensure_dir(os.path.dirname(file))
+    fd = os.open(file + '.lock', os.O_CREAT | os.O_RDWR, 0o600)
+    try:
+        fcntl.flock(fd, fcntl.LOCK_EX)
+        yield
+    finally:
+        os.close(fd)
+
+
+@contextlib.contextmanager
 def lock(blocking=True):
     """Exclusive lock on ~/.honey/.lock. Yields False if non-blocking and already held."""
     import fcntl

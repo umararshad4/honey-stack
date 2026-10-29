@@ -37,7 +37,7 @@ One is the minimal viable version (fewest files, smallest diff). One is the idea
 | EXPANSION | Push scope up. What's the 10x version for 2x the effort? What adjacent 30-minute touches would make it sing? | Greenfield feature; the user says "go big" |
 | SELECTIVE | Hold the scope and make it bulletproof, but surface each expansion separately for the user to cherry-pick, with neutral effort and risk. | Enhancing an existing system |
 | HOLD | Scope is accepted. Make it bulletproof: failure modes, edge cases, observability. Neither add nor cut silently. | Bug fix, refactor |
-| REDUCTION | Find the minimum that ships the core outcome; everything else becomes a follow-up. Separate "must ship together" from "nice to ship together". | Plan touches more than 15 files; honey scope `ultra` |
+| REDUCTION | Find the minimum that ships the core outcome; everything else becomes a follow-up. Separate "must ship together" from "nice to ship together". | Plan touches more than 15 files or the requirements are broad |
 
 Expansions are opt-in, one decision brief each, with three options: add to this plan, defer (write it down under "Not in scope" with the reason), or skip. Raise scope concerns once, here. After the mode is chosen, execute it faithfully: in REDUCTION don't sneak scope back, in EXPANSION don't argue for less.
 

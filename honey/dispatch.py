@@ -33,6 +33,12 @@ class Ctx:
 
 def _init_state(ctx) -> None:
     if "started" in ctx.state:
+        mode = modes.selected(ctx.state, modes.defaults()["mode"])
+        if ctx.state.get("mode") != mode or any(key in ctx.state for key in ("scope", "process", "voice")):
+            ctx.state["mode"] = mode
+            for key in ("scope", "process", "voice"):
+                ctx.state.pop(key, None)
+            ctx.dirty = True
         return
     ctx.state.update(modes.defaults())
     ctx.state.update(started=text.now(), turn=0, agent=ctx.agent,
@@ -267,13 +273,14 @@ HANDLERS = {"SessionStart": session_start, "UserPromptSubmit": user_prompt, "Use
 
 
 def handle(agent: str, payload: dict) -> dict:
-    ctx = Ctx(agent, payload)
-    out = HANDLERS.get(ctx.event, passive)(ctx)
-    health.record(ctx)
-    if ctx.dirty:
-        # shortcut: last-writer-wins on concurrent hooks of one session; per-field merge if lost updates show up
-        store.write_json(ctx.state_file, ctx.state)
-    return out or {}
+    file = paths.path('state', 'sessions', paths.session_key(agent, payload.get('session_id', '')) + '.json')
+    with store.session_lock(file):
+        ctx = Ctx(agent, payload)
+        out = HANDLERS.get(ctx.event, passive)(ctx)
+        health.record(ctx)
+        if ctx.dirty:
+            store.write_json(ctx.state_file, ctx.state)
+        return out or {}
 
 
 def run(agent: str) -> int:

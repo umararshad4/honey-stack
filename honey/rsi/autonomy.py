@@ -155,8 +155,10 @@ def repair_toolkit(proposal: dict) -> str:
 
 def run() -> dict:
     """Drain a bounded snapshot. Caller owns store.lock; do not nest it here."""
+    from honey.rsi import publish
+    announced = publish.run(include_patches=False)
     if not enabled():
-        return {"skipped": "autonomy disabled"}
+        return {"skipped": "autonomy disabled", "publication": announced}
     out = {"applied": [], "blocked": [], "deferred": []}
     queue = sorted(review.pending(), key=lambda p: (p.get("last_attempt_ns", 0), p.get("created", ""), p["id"]))
     for proposal in queue[:MAX_PER_RUN]:
@@ -187,6 +189,7 @@ def run() -> dict:
                          last_attempt_ns=time.time_ns(), attempt_state=state)
             store.write_json(paths.path("proposals", saved["id"] + ".json"), saved)
             out[state].append({"id": saved["id"], "reason": saved["last_error"]})
+    out['publication'] = publish.run(suggestion_result=announced.get('suggestions'))
     curate.write_brief_md()
     store.write_json(paths.path("state", "autonomy-last.json"), dict(out, ts=text.now()))
     return out

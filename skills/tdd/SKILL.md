@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: "Use when building or fixing test-first, the user mentions TDD, red-green or a regression test, or process mode is strict."
+description: "Use when building or fixing test-first, or the user mentions TDD, red-green or a regression test."
 license: MIT
 metadata:
   reviewed: "2026-10-18"
@@ -57,9 +57,9 @@ If no cheap test path exists (it would need a broad harness, production-only sta
 | Setup is huge or everything needs a mock | The design is too coupled. Inject the boundary dependency and simplify the interface. |
 | Test passes on its first run | It tests existing behavior or nothing. Fix the test before writing code. |
 
-## Strict mode
+## Explicit strict TDD
 
-Applies when process is strict or the user asks for strict TDD.
+Applies when the user asks for strict TDD. Response modes do not change the test workflow.
 
 ```
 NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
@@ -69,4 +69,4 @@ Production code written before its test gets deleted, not kept as reference or a
 
 Start the slice over if a test passes before the code exists, if you can't explain why it failed, or if a test is being deferred to "after".
 
-Light mode runs the same loop, but a slice with no cheap test seam may use the closest executable check (see above) and name it in the receipt.
+Otherwise run the same loop, but a slice with no cheap test seam may use the closest executable check (see above) and name it in the receipt.

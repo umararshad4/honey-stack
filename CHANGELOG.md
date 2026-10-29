@@ -6,21 +6,26 @@ All notable changes to honey-stack. The format follows [Keep a Changelog](https:
 - **MINOR**: new skills or RSI capabilities
 - **PATCH**: fixes
 
-Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions then publishes the release from this file.
+Successful main CI automatically versions and publishes releases. Manual releases remain available with `python3 scripts/release.py X.Y.Z --push`.
 
 ## [Unreleased]
 
 ### Added
+- `honey task run` executes real verification commands and records snapshot-bound evidence on hosts that hide inner tool events.
+- Opt-in `honey rsi publish on/off/status/run` publishes pending suggestions as GitHub issues and applied, evaluated skill changes as PRs, with duplicate prevention, exact-head receipts and retryable failures. Private session evidence, evaluation history and local preferences stay local.
+- Automatic semantic-version releases after successful main CI, with atomic commit/tag pushes, stale-run protection and retryable GitHub publication.
 - Session-specific hook health separates installation, enablement, delivery and supported payload coverage.
 - Task contracts record scope, workspace and operation-specific checks; completion reminders use fresh observed results instead of receipt wording alone.
 - Bounded task/session tool metrics and coach denominators for repeated reads/checks, failures, unknown results and reported durations.
 - Maintained behavioral evaluation cases, fixture integrity checks and exact candidate checks before skill patches apply.
 
 ### Changed
+- Replaced scope/process/voice mode choices with `direct`, `explain`, and `balance` response styles. The indicator and status line show the active style; existing saved voice settings are read compatibly.
 - Feedback attribution uses task identity and explicit skill references, preserving uncertainty for ambiguous corrections, requirement changes, preferences and environment failures.
 - Strict test-first guidance applies to code; inspection stays read-only and system tasks use resulting-state checks.
 
 ### Fixed
+- Recognize direct “make it” implementation requests after inspection without requiring a repeated confirmation phrase.
 - Local marketplace auto-updates now fetch release tags into the source checkout and refresh installed plugins. Failed refreshes remain pending for retry and do not report a successful update.
 - Recognize modern shell/read/edit envelopes, reject conflicting success metadata, and preserve missing or opaque outcomes as unverified.
 - Keep failed, incomplete, stale and previous-task checks from verifying current work; permit explicit workspace binding for sessions started outside the project.

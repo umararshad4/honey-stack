@@ -14,7 +14,7 @@ def _print(obj, as_json):
 
 
 def status(as_json=False):
-    from honey.rsi import autonomy, reflect
+    from honey.rsi import autonomy, publish, reflect
     rows = curate.load()
     by = {}
     for b in rows:
@@ -29,6 +29,8 @@ def status(as_json=False):
     out = {"home": paths.home(), "bullets": by, "pending_review": len(review.pending()), "brief_chars": len(txt),
            "brief_ids": ids, "sessions_observed": n_sessions, "usd_this_month": round(month, 4),
            "autonomous": autonomy.enabled(),
+           "publication": publish.config(),
+           "recent_publication": store.read_json(paths.path("state", "publication-last.json"), {}) or {},
            "budget_caps_enabled": reflect.dollar_caps_enabled(),
            "unknown_cost_calls_this_month": unknown_costs,
            "monthly_cost_complete": unknown_costs == 0,
@@ -38,6 +40,17 @@ def status(as_json=False):
         return _print(out, True)
     print(f"honey RSI · {out['home']}")
     print("  autonomy: " + ("enabled" if out["autonomous"] else "disabled (manual review)"))
+    publishing = out['publication']
+    kinds = ' (issues + PRs)' if publishing.get('suggestions') else ' (PRs)'
+    print('  publication: ' + (publishing.get('repository', '') + kinds if publishing.get('enabled') else 'disabled'))
+    for item in out['recent_publication'].get('published', []):
+        print(f"    {item['id']}: {item['url']} head {item['sha']}")
+    for item in out['recent_publication'].get('blocked', []):
+        print(f"    {item['id']}: publication blocked: {item['reason']}")
+    for item in out['recent_publication'].get('suggestions', {}).get('published', []):
+        print(f"    {item['id']}: suggestion issue {item['url']}")
+    for item in out['recent_publication'].get('suggestions', {}).get('blocked', []):
+        print(f"    {item['id']}: issue publication blocked: {item['reason']}")
     print("  dollar caps: " + ("enabled" if out["budget_caps_enabled"] else "disabled; rate limits still apply"))
     print(f"  learnings: {by or 'none yet'}")
     print(f"  pending items: {out['pending_review']}   brief: {out['brief_chars']} chars ({len(ids)} lines)")
@@ -91,6 +104,9 @@ def list_review(as_json=False):
               f"    why: {p.get('rationale', '')}\n    fix: {p.get('fix', '')}")
         if p.get("last_error"):
             print(f"    {p.get('attempt_state', 'blocked')}: {p['last_error']}")
+        issue = p.get('github_issue') or {}
+        if issue:
+            print(f"    GitHub issue: {issue.get('url') or issue.get('error') or issue.get('state')}")
     for b in proposed:
         print(f"[{b['id']}] learning: {curate.line(b)[2:]}  (sessions={len(b.get('sessions', []))})")
 
@@ -151,6 +167,9 @@ def _decide_proposal(item_id, action, note):
         guards.set_status(p["guard"], "rejected")
     p = review.decide(item_id, action, note)
     print(f"{item_id} → {p['status']}" + (f". {msg}" if msg else ""))
+    if action in ('apply', 'edit') and kind == 'skill_patch':
+        from honey.rsi import publish
+        _print(publish.run(), False)
     store.git_commit(f"rsi: {action} {item_id}")
 
 
@@ -169,6 +188,9 @@ def main(args) -> int:
     sub = ap.add_subparsers(dest="cmd")
     s = sub.add_parser("autonomy")
     s.add_argument("action", choices=["on", "off", "status"], default="status", nargs="?")
+    s = sub.add_parser('publish', help='Publish suggestion issues and applied skill PRs')
+    s.add_argument('action', choices=['on', 'off', 'status', 'run'], default='status', nargs='?')
+    s.add_argument('--json', action='store_true')
     for name in ("status", "review", "brief", "audit", "improve"):
         s = sub.add_parser(name)
         s.add_argument("--json", action="store_true")
@@ -196,7 +218,11 @@ def main(args) -> int:
     s = sub.add_parser("reflect")
     s.add_argument("--session", required=True)
     a = ap.parse_args(args)
-    if a.cmd == "autonomy":
+    if a.cmd == 'publish':
+        from honey.rsi import publish
+        with store.lock():
+            _print(publish.run() if a.action == 'run' else publish.configure(a.action), a.json)
+    elif a.cmd == "autonomy":
         from honey.rsi import autonomy
         with store.lock():
             if a.action != "status":

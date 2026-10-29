@@ -4,7 +4,7 @@ from honey.rsi import text
 
 assert s.origin("<task-notification><task-id>x</task-id> MCT finished") == "system"
 assert s.origin("[SYSTEM NOTIFICATION - NOT USER INPUT] …") == "system"
-assert s.origin("/honey ultra") == "command"
+assert s.origin("/honey direct") == "command"
 assert s.origin("fix the MCT router") == "user"
 assert "correction" in s.classify("no, don't open a PR yet, I said only push")
 assert "correction" not in s.classify("no worries, carry on with the plan")

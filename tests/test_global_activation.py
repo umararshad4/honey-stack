@@ -49,13 +49,13 @@ class GlobalActivation(unittest.TestCase):
     def test_bootstrap_is_read_only_and_marks_unobserved_hooks(self):
         home = self.root / '.honey'
         home.mkdir()
-        (home / 'config.json').write_text(json.dumps({'modes': {'scope': 'ultra', 'process': 'strict'}}))
+        (home / 'config.json').write_text(json.dumps({'mode': 'explain'}))
         env = dict(os.environ, HONEY_HOME=str(home), CODEX_THREAD_ID='probe')
         before = {str(p.relative_to(home)): p.read_bytes() for p in home.rglob('*') if p.is_file()}
         result = subprocess.run([sys.executable, str(Path(REPO, 'bin/honey')), 'bootstrap', '--agent', 'codex'],
                                 env=env, capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stderr + result.stdout)
-        self.assertIn('🍯 HONEY · ultra · strict · hooks unverified', result.stdout)
+        self.assertIn('🍯 HONEY · explain · hooks unverified', result.stdout)
         self.assertIn('Smallest complete change', result.stdout)
         after = {str(p.relative_to(home)): p.read_bytes() for p in home.rglob('*') if p.is_file()}
         self.assertEqual(before, after)

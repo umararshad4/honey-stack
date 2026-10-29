@@ -18,7 +18,7 @@ CHECKS = {'code': ['verification'], 'generic': ['verification'],
 INSPECT = re.compile(r"\b(read.only|only (?:tell|explain|inspect|review)|(?:first|just) tell|"
                      r"(?:do not|don't) (?:implement\b|(?:change|edit|modify) (?:any |the )?(?:files?|code|anything)\b|"
                      r"(?:change|edit|modify)\s*[.!?]?$))", re.I)
-ACTION = re.compile(r'\b(implement|fix|build|create|add|write|refactor|update|rename|run|restart|install|change|edit|remove|uninstall|delete|disable|enable|configure|commit|push|merge|deploy)\b', re.I)
+ACTION = re.compile(r'\b(implement|fix|build|create|add|write|refactor|update|rename|run|restart|install|change|edit|remove|uninstall|delete|disable|enable|configure|commit|push|merge|deploy)\b|\bmake\s+(?:it|that|this)\b', re.I)
 FOLLOWUP = re.compile(r'^\s*(?:also\b|but\b|no[, ]|that\b|it\b|same\b)', re.I)
 QUESTION = re.compile(r'^\s*(?:what|why|how|which|tell me|explain|inspect)\b', re.I)
 STATUS = re.compile(r'^\s*(?:what(?:\s+is|\'s)\s+(?:the\s+)?(?:status|progress)|any\s+(?:updates?|progress)|status\??$|how\s+is\s+it\s+going)', re.I)
@@ -81,9 +81,11 @@ def command_kind(command):
     if not words or any(re.fullmatch(r'[;&|<>()]+', w) for w in words):
         return None
     exe, args = os.path.basename(words[0]), words[1:]
+    if re.fullmatch(r'python(?:3(?:\.\d+)?)?', exe.lower()):
+        exe = 'python3'
     if exe in ('python', 'python3') and args and os.path.abspath(args[0]) == os.path.join(paths.REPO, 'bin', 'honey'):
         exe, args = 'honey', args[1:]
-    if exe == 'honey' and (args[:1] == ['doctor'] or len(args) > 1 and args[0] == 'task' and args[1] in ('status', 'set', 'verify')):
+    if exe == 'honey' and (args[:1] == ['doctor'] or len(args) > 1 and args[0] == 'task' and args[1] in ('status', 'set', 'verify', 'run')):
         return 'read'  # bookkeeping changes evidence, not the task's target state
     # A redirected project/test path needs an explicitly mapped check, not automatic credit.
     external = any(a.split('=', 1)[-1].startswith(('/', '../', '~/'))
@@ -151,9 +153,10 @@ def _tracked(task, command):
             or hashlib.sha256((command or '').encode()).hexdigest() in task.get('check_outcomes', {}))
 
 
-def _invalidate(ctx, task):
+def _invalidate(ctx, task, preserve_runner=False):
     task['mutation'] += 1
-    task['evidence'] = {}
+    task['evidence'] = {name: proof for name, proof in task['evidence'].items()
+                        if preserve_runner and proof.get('source') == 'runner'}
     ctx.state['nagged'] = False
     ctx.state['evidence_nagged'] = False
     ctx.dirty = True
@@ -206,7 +209,7 @@ def record_tool(ctx, event):
     if (mutation(event) or event.get('kind') == 'opaque'
             or event.get('kind') == 'shell' and command_kind(event.get('command')) not in ('read', 'check')
             and not _tracked(task, event.get('command'))):
-        _invalidate(ctx, task)
+        _invalidate(ctx, task, preserve_runner=event.get('kind') == 'opaque' and not event.get('failed'))
         if event.get('path'):
             target = _absolute(event['path'], task['cwd'])
             task['targets'] = list(dict.fromkeys(task['targets'] + [target]))[-20:]
@@ -232,9 +235,14 @@ def missing(state):
     task = state.get('task') or {}
     if task.get('mode') != 'execute':
         return []
-    pending = [c for c in task.get('checks', [])
-               if task.get('evidence', {}).get(c, {}).get('mutation') != task.get('mutation')
-               or not task.get('evidence', {}).get(c, {}).get('success')]
+    from honey import verification
+    pending = []
+    for name in task.get('checks', []):
+        proof = task.get('evidence', {}).get(name, {})
+        good = verification.valid(task, proof) if proof.get('source') == 'runner' else (
+            proof.get('mutation') == task.get('mutation') and proof.get('success'))
+        if not good:
+            pending.append(name)
     for name, proof in task.get('evidence', {}).items():
         target = proof.get('path')
         if target and ((proof.get('observation') == 'absent' and os.path.lexists(target))
@@ -250,7 +258,7 @@ def missing(state):
 
 def main(argv):
     p = argparse.ArgumentParser(prog='honey task')
-    p.add_argument('action', choices=['status', 'set', 'verify'])
+    p.add_argument('action', choices=['status', 'set', 'verify', 'run'])
     p.add_argument('--agent', choices=['claude', 'codex'], default='codex')
     p.add_argument('--session', default=os.environ.get('CODEX_THREAD_ID'))
     p.add_argument('--json', action='store_true')
@@ -262,13 +270,29 @@ def main(argv):
     p.add_argument('--tool-call')
     p.add_argument('--absent')
     p.add_argument('--present')
-    a = p.parse_args(argv)
+    separator = argv.index('--') if '--' in argv else len(argv)
+    command = argv[separator + 1:] if separator < len(argv) else []
+    a = p.parse_args(argv[:separator])
     if not a.session:
         p.error('--session is required outside a Codex session')
     file = paths.path('state', 'sessions', paths.session_key(a.agent, a.session) + '.json')
+    if a.action == 'run':
+        return _operate(a, file, command)
+    with store.session_lock(file):
+        return _operate(a, file, command)
+
+
+def _operate(a, file, command):
     state = store.read_json(file, {}) or {}
     task = state.get('task')
     try:
+        if a.action == 'run':
+            from honey import verification
+            if len(a.check) != 1:
+                raise ValueError('Choose exactly one required check')
+            return verification.run(file, a.check[0], command)
+        if command:
+            raise ValueError('Commands are accepted only by task run')
         if a.action == 'set':
             if not a.mode:
                 raise ValueError('--mode is required')
@@ -290,7 +314,10 @@ def main(argv):
                 raise ValueError('supply exactly one of --tool-call, --absent, or --present')
             if a.tool_call:
                 proof = next((c for c in reversed(task['calls']) if c['id'] == a.tool_call), None)
-                if not proof or not proof['success'] or proof['mutation'] != task['mutation']:
+                from honey import verification
+                current = verification.valid(task, proof) if proof and proof.get('source') == 'runner' else (
+                    proof and proof.get('mutation') == task['mutation'])
+                if not proof or not proof['success'] or not current:
                     raise ValueError('tool call lacks fresh successful evidence in this task workspace')
                 latest = next(c for c in reversed(task['calls']) if c['fingerprint'] == proof['fingerprint'])
                 if latest['id'] != proof['id'] or task['check_outcomes'].get(proof['fingerprint'], 'passed') != 'passed':

@@ -62,7 +62,7 @@ Verdict: fix 1 and 4 first.   net: -24 lines possible.   Not checked: <what matt
 
 If nothing is found, give the summary, then `Looks good. Ship.`, then one line on what you checked.
 
-**Second opinion.** Only when the user asks or process is strict, ask the other agent with the filled `references/reviewer-prompt.md`: from Claude Code run `codex exec -s read-only "<prompt>"`, and from Codex run `claude -p --permission-mode plan "<prompt>"`. If that CLI is missing, say so and skip. Merge the answers as lead reviewer: a finding both raised is the strongest signal; mark each of the other's findings as act on, consider, or dismissed with a reason.
+**Second opinion.** When the user asks, ask the other agent with the filled `references/reviewer-prompt.md`: from Claude Code run `codex exec -s read-only "<prompt>"`, and from Codex run `claude -p --permission-mode plan "<prompt>"`. If that CLI is missing, say so and skip. Merge the answers as lead reviewer: a finding both raised is the strongest signal; mark each of the other's findings as act on, consider, or dismissed with a reason. Response mode does not request a second opinion.
 
 ## B. Repo audit
 
