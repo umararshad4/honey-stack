@@ -70,7 +70,7 @@ def smoke() -> tuple:
 
 def main(argv: list) -> int:
     if argv:
-        from honey import health
+        from honey import codex_hooks, health
         parser = argparse.ArgumentParser(description='Inspect delivery and coverage for one actual session.')
         parser.add_argument('--agent', choices=('claude', 'codex'), default='codex')
         parser.add_argument('--session', help='Session ID; defaults to the selected agent session environment variable.')
@@ -78,12 +78,17 @@ def main(argv: list) -> int:
         args = parser.parse_args(argv)
         sid = args.session or os.environ.get('CODEX_THREAD_ID' if args.agent == 'codex' else 'CLAUDE_SESSION_ID')
         result = health.report(args.agent, sid)
+        if args.agent == 'codex':
+            result['hook_trust'] = codex_hooks.inspect()
+            result['healthy'] = result['healthy'] and result['hook_trust']['status'] == 'trusted'
         if args.json:
             print(json.dumps(result, sort_keys=True))
         else:
             print(f"honey doctor: {args.agent} session {sid or '(not supplied)'}")
             print(f"  installed={result['installed']} enabled={result['enabled']} delivery={result['delivery']} paused={result['paused']}")
             print(f"  adapter coverage={result['coverage']['status']} runtime={result['runtime_version'] or 'unobserved'}")
+            if args.agent == 'codex':
+                print('  hook trust=' + result['hook_trust']['status'])
             if result['coverage']['unsupported_tools']:
                 print('  unsupported tools: ' + ', '.join(result['coverage']['unsupported_tools']))
             print('  Coverage describes observed payloads; policy enforcement is not established by a heartbeat.')
@@ -127,9 +132,10 @@ def main(argv: list) -> int:
     rep.ok(enabled(PLUGIN), f"{PLUGIN} enabled", f"{PLUGIN} not enabled in config.toml")
     for p in CODEX_CLASH:
         rep.ok(not enabled(p), f"{p} disabled", f"{p} still enabled")
-    trusted = re.findall(r'\[hooks\.state\."honey@honey-stack:hooks/codex-hooks\.json:(\w+):', toml)
-    rep.ok(len(set(trusted)) >= 9, f"Codex trusts {len(set(trusted))} honey hooks",
-           f"Codex trusts {len(set(trusted))}/9 honey hooks: open codex, run /hooks, trust the honey entries", warn=True)
+    from honey import codex_hooks
+    trust = codex_hooks.inspect()
+    rep.ok(trust['status'] == 'trusted', f"Codex trusts {trust.get('trusted', 0)} current honey hooks",
+           f"Codex hook trust: {trust['status']}; review /hooks for the installed Honey version")
     caches = glob.glob(os.path.join(xdir, "plugins", "cache", "honey-stack", "honey", "*"))
     if caches:
         rep.ok(_tree_hash(caches[-1]) == _tree_hash(paths.REPO), "Codex cache matches repo", "Codex cache is stale: run honey sync", warn=True)
