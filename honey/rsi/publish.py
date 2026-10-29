@@ -46,12 +46,18 @@ def config():
 def configure(action):
     cfg = store.read_json(paths.path('config.json'), {}) or {}
     settings = cfg.setdefault('rsi', {}).setdefault('publish', {})
-    if action == 'on':
+    if action in ('on','automatic'):
         repo = repository()
         details = json.loads(gh('repo', 'view', repo, '--json', 'nameWithOwner,defaultBranchRef'))
         if details['nameWithOwner'].lower() != repo.lower():
             raise ValueError('GitHub repository does not match origin')
         settings.update(enabled=True, suggestions=True, repository=repo, base=details['defaultBranchRef']['name'])
+        if action == 'automatic':
+            settings['auto_merge'] = True
+            cfg['rsi']['autonomous'] = True
+            cfg['autoupdate'] = True
+        else:
+            settings.pop('auto_merge',None)
     elif action == 'off':
         settings['enabled'] = False
     if action != 'status':
@@ -235,5 +241,8 @@ def run(include_patches=True, suggestion_result=None):
             proposal.setdefault('publication', {}).update(state='blocked', error=error, updated=text.now())
             save(proposal)
             result['blocked'].append({'id': proposal['id'], 'reason': error})
+    if include_patches and settings.get('auto_merge'):
+        from honey.rsi import delivery
+        result['delivery'] = delivery.run(settings)
     store.write_json(paths.path('state', 'publication-last.json'), dict(result, ts=text.now()))
     return result

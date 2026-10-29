@@ -11,6 +11,7 @@ Successful main CI automatically versions and publishes releases. Manual release
 ## [Unreleased]
 
 ### Added
+- Opt-in `honey rsi publish automatic` completes validated skill delivery through exact-head CI-gated merge, release detection and retryable installation while preserving private local history.
 - `honey task run` executes real verification commands and records snapshot-bound evidence on hosts that hide inner tool events.
 - Opt-in `honey rsi publish on/off/status/run` publishes pending suggestions as GitHub issues and applied, evaluated skill changes as PRs, with duplicate prevention, exact-head receipts and retryable failures. Private session evidence, evaluation history and local preferences stay local.
 - Automatic semantic-version releases after successful main CI, with atomic commit/tag pushes, stale-run protection and retryable GitHub publication.
