@@ -28,9 +28,12 @@ def statusline() -> int:
 
 def main(argv: list) -> int:
     if not argv or argv[0] in ("-h", "--help"):
-        print("usage: honey install | uninstall | update | autoupdate | doctor | task status|set|verify | sync | rsi … | statusline | --version | hook --agent claude|codex")
+        print("usage: honey install | uninstall | update | autoupdate | doctor | bootstrap --agent claude|codex | task status|set|verify | sync | rsi … | statusline | --version | hook --agent claude|codex")
         return 0
     cmd, rest = argv[0], argv[1:]
+    if cmd == 'bootstrap':
+        from honey import activation
+        return activation.main(rest)
     if cmd in ("--version", "-V", "version"):
         from honey import __version__
         print(f"honey-stack {__version__}")

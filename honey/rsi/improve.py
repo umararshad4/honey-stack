@@ -31,7 +31,13 @@ def _skill(proposal: dict):
 def run() -> dict:
     """Prepare at most one child; a preparation failure cannot stop application."""
     try:
-        return _run()
+        result = _run()
+        if autonomy.enabled():
+            state_file = paths.path('state', 'improvement-last.json')
+            latest = store.read_json(state_file, {}) or {}
+            latest.update(last_checked_at=text.now(), last_check_result=result.get('result', result))
+            store.write_json(state_file, latest)
+        return result
     except Exception as exc:
         state_file = paths.path('state', 'improvement-last.json')
         previous = store.read_json(state_file, {}) or {}
@@ -50,7 +56,10 @@ def _run() -> dict:
     if any(p.get('attempt_state') != 'blocked' or
            (p.get('application') or {}).get('state') == 'sync_pending' for p in pending_patches):
         return {'skipped': 'waiting for pending evaluated patch'}
-    if time.time() - previous.get('attempted_at', 0) < INTERVAL_SECONDS:
+    last_skip = (previous.get('result') or {}).get('skipped', '')
+    was_budget_deferred = isinstance(last_skip, str) and last_skip.startswith(
+        ('weekly_usd budget', 'monthly_usd budget'))
+    if not was_budget_deferred and time.time() - previous.get('attempted_at', 0) < INTERVAL_SECONDS:
         return {'skipped': 'daily improvement cooldown'}
     choices = []
     verified_quotes = {}
@@ -91,6 +100,15 @@ def _run() -> dict:
     if not choices:
         return {'skipped': 'no actionable skill evidence'}
     _, ident, proposal, skill = min(choices, key=lambda row: row[:2])
+    blocked = patch._budget_block()
+    if blocked:
+        # No provider call has started. Preserve the previous real-attempt clock.
+        out = dict(previous, ts=text.now(), id=ident, result={'skipped': blocked})
+        store.write_json(state_file, out)
+        if proposal:
+            proposal['preparation'] = out['result']
+            store.write_json(paths.path('proposals', ident + '.json'), proposal)
+        return out
     now = time.time()
     attempted[ident] = now
     out = {'attempted_at': now, 'ts': text.now(), 'id': ident, 'targets': attempted}

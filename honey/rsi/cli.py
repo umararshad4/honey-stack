@@ -14,31 +14,42 @@ def _print(obj, as_json):
 
 
 def status(as_json=False):
-    from honey.rsi import autonomy
+    from honey.rsi import autonomy, reflect
     rows = curate.load()
     by = {}
     for b in rows:
         by[b.get("status")] = by.get(b.get("status"), 0) + 1
     txt, ids = curate.brief("claude", "")
     costs = store.read_jsonl(paths.path("costs.jsonl"))
-    month = sum(c.get("usd") or 0 for c in costs if c.get("ts", "").startswith(time.strftime("%Y-%m")))
+    month_rows = [c for c in costs if c.get("ts", "").startswith(time.strftime("%Y-%m"))]
+    month = sum(c.get("usd") or 0 for c in month_rows)
+    unknown_costs = sum(c.get("usd") is None for c in month_rows)
     ev_dir = paths.path("events")
     n_sessions = sum(len(fs) for _, _, fs in os.walk(ev_dir)) if os.path.isdir(ev_dir) else 0
     out = {"home": paths.home(), "bullets": by, "pending_review": len(review.pending()), "brief_chars": len(txt),
            "brief_ids": ids, "sessions_observed": n_sessions, "usd_this_month": round(month, 4),
            "autonomous": autonomy.enabled(),
+           "budget_caps_enabled": reflect.dollar_caps_enabled(),
+           "unknown_cost_calls_this_month": unknown_costs,
+           "monthly_cost_complete": unknown_costs == 0,
            "recent_autonomy": store.read_json(paths.path("state", "autonomy-last.json"), {}) or {},
            "recent_improvement": store.read_json(paths.path("state", "improvement-last.json"), {}) or {}}
     if as_json:
         return _print(out, True)
     print(f"honey RSI · {out['home']}")
     print("  autonomy: " + ("enabled" if out["autonomous"] else "disabled (manual review)"))
+    print("  dollar caps: " + ("enabled" if out["budget_caps_enabled"] else "disabled; rate limits still apply"))
     print(f"  learnings: {by or 'none yet'}")
     print(f"  pending items: {out['pending_review']}   brief: {out['brief_chars']} chars ({len(ids)} lines)")
-    print(f"  sessions observed: {n_sessions}   spend this month: ${out['usd_this_month']}")
+    usage = (f"known usage this month: ${out['usd_this_month']}; {unknown_costs} calls with unknown cost"
+             if unknown_costs else f"spend this month: ${out['usd_this_month']}")
+    print(f"  sessions observed: {n_sessions}   {usage}")
     if out["recent_improvement"]:
         last = out["recent_improvement"]
-        print(f"  last improvement: {last.get('ts', '')} {last.get('id', '')} {last.get('result', {})}")
+        if last.get('last_checked_at'):
+            print(f"  last improvement check: {last['last_checked_at']} {last.get('last_check_result', {})}")
+        else:
+            print(f"  last improvement: {last.get('ts', '')} {last.get('id', '')} {last.get('result', {})}")
     recent = out["recent_autonomy"]
     if recent:
         print(f"  last automatic pass: {len(recent.get('applied', []))} applied, "
@@ -247,10 +258,16 @@ def main(args) -> int:
         by = {}
         for c in rows:
             k = (c.get("ts", "")[:7], c.get("job"))
-            by[k] = by.get(k, 0) + (c.get("usd") or 0)
+            bucket = by.setdefault(k, {"usd": 0, "unknown": 0})
+            bucket["usd"] += c.get("usd") or 0
+            bucket["unknown"] += c.get("usd") is None
         for (m, j), v in sorted(by.items()):
-            print(f"{m} {j:10} ${v:.4f}")
-        print(f"total ${sum(by.values()):.4f} over {len(rows)} calls")
+            suffix = f" + {v['unknown']} calls with unknown cost" if v['unknown'] else ""
+            print(f"{m} {j:10} ${v['usd']:.4f}{suffix}")
+        unknown = sum(v['unknown'] for v in by.values())
+        label = 'known subtotal' if unknown else 'total'
+        suffix = f"; {unknown} calls with unknown cost" if unknown else ""
+        print(f"{label} ${sum(v['usd'] for v in by.values()):.4f} over {len(rows)} calls{suffix}")
     elif a.cmd == "guards":
         from honey.rsi import guards
         for g in guards.load():

@@ -26,6 +26,11 @@ def budgets() -> dict:
     return dict(BUDGETS, **(cfg.get("budgets") or {}))
 
 
+def dollar_caps_enabled() -> bool:
+    """Only an explicit opt-out removes dollar limits; cadence remains bounded."""
+    return budgets().get("enabled") is not False
+
+
 def _spent(costs, days) -> float:
     cutoff = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - days * 86400))
     return sum(c.get("usd") or 0 for c in costs if c.get("ts", "") >= cutoff)
@@ -37,9 +42,9 @@ def budget_block(engine: str):
     today = time.strftime("%Y-%m-%d", time.gmtime())
     if sum(1 for c in costs if c.get("ts", "").startswith(today) and c.get("job") == "reflect") >= b["max_reflections_per_day"]:
         return "daily reflection cap"
-    if _spent(costs, 7) + b["reflection_usd"] > b["weekly_usd"]:
+    if dollar_caps_enabled() and _spent(costs, 7) + b["reflection_usd"] > b["weekly_usd"]:
         return "weekly budget"
-    if _spent(costs, 30) + b["reflection_usd"] > b["monthly_usd"]:
+    if dollar_caps_enabled() and _spent(costs, 30) + b["reflection_usd"] > b["monthly_usd"]:
         return "monthly budget"
     if engine == "codex" and sum(1 for c in costs if c.get("engine") == "codex" and c.get("ts", "") >= time.strftime(
             "%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - 7 * 86400))) >= b["codex_runs_per_week"]:
@@ -70,7 +75,9 @@ def call_llm(system: str, user: str, schema: dict, max_usd: float, model: str = 
     if name == "claude":
         cmd = [exe, "-p", "--model", model, "--tools", "", "--settings", '{"disableAllHooks":true}',
                "--no-session-persistence", "--strict-mcp-config", "--system-prompt", system,
-               "--output-format", "json", "--json-schema", json.dumps(schema), "--max-budget-usd", str(max_usd)]
+               "--output-format", "json", "--json-schema", json.dumps(schema)]
+        if dollar_caps_enabled():
+            cmd += ["--max-budget-usd", str(max_usd)]
         r = subprocess.run(cmd, input=user, capture_output=True, text=True, timeout=180, env=_child_env(), cwd=paths.home())
         out = json.loads(r.stdout or "{}")
         if r.returncode != 0 or out.get("is_error"):

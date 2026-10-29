@@ -133,6 +133,7 @@ def write_case(root: str, skill: str, case: dict) -> str:
 
 
 def run_eval(root: str, glob_: str, out: str, eval_dir: str = "evals") -> dict:
+    from honey.rsi import reflect
     exe = shutil.which("claude") or os.path.expanduser("~/.local/bin/claude")
     env = dict(os.environ, RSI_CHILD="1")
     # A stale result file must never turn a crashed evaluation into success.
@@ -143,8 +144,10 @@ def run_eval(root: str, glob_: str, out: str, eval_dir: str = "evals") -> dict:
                 for p in glob.glob(os.path.join(root, eval_dir, pattern))
                 if fnmatch.fnmatch(os.path.basename(os.path.dirname(p)), glob_)}
     reservation = _reserve("eval", EVAL_USD, "claude")
-    command = [exe, "plugin", "eval", root, "--case", glob_, "--runs", "1", "--ablation", "none", "--max-cost-usd", str(EVAL_USD),
+    command = [exe, "plugin", "eval", root, "--case", glob_, "--runs", "1", "--ablation", "none",
                "--no-publish", "--trust-plugin", "--json", out, "--output-dir", os.path.abspath(out) + "-artifacts"]
+    if reflect.dollar_caps_enabled():
+        command += ["--max-cost-usd", str(EVAL_USD)]
     if eval_dir != "evals":
         command += ["--eval-dir", eval_dir, "--scaffold", "--allow-tools", "Bash", "Write", "Edit"]
     result = subprocess.run(command, capture_output=True, text=True, timeout=900, env=env)
@@ -210,7 +213,7 @@ def _budget_block(amount=None):
     costs = store.read_jsonl(paths.path("costs.jsonl"))
     reserve = PATCH_USD + 2 * EVAL_USD if amount is None else amount
     for days, key in ((7, "weekly_usd"), (30, "monthly_usd")):
-        if reflect._spent(costs, days) + reserve > budgets[key]:
+        if reflect.dollar_caps_enabled() and reflect._spent(costs, days) + reserve > budgets[key]:
             return key + " budget cannot cover draft and both evaluations"
     if reflect.engine()[0] == "codex":
         return reflect.budget_block("codex")
@@ -219,12 +222,14 @@ def _budget_block(amount=None):
 
 def _reserve(job, cap, engine):
     """Caller holds RSI lock; retain the cap if a paid call crashes without usage."""
+    from honey.rsi import reflect
     blocked = _budget_block(cap)
     if blocked:
         raise RuntimeError(blocked)
     ident = str(time.time_ns())
     store.append_jsonl(paths.path("costs.jsonl"), {"id": ident, "ts": text.now(), "job": job,
-                      "engine": engine, "usd": cap, "estimated": True, "ok": False})
+                      "engine": engine, "usd": cap if reflect.dollar_caps_enabled() else None,
+                      "estimated": True, "ok": False})
     return ident
 
 

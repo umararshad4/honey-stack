@@ -98,6 +98,20 @@ else:
         self.assertEqual(store.read_json(paths.path("synced.json"))["head"], new_head)
         self.assertIn("1.0.0 → 1.1.0", autoupdate.notice())
 
+    def test_feature_branch_is_not_reported_ready_when_release_is_current(self):
+        self.git(self.checkout, 'switch', '-c', 'feature/local-work')
+        result = autoupdate.run()
+        self.assertEqual(result['status'], 'skipped')
+        self.assertIn('not on main', result['reason'])
+
+    def test_local_main_commits_are_not_reported_ready(self):
+        (self.checkout / 'local.txt').write_text('local work')
+        self.git(self.checkout, 'add', 'local.txt')
+        self.git(self.checkout, 'commit', '-qm', 'local work')
+        result = autoupdate.run()
+        self.assertEqual(result['status'], 'skipped')
+        self.assertIn('own commits', result['reason'])
+
     def test_failed_refresh_is_retried_without_a_false_success(self):
         new_head = self.release()
         (self.root / "fail-refresh").touch()

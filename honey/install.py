@@ -138,11 +138,34 @@ def _plan_toml(env: Env, steps: list) -> None:
 def _plan_instruction(env: Env, steps: list, target: str, template: str) -> None:
     raw = _read(target)
     new = _read(os.path.join(paths.REPO, "migrate", template))
-    if raw is None or raw == new:
+    if raw == new:
+        return
+    if raw is None:
+        steps.append({'kind': 'write_new', 'path': target, 'content': new, 'old': None,
+                      'summary': f'{target}: create personal instruction template'})
         return
     steps.append({"kind": "replace_file", "file": target, "new": new, "old": raw,
                   "backup": os.path.join(env.backups, os.path.basename(os.path.dirname(target)), os.path.basename(target)),
                   "summary": f"{target}: slim to personal preferences (original backed up)"})
+
+
+def _plan_activation(env: Env, steps: list, target: str, agent: str) -> None:
+    from honey import activation
+    replacement = activation.block(os.path.join(env.localbin, 'honey'), agent)
+    prior = next((step for step in steps if (step.get('file') or step.get('path')) == target
+                  and step['kind'] in ('replace_file', 'write_new')), None)
+    if prior:
+        field = 'new' if prior['kind'] == 'replace_file' else 'content'
+        prior[field], _ = activation.replace_block(prior[field], replacement)
+        if prior[field] == prior['old']:
+            steps.remove(prior)
+        return
+    original = _read(target)
+    updated, old_block = activation.replace_block(original or '', replacement)
+    if updated != original:
+        steps.append({'kind': 'instruction_block', 'file': target, 'old': original, 'new': updated,
+                      'block': replacement, 'old_block': old_block,
+                      'summary': f'{target}: activate global Honey bootstrap (preserve personal instructions)'})
 
 
 def _plan_broken_links(steps: list, d: str) -> None:
@@ -186,7 +209,8 @@ def _plan_codex_agents(env: Env, steps: list) -> None:
     import glob as _glob
     for fp in sorted(_glob.glob(os.path.join(paths.REPO, "agents", "*.md"))):
         name = os.path.basename(fp)[:-3]
-        raw = open(fp, encoding="utf-8").read()
+        with open(fp, encoding="utf-8") as stream:
+            raw = stream.read()
         fm, body = (raw.split("---", 2)[1], raw.split("---", 2)[2]) if raw.startswith("---") else ("", raw)
         m = re.search(r"^description:\s*(.*)$", fm, re.M)
         desc = (m.group(1).strip().strip('"') if m else name)[:300]
@@ -211,6 +235,7 @@ def plan(env: Env) -> list:
         _plan_broken_links(steps, os.path.join(env.claude, "skills"))
         if env.slim:
             _plan_instruction(env, steps, os.path.join(env.claude, "CLAUDE.md"), "CLAUDE.md")
+        _plan_activation(env, steps, os.path.join(env.claude, 'CLAUDE.md'), 'claude')
         mct = os.path.join(env.claude, "MCT.md")
         if env.retire and os.path.exists(mct):
             steps.append({"kind": "move", "src": mct, "dst": os.path.join(env.backups, "claude", "MCT.md"),
@@ -225,10 +250,6 @@ def plan(env: Env) -> list:
                     steps.append({"kind": "edit_json", "file": fp, "before_sha": _sha(raw), "new": new, "old": raw,
                                   "undo": {"budget_fraction": d.get("skillListingBudgetFraction")},
                                   "summary": f"settings.json: skillListingBudgetFraction -> {env.budget_fraction} (more room for skill descriptions)"})
-        link = os.path.join(env.localbin, "honey")
-        if not os.path.lexists(link):
-            steps.append({"kind": "symlink", "path": link, "target": os.path.join(paths.REPO, "bin", "honey"),
-                          "summary": f"link {link} → repo bin/honey"})
     if env.want("codex"):
         if not env.sandbox and f'[plugins."{PLUGIN}"]' not in (_read(os.path.join(env.codex, "config.toml")) or ""):
             steps.append({"kind": "cli", "agent": "codex", "summary": f"codex plugin marketplace add + add {PLUGIN}",
@@ -237,11 +258,20 @@ def plan(env: Env) -> list:
         _plan_toml(env, steps)
         if env.slim:
             _plan_instruction(env, steps, os.path.join(env.codex, "AGENTS.md"), "AGENTS.md")
+        _plan_activation(env, steps, os.path.join(env.codex, 'AGENTS.md'), 'codex')
         _plan_broken_links(steps, os.path.join(env.agents, "skills"))
         if os.path.isdir(os.path.join(paths.REPO, "agents")):
             _plan_codex_agents(env, steps)
     if env.retire:
         _plan_retire(env, steps)
+    link = os.path.join(env.localbin, 'honey')
+    if not os.path.lexists(link):
+        try:
+            source = paths.source_repo()
+        except RuntimeError:
+            source = paths.REPO
+        steps.append({'kind': 'symlink', 'path': link, 'target': os.path.join(source, 'bin', 'honey'),
+                      'summary': f'link {link} → source bin/honey'})
     return steps
 
 
@@ -267,6 +297,17 @@ def _apply(env: Env, st: dict) -> dict:
             r = subprocess.run([exe, *c], capture_output=True, text=True, timeout=180)
             if r.returncode != 0 and "already" not in (r.stdout + r.stderr).lower():
                 raise RuntimeError(f"{st['agent']} {' '.join(c)} failed: {(r.stderr or r.stdout)[-400:]}")
+    elif k == 'instruction_block':
+        if _read(st['file']) != st['old']:
+            raise RuntimeError(f"{st['file']} changed since planning; re-run")
+        os.makedirs(os.path.dirname(st['file']), exist_ok=True)
+        if st['old'] is not None:
+            backup = os.path.join(env.backups, 'global-activation', os.path.basename(os.path.dirname(st['file'])), os.path.basename(st['file']))
+            os.makedirs(os.path.dirname(backup), exist_ok=True)
+            shutil.copy2(st['file'], backup)
+            rec['backup'] = backup
+        _write_preserving_mode(st['file'], st['new'])
+        rec['written_sha'] = _sha(st['new'])
     elif k in ("edit_json", "edit_toml", "replace_file"):
         cur = _read(st["file"])
         if cur != st["old"]:
@@ -323,6 +364,20 @@ def _undo_json(rec: dict) -> str:
 
 def _undo(rec: dict) -> str:
     k = rec["kind"]
+    if k == 'instruction_block':
+        current = _read(rec['file'])
+        if current is None:
+            return f"already absent: {rec['file']}"
+        if _sha(current) == rec['written_sha']:
+            if rec.get('backup'):
+                shutil.copy2(rec['backup'], rec['file'])
+            else:
+                os.unlink(rec['file'])
+        elif current.count(rec['block']) == 1:
+            _write_preserving_mode(rec['file'], current.replace(rec['block'], rec.get('old_block') or '', 1))
+        else:
+            return f"global activation block changed; preserved {rec['file']}"
+        return f"removed global Honey activation from {rec['file']}"
     if k == "cli":
         exe = _cli(rec["agent"])
         for c in rec["undo_cmds"]:

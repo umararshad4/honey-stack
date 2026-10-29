@@ -96,6 +96,40 @@ class Continuous(unittest.TestCase):
         self.assertEqual(self.saved(first)['status'], 'pending')
         self.assertEqual(self.saved(second)['status'], 'pending')
 
+    def test_budget_deferral_does_not_consume_daily_attempt(self):
+        from honey.rsi import improve, patch
+        p = self.proposal()
+        store.write_json(paths.path('config.json'), {
+            'rsi': {'autonomous': True}, 'budgets': {'weekly_usd': 0.5}})
+        with mock.object(patch, 'propose', return_value={'skipped': 'no change needed'}) as gen:
+            with store.lock():
+                result = improve.run()
+            gen.assert_not_called()
+            self.assertIn('weekly_usd', result['result']['skipped'])
+            self.assertNotIn('attempted_at', result)
+            self.assertNotIn('prepared_at', self.saved(p))
+            # Budget becomes available before 24 hours pass: no paid work happened yet.
+            store.write_json(paths.path('config.json'), {
+                'rsi': {'autonomous': True}, 'budgets': {'weekly_usd': 1.5}})
+            with store.lock():
+                improve.run()
+                improve.run()
+            self.assertEqual(gen.call_count, 1)
+
+    def test_disabling_caps_recovers_legacy_budget_cooldown(self):
+        from honey.rsi import improve, patch
+        self.proposal()
+        store.write_json(paths.path('state', 'improvement-last.json'), {
+            'attempted_at': 200000, 'result': {
+                'skipped': 'weekly_usd budget cannot cover draft and both evaluations'}})
+        store.write_json(paths.path('config.json'), {
+            'rsi': {'autonomous': True}, 'budgets': {'enabled': False}})
+        with mock.object(improve.time, 'time', return_value=200010), \
+                mock.object(patch, 'propose', return_value={'skipped': 'no change needed'}) as gen, store.lock():
+            improve.run()
+            improve.run()
+        self.assertEqual(gen.call_count, 1)
+
     def test_new_skill_requires_real_quotes_from_two_sessions(self):
         from honey.rsi import improve, patch
         p = self.proposal('reports', 'skill_new')
@@ -221,6 +255,16 @@ class Continuous(unittest.TestCase):
         with mock.object(patch, 'propose', return_value={'skipped': 'none'}) as gen, store.lock():
             improve.run()
         gen.assert_not_called()
+
+    def test_noop_check_does_not_leave_old_budget_failure_as_latest_status(self):
+        from honey.rsi import improve
+        store.write_json(paths.path('state', 'improvement-last.json'), {
+            'attempted_at': 1, 'result': {'skipped': 'weekly_usd budget cannot cover draft and both evaluations'}})
+        with store.lock():
+            improve.run()
+        latest = store.read_json(paths.path('state', 'improvement-last.json'))
+        self.assertEqual(latest['last_check_result'], {'skipped': 'no actionable skill evidence'})
+        self.assertEqual(latest['attempted_at'], 1)
 
     def test_diagnosis_note_contains_only_verified_user_quotes(self):
         from honey.rsi import improve, patch

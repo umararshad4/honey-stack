@@ -56,14 +56,16 @@ def update_checkout(repo: str) -> dict:
     if not releases:
         return {"status": "skipped", "reason": "no release tags on origin/main"}
     newest = releases[-1]
-    if _git(repo, "merge-base", "--is-ancestor", newest, "HEAD").returncode == 0:
-        return {"status": "current"}
     branch = _git(repo, "symbolic-ref", "--short", "-q", "HEAD").stdout.strip()
     at_release = RELEASE.match(_git(repo, "describe", "--tags", "--exact-match", "--match", "v[0-9]*").stdout.strip())
     if branch != "main" and not (not branch and at_release):  # main, or a detached HEAD sitting exactly on a release
         return {"status": "skipped", "reason": "not on main or a detached release tag"}
     if _git(repo, "status", "--porcelain", "--untracked-files=no").stdout.strip():
         return {"status": "skipped", "reason": "local changes"}
+    if _git(repo, "merge-base", "--is-ancestor", newest, "HEAD").returncode == 0:
+        if _git(repo, "merge-base", "--is-ancestor", "HEAD", "refs/remotes/origin/main").returncode != 0:
+            return {"status": "skipped", "reason": "checkout has its own commits (not a fast-forward)"}
+        return {"status": "current"}
     behind = [t for t in releases if _git(repo, "merge-base", "--is-ancestor", t, "HEAD").returncode == 0]
     current = behind[-1].lstrip("v") if behind else "?"
     if _git(repo, "merge", "--ff-only", "--quiet", newest).returncode != 0:
