@@ -51,6 +51,9 @@ def status(as_json=False):
         print(f"    {item['id']}: suggestion issue {item['url']}")
     for item in out['recent_publication'].get('suggestions', {}).get('blocked', []):
         print(f"    {item['id']}: issue publication blocked: {item['reason']}")
+    for category, items in out['recent_publication'].get('delivery', {}).items():
+        for item in items:
+            print(f"    delivery {category}: {item if isinstance(item, str) else item.get('id')}")
     print("  dollar caps: " + ("enabled" if out["budget_caps_enabled"] else "disabled; rate limits still apply"))
     print(f"  learnings: {by or 'none yet'}")
     print(f"  pending items: {out['pending_review']}   brief: {out['brief_chars']} chars ({len(ids)} lines)")
@@ -189,7 +192,7 @@ def main(args) -> int:
     s = sub.add_parser("autonomy")
     s.add_argument("action", choices=["on", "off", "status"], default="status", nargs="?")
     s = sub.add_parser('publish', help='Publish suggestion issues and applied skill PRs')
-    s.add_argument('action', choices=['on', 'off', 'status', 'run'], default='status', nargs='?')
+    s.add_argument('action', choices=['on', 'off', 'status', 'run', 'automatic'], default='status', nargs='?')
     s.add_argument('--json', action='store_true')
     for name in ("status", "review", "brief", "audit", "improve"):
         s = sub.add_parser(name)

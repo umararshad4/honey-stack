@@ -10,6 +10,9 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+### Added
+- Opt-in `honey rsi publish automatic` completes validated skill delivery through exact-head CI-gated merge, release detection and retryable installation while preserving private local history.
+
 ## [0.12.0] - 2026-10-29
 
 ### Added
