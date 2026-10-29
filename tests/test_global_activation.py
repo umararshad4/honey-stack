@@ -36,6 +36,7 @@ class GlobalActivation(unittest.TestCase):
             self.assertTrue(body.startswith(original))
             self.assertIn('honey:global:start', body)
             self.assertIn('bootstrap --agent ' + agent, body)
+            self.assertIn('if no native `honey-stack active` startup context was supplied', body)
             self.assertIn('hooks unverified', body)
         with contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(install.install(self.env, False, True), 0)

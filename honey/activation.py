@@ -16,7 +16,8 @@ END = '<!-- honey:global:end -->'
 def block(launcher: str, agent: str) -> str:
     command = 'python3 ' + shlex.quote(launcher) + ' bootstrap --agent ' + agent
     return (START + '\n## Honey global activation\n'
-            'At the first user turn of each session, run `' + command + '` and follow its returned workflow rules. '
+            'At the first user turn of each session, if no native `honey-stack active` startup context was supplied, '
+            'run `' + command + '` and follow its returned workflow rules. Otherwise follow the supplied native Honey context. '
             'This command only reads configuration; do not invoke hook handlers or manufacture lifecycle events.\n'
             'Use the returned `🍯 HONEY` indicator at the start of user-facing replies. If it says '
             '`hooks unverified`, retain that label; instruction loading is not proof of hook delivery. '
