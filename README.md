@@ -103,6 +103,7 @@ Claude: `/honey:<skill>`. Codex: `$<skill>`.
 | Command | Use when |
 |---|---|
 | `/rsi autonomy on / off / status` | Enable, disable, or inspect automatic application |
+| `/rsi publish on / off / status` | Opt in to publishing validated skill changes as GitHub PRs |
 | `/rsi improve` | Run a due improvement pass and apply eligible proposals |
 | `/rsi status` | Check it's running and what's queued |
 | `/rsi review` | Claude's statusline shows `rsi:N`; decide on proposals |
@@ -145,6 +146,14 @@ With dollar caps enabled, the patcher reserves the draft and both evaluations ag
 Use `honey rsi status` for the latest automatic result and `honey rsi review --json` for recent changes and blocked reasons. Unsupported diagnoses remain pending; RSI never executes a proposal's free-form fix text. Diagnosis and new-skill parents complete only after their evaluated child patch is applied, as do upstream ports. Evaluation overlays the current runtime into its worktree and application checks that snapshot. Edited patch targets, runtime drift and diverged branches block application; unrelated documentation edits are preserved, and configured cost limits still apply. Run `honey sync` from the source checkout once to refresh Codex and record the editable source location; the plugin cache is never an editable source.
 
 Instruction edits have conflict-checked `honey rsi revert <id>` snapshots; toolkit repairs retain installer undo records. Guard IDs remain inspectable with `honey rsi guards`. A failed skill sync records `sync_pending` for retry. Legacy instruction snapshots used random short hashes, so automatic revert refuses those; the original text remains in the proposal's `before` field for manual recovery. Automatic decisions do not count as user feedback.
+
+### Publishing improvements
+
+Run `honey rsi publish on` from your Honey source checkout to authorize publishing applied skill improvements to its GitHub origin. This pins the repository and its default branch in your local configuration and requires authenticated `gh` access with permission to push branches and create PRs. `honey rsi publish off` stops publication; `honey rsi publish status --json` shows the configuration.
+
+The flow is **evaluate → apply and sync locally → push a skill-only commit → open a PR**. Automatic passes publish eligible applied skill patches when autonomy and publication are enabled; explicitly applying a skill patch also attempts publication. Existing eligible applied patches are included. `honey rsi status` reports published URLs and exact heads, or blocked reasons. The proposal's `publication` record retains the SHA and URL. A failed push or PR request retries on a later pass using the same commit and checks for an existing PR first. Publication failures do not undo successful local application. Published means a branch and PR exist, not that CI passed or the PR merged.
+
+Personal preferences, instruction files, machine repairs, guards, session logs, and generated evaluation prompts stay local. Public commits start from the remote base and contain only the evaluated `skills/<name>/SKILL.md`; local evaluation commits and their history are not pushed. PR text uses fixed metadata, never user quotes or the model's rationale. The skill text itself is shared. Runtime changes absent from the remote baseline, dirty runtime files, legacy patches without snapshots, unexpected files, and changed remote branches block publication. No force pushes, automatic merges or releases. A published PR's closure is respected.
 
 ## Update · Uninstall
 

@@ -11,6 +11,7 @@ Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions 
 ## [Unreleased]
 
 ### Added
+- Opt-in `honey rsi publish on/off/status` publishes applied, evaluated skill changes as GitHub PRs with exact-head receipts and retryable failures, excluding private evaluation history and local preferences.
 - Session-specific hook health separates installation, enablement, delivery and supported payload coverage.
 - Task contracts record scope, workspace and operation-specific checks; completion reminders use fresh observed results instead of receipt wording alone.
 - Bounded task/session tool metrics and coach denominators for repeated reads/checks, failures, unknown results and reported durations.

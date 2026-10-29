@@ -187,6 +187,8 @@ def run() -> dict:
                          last_attempt_ns=time.time_ns(), attempt_state=state)
             store.write_json(paths.path("proposals", saved["id"] + ".json"), saved)
             out[state].append({"id": saved["id"], "reason": saved["last_error"]})
+    from honey.rsi import publish
+    out['publication'] = publish.run()
     curate.write_brief_md()
     store.write_json(paths.path("state", "autonomy-last.json"), dict(out, ts=text.now()))
     return out
