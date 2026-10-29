@@ -77,9 +77,11 @@ with tempfile.TemporaryDirectory() as d:
     tip = commit(origin, "b", "v1.1.0")
     git(origin, "tag", "v٩.٢.٣")                                       # Unicode-digit lookalike is not a release
     assert autoupdate.update_checkout(clone)["to"] == "1.1.0"          # fast-forwarded main
-    # HEAD ahead of the newest release, on main: current, not downgraded
-    commit(clone, "mine"); git(clone, "reset", "-q", "--hard", "HEAD")
-    assert autoupdate.update_checkout(clone)["status"] == "current"
+    # Local-only main commits are preserved and reported as blocking updates.
+    own_head = commit(clone, "mine")
+    result = autoupdate.update_checkout(clone)
+    assert result["status"] == "skipped" and "own commits" in result["reason"], result
+    assert git(clone, "rev-parse", "HEAD") == own_head
     # a feature branch is never moved, even when clean and behind
     git(clone, "checkout", "-q", "-b", "feature", "v1.0.0")
     r = autoupdate.update_checkout(clone)
