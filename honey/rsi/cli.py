@@ -41,11 +41,16 @@ def status(as_json=False):
     print(f"honey RSI · {out['home']}")
     print("  autonomy: " + ("enabled" if out["autonomous"] else "disabled (manual review)"))
     publishing = out['publication']
-    print('  publication: ' + (publishing.get('repository', '') + ' (PRs)' if publishing.get('enabled') else 'disabled'))
+    kinds = ' (issues + PRs)' if publishing.get('suggestions') else ' (PRs)'
+    print('  publication: ' + (publishing.get('repository', '') + kinds if publishing.get('enabled') else 'disabled'))
     for item in out['recent_publication'].get('published', []):
         print(f"    {item['id']}: {item['url']} head {item['sha']}")
     for item in out['recent_publication'].get('blocked', []):
         print(f"    {item['id']}: publication blocked: {item['reason']}")
+    for item in out['recent_publication'].get('suggestions', {}).get('published', []):
+        print(f"    {item['id']}: suggestion issue {item['url']}")
+    for item in out['recent_publication'].get('suggestions', {}).get('blocked', []):
+        print(f"    {item['id']}: issue publication blocked: {item['reason']}")
     print("  dollar caps: " + ("enabled" if out["budget_caps_enabled"] else "disabled; rate limits still apply"))
     print(f"  learnings: {by or 'none yet'}")
     print(f"  pending items: {out['pending_review']}   brief: {out['brief_chars']} chars ({len(ids)} lines)")
@@ -99,6 +104,9 @@ def list_review(as_json=False):
               f"    why: {p.get('rationale', '')}\n    fix: {p.get('fix', '')}")
         if p.get("last_error"):
             print(f"    {p.get('attempt_state', 'blocked')}: {p['last_error']}")
+        issue = p.get('github_issue') or {}
+        if issue:
+            print(f"    GitHub issue: {issue.get('url') or issue.get('error') or issue.get('state')}")
     for b in proposed:
         print(f"[{b['id']}] learning: {curate.line(b)[2:]}  (sessions={len(b.get('sessions', []))})")
 
@@ -180,8 +188,8 @@ def main(args) -> int:
     sub = ap.add_subparsers(dest="cmd")
     s = sub.add_parser("autonomy")
     s.add_argument("action", choices=["on", "off", "status"], default="status", nargs="?")
-    s = sub.add_parser('publish', help='Opt in to publishing applied skills as GitHub PRs')
-    s.add_argument('action', choices=['on', 'off', 'status'], default='status', nargs='?')
+    s = sub.add_parser('publish', help='Publish suggestion issues and applied skill PRs')
+    s.add_argument('action', choices=['on', 'off', 'status', 'run'], default='status', nargs='?')
     s.add_argument('--json', action='store_true')
     for name in ("status", "review", "brief", "audit", "improve"):
         s = sub.add_parser(name)
@@ -213,7 +221,7 @@ def main(args) -> int:
     if a.cmd == 'publish':
         from honey.rsi import publish
         with store.lock():
-            _print(publish.configure(a.action), a.json)
+            _print(publish.run() if a.action == 'run' else publish.configure(a.action), a.json)
     elif a.cmd == "autonomy":
         from honey.rsi import autonomy
         with store.lock():

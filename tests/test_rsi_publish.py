@@ -9,7 +9,7 @@ from unittest.mock import patch as mock
 
 from helpers import REPO
 from honey import paths
-from honey.rsi import autonomy, patch, publish, store
+from honey.rsi import autonomy, patch, publish, review, store
 
 
 class Publication(unittest.TestCase):
@@ -41,11 +41,13 @@ class Publication(unittest.TestCase):
             'sha256': patch._runtime_digest(patch._runtime_files(str(self.root)), 'skills/debug/SKILL.md')}
         self.save()
         store.write_json(paths.path('config.json'), {'rsi': {'autonomous': True, 'publish': {
-            'enabled': True, 'repository': 'example/honey', 'base': 'main'}}})
+            'enabled': True, 'suggestions': True, 'repository': 'example/honey', 'base': 'main'}}})
         # Keep real Git transport, replacing only the GitHub repository identity and API.
         self.real_repository = publish.repository
         mock.object(publish, 'repository', return_value='example/honey').start()
         self.prs = []
+        self.issues = []
+        self.issue_creates = 0
         self.creates = 0
         self.fail_create = False
         mock.object(publish, 'gh', side_effect=self.gh).start()
@@ -62,6 +64,19 @@ class Publication(unittest.TestCase):
         store.write_json(paths.path('proposals', self.p['id'] + '.json'), self.p)
 
     def gh(self, *args):
+        if args[0] == 'api':
+            if '--slurp' in args and '--jq' in args:
+                raise RuntimeError('the --slurp option is not supported with --jq')
+            return json.dumps([[dict(issue, html_url=issue['url']) for issue in self.issues]])
+        if args[:2] == ('issue', 'list'):
+            return json.dumps(self.issues)
+        if args[:2] == ('issue', 'create'):
+            self.issue_creates += 1
+            title = args[args.index('--title') + 1]
+            body = Path(args[args.index('--body-file') + 1]).read_text()
+            self.issues.append({'url': 'https://github.com/example/honey/issues/' + str(self.issue_creates),
+                                'title': title, 'body': body})
+            return self.issues[-1]['url']
         if args[:2] == ('pr', 'list'):
             return json.dumps(self.prs)
         if args[:2] == ('pr', 'create'):
@@ -107,7 +122,8 @@ class Publication(unittest.TestCase):
         store.write_json(paths.path('config.json'), settings)
         for kind in ('instr_line', 'toolkit_fix', 'guard'):
             self.p['type'] = kind; self.save()
-            self.assertEqual(self.run_publish(), {'published': [], 'blocked': []})
+            self.assertEqual(self.run_publish(), {'published': [], 'blocked': [],
+                                                 'suggestions': {'published': [], 'blocked': []}})
         publish.gh.assert_not_called()
 
     def test_failed_create_retries_exact_sha_without_duplicate(self):
@@ -205,7 +221,7 @@ class Publication(unittest.TestCase):
         with mock.object(publish, 'gh', return_value=json.dumps({
                 'nameWithOwner': 'example/honey', 'defaultBranchRef': {'name': 'main'}})):
             self.assertEqual(publish.configure('on'), {
-                'enabled': True, 'repository': 'example/honey', 'base': 'main'})
+                'enabled': True, 'suggestions': True, 'repository': 'example/honey', 'base': 'main'})
         self.assertEqual(publish.configure('status')['base'], 'main')
         self.assertFalse(publish.configure('off')['enabled'])
 
@@ -220,6 +236,94 @@ class Publication(unittest.TestCase):
         self.git('config', 'remote.origin.pushurl', 'https://github.com/other/repository.git')
         with self.assertRaisesRegex(ValueError, 'push destination'):
             self.real_repository()
+
+    def test_pending_suggestion_is_published_without_private_evidence(self):
+        suggestion = review.add(1, 'toolkit_fix', 'ship skill: distinguish questions from permission',
+                                'Answer feasibility questions before taking action.', 'Investigate the routing.',
+                                [{'q': 'PRIVATE USER QUOTE', 'sid': 'PRIVATE SESSION'}], 'suggestion')
+        result = self.run_publish()
+        self.assertEqual(len(result['suggestions']['published']), 1)
+        self.assertEqual(self.issue_creates, 1)
+        self.assertIn('Answer feasibility questions', self.issues[0]['body'])
+        self.assertNotIn('PRIVATE', json.dumps(self.issues))
+        saved = store.read_json(paths.path('proposals', suggestion['id'] + '.json'))
+        self.assertEqual(saved['status'], 'pending')
+        self.assertEqual(saved['github_issue']['state'], 'published')
+        self.run_publish()
+        self.assertEqual(self.issue_creates, 1)
+
+    def suggestion(self, kind='toolkit_fix'):
+        return review.add(1, kind, 'workflow suggestion', 'Review routing.', 'Add a focused regression test.',
+                          [{'q': 'PRIVATE QUOTE'}], kind)
+
+    def test_suggestions_publish_when_local_auto_application_is_off(self):
+        self.suggestion()
+        autonomy.configure(False)
+        result = autonomy.run()
+        self.assertEqual(len(result['publication']['suggestions']['published']), 1)
+        self.assertEqual(self.creates, 0)
+
+    def test_suggestion_is_published_before_automatic_application(self):
+        suggestion = self.suggestion()
+        def apply(proposal):
+            saved = store.read_json(paths.path('proposals', proposal['id'] + '.json'))
+            self.assertEqual(saved['github_issue']['state'], 'published')
+            return 'applied fixture'
+        with mock.object(autonomy, 'apply', side_effect=apply), mock.object(patch, '_validate_eval'):
+            result = autonomy.run()
+        self.assertEqual(len(result['publication']['suggestions']['published']), 1)
+        saved = store.read_json(paths.path('proposals', suggestion['id'] + '.json'))
+        self.assertEqual(saved['status'], 'applied')
+
+    def test_issue_creation_response_loss_reuses_existing_issue(self):
+        suggestion = self.suggestion()
+        real = self.gh
+        def lose_response(*args):
+            result = real(*args)
+            if args[:2] == ('issue', 'create'):
+                raise RuntimeError('response lost')
+            return result
+        with mock.object(publish, 'gh', side_effect=lose_response):
+            self.assertEqual(len(self.run_publish()['suggestions']['blocked']), 1)
+        self.assertEqual(len(self.run_publish()['suggestions']['published']), 1)
+        self.assertEqual(self.issue_creates, 1)
+        self.assertEqual(store.read_json(paths.path('proposals', suggestion['id'] + '.json'))['status'], 'pending')
+
+    def test_existing_issue_is_reused_after_local_receipt_loss(self):
+        suggestion = self.suggestion()
+        self.run_publish()
+        self.issues[0]['state'] = 'CLOSED'
+        store.write_json(paths.path('proposals', suggestion['id'] + '.json'), suggestion)
+        self.run_publish()
+        self.assertEqual(self.issue_creates, 1)
+
+    def test_personal_proposals_and_old_opt_in_never_create_issues(self):
+        for kind in ('instr_line', 'instr_edit', 'instr_remove', 'guard', 'skill_patch'):
+            self.suggestion(kind)
+        self.assertEqual(self.run_publish()['suggestions']['published'], [])
+        self.suggestion()
+        settings = store.read_json(paths.path('config.json'))
+        settings['rsi']['publish'].pop('suggestions')
+        store.write_json(paths.path('config.json'), settings)
+        self.assertEqual(self.run_publish()['suggestions']['published'], [])
+        self.assertEqual(self.issue_creates, 0)
+
+    def test_public_issue_redacts_secrets_paths_links_and_mentions(self):
+        suggestion = self.suggestion()
+        suggestion['rationale'] = 'Inspect someone@example.com at /Users/private/project and https://private.example @somebody'
+        store.write_json(paths.path('proposals', suggestion['id'] + '.json'), suggestion)
+        self.run_publish()
+        body = self.issues[0]['body']
+        for private in ('someone@example.com', '/Users/private', 'https://private.example', '@somebody', 'PRIVATE QUOTE'):
+            self.assertNotIn(private, body)
+        self.assertIn('unimplemented suggestion', body)
+
+    def test_origin_mismatch_blocks_suggestion_without_external_writes(self):
+        self.suggestion()
+        with mock.object(publish, 'repository', return_value='other/repo'):
+            result = self.run_publish()
+        self.assertIn('origin changed', result['suggestions']['blocked'][0]['reason'])
+        self.assertEqual(self.issue_creates, 0)
 
 
 if __name__ == '__main__':

@@ -103,7 +103,7 @@ Claude: `/honey:<skill>`. Codex: `$<skill>`.
 | Command | Use when |
 |---|---|
 | `/rsi autonomy on / off / status` | Enable, disable, or inspect automatic application |
-| `/rsi publish on / off / status` | Opt in to publishing validated skill changes as GitHub PRs |
+| `/rsi publish on / off / status / run` | Publish pending suggestions as GitHub issues and validated skill changes as PRs |
 | `/rsi improve` | Run a due improvement pass and apply eligible proposals |
 | `/rsi status` | Check it's running and what's queued |
 | `/rsi review` | Claude's statusline shows `rsi:N`; decide on proposals |
@@ -149,9 +149,11 @@ Instruction edits have conflict-checked `honey rsi revert <id>` snapshots; toolk
 
 ### Publishing improvements
 
-Run `honey rsi publish on` from your Honey source checkout to authorize publishing applied skill improvements to its GitHub origin. This pins the repository and its default branch in your local configuration and requires authenticated `gh` access with permission to push branches and create PRs. `honey rsi publish off` stops publication; `honey rsi publish status --json` shows the configuration.
+Run `honey rsi publish on` from your Honey source checkout to authorize publishing pending suggestions as issues and applied skill improvements as PRs to its GitHub origin. This pins the repository and its default branch in your local configuration and requires authenticated `gh` access with permission to create issues, push branches and create PRs. `honey rsi publish off` stops publication; `honey rsi publish status --json` shows the configuration. Older PR-only opt-ins retain their previous behavior until `publish on` is run again.
 
-The flow is **evaluate → apply and sync locally → push a skill-only commit → open a PR**. Automatic passes publish eligible applied skill patches when autonomy and publication are enabled; explicitly applying a skill patch also attempts publication. Existing eligible applied patches are included. `honey rsi status` reports published URLs and exact heads, or blocked reasons. The proposal's `publication` record retains the SHA and URL. A failed push or PR request retries on a later pass using the same commit and checks for an existing PR first. Publication failures do not undo successful local application. Published means a branch and PR exist, not that CI passed or the PR merged.
+Pending toolkit diagnoses, new-skill suggestions and upstream proposals become **GitHub issues automatically during ordinary RSI processing**, even if automatic local application is off. No implementation or passing evaluation is required to record a suggestion. Each issue identifies the proposal and explicitly says it is unimplemented and needs confirmation. Only the bounded, redacted title, diagnosis and proposed next step are shared; session quotes, session identifiers and local evidence are excluded. Closed issues are respected and not recreated. Issue publication does not mark a local proposal applied. `honey rsi review` shows the issue link. `honey rsi publish run --json` publishes the current eligible backlog without invoking paid reflection or evaluation.
+
+The full flow is **suggestion → GitHub issue → evaluation → apply and sync locally → skill-only commit → PR**. Automatic passes publish eligible applied skill patches when autonomy and publication are enabled; explicitly applying a skill patch also attempts publication. Existing eligible applied patches are included. `honey rsi status` reports published URLs and exact heads, or blocked reasons. The proposal's `github_issue` and `publication` records retain the issue URL and PR SHA/URL respectively. Failed GitHub requests retry on a later pass and look for an existing issue or PR first. Publication failures do not undo successful local application. Published means the issue or PR exists, not that a suggestion is proven or a PR has passed CI or merged.
 
 Personal preferences, instruction files, machine repairs, guards, session logs, and generated evaluation prompts stay local. Public commits start from the remote base and contain only the evaluated `skills/<name>/SKILL.md`; local evaluation commits and their history are not pushed. PR text uses fixed metadata, never user quotes or the model's rationale. The skill text itself is shared. Runtime changes absent from the remote baseline, dirty runtime files, legacy patches without snapshots, unexpected files, and changed remote branches block publication. No force pushes, automatic merges or releases. A published PR's closure is respected.
 

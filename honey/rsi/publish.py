@@ -1,4 +1,4 @@
-"""Publish applied skill changes, never local instructions or session evidence."""
+"""Publish suggestion issues and applied skill PRs, excluding private evidence."""
 from __future__ import annotations
 
 import json
@@ -51,7 +51,7 @@ def configure(action):
         details = json.loads(gh('repo', 'view', repo, '--json', 'nameWithOwner,defaultBranchRef'))
         if details['nameWithOwner'].lower() != repo.lower():
             raise ValueError('GitHub repository does not match origin')
-        settings.update(enabled=True, repository=repo, base=details['defaultBranchRef']['name'])
+        settings.update(enabled=True, suggestions=True, repository=repo, base=details['defaultBranchRef']['name'])
     elif action == 'off':
         settings['enabled'] = False
     if action != 'status':
@@ -61,6 +61,68 @@ def configure(action):
 
 def save(proposal):
     store.write_json(paths.path('proposals', paths.safe_id(proposal['id']) + '.json'), proposal)
+
+
+def public_text(value, limit):
+    """Share bounded diagnoses, never raw quotes, identifiers or local paths."""
+    value = text.redact(value if isinstance(value, str) else '', limit)
+    value = re.sub(r'https?://\S+', '[link omitted]', value)
+    value = re.sub(r'(?:~|/(?:Users|home|tmp|private))/(?:[^\s)]+)', '[path omitted]', value)
+    return value.replace('@', '(at)')
+
+
+def suggestions(settings):
+    result = {'published': [], 'blocked': []}
+    if not settings.get('suggestions'):
+        return result
+    pending = [p for p in review.pending() if p.get('type') in ('toolkit_fix', 'skill_new', 'upstream_port')
+               and (p.get('github_issue') or {}).get('state') != 'published']
+    pending.sort(key=lambda p: (p.get('github_issue') or {}).get('updated', ''))
+    issues = None
+    for proposal in pending[:20]:
+        try:
+            repo = settings['repository']
+            if repository().lower() != repo.lower():
+                raise ValueError('Publication origin changed; enable publication again to confirm it')
+            state = proposal.get('github_issue') or {}
+            if state.get('repository') not in (None, repo):
+                raise ValueError('Suggestion issue repository changed')
+            if issues is None:
+                # REST pagination avoids search-index lag after an ambiguous create response.
+                pages = json.loads(gh('api', '--paginate', '--slurp',
+                                     f'repos/{repo}/issues?state=all&per_page=100'))
+                issues = [{'title': issue['title'], 'url': issue['html_url']}
+                          for page in pages for issue in page if 'pull_request' not in issue]
+            prefix = 'RSI ' + proposal['id'] + ': '
+            found = [issue for issue in issues if issue['title'].startswith(prefix)]
+            if len(found) > 1:
+                raise ValueError('Multiple issues already exist for this suggestion')
+            if found:
+                url = found[0]['url']
+            else:
+                title = prefix + public_text(proposal.get('title'), 160).replace('\n', ' ')
+                summary = public_text(proposal.get('rationale'), 600) or 'Investigate this potential workflow improvement.'
+                fix = public_text(proposal.get('fix'), 600) or 'Confirm the diagnosis and prepare a tested change.'
+                body = ('## RSI suggestion\n\n' + summary + '\n\n## Proposed next step\n\n' + fix +
+                        '\n\nThis is an unimplemented suggestion, not a verified defect or an applied change. '
+                        'Confirm the diagnosis and supporting evidence before implementation.\n\n'
+                        'Raw session quotes, personal preferences and local evidence are not included.\n')
+                with tempfile.TemporaryDirectory(prefix='honey-issue-') as directory:
+                    file = os.path.join(directory, 'body.md')
+                    store.write_text(file, body)
+                    url = gh('issue', 'create', '--repo', repo, '--title', title, '--body-file', file)
+                issues.append({'title': title, 'url': url})
+            if not re.fullmatch(r'https://github\.com/' + re.escape(repo) + r'/issues/[0-9]+', url, re.I):
+                raise ValueError('Suggestion issue URL does not match the configured repository')
+            proposal['github_issue'] = {'state': 'published', 'repository': repo, 'url': url, 'updated': text.now()}
+            save(proposal)
+            result['published'].append({'id': proposal['id'], 'url': url})
+        except Exception as exc:
+            error = text.redact(str(exc), 300)
+            proposal.setdefault('github_issue', {}).update(state='blocked', error=error, updated=text.now())
+            save(proposal)
+            result['blocked'].append({'id': proposal['id'], 'reason': error})
+    return result
 
 
 def prepare(proposal, settings):
@@ -155,16 +217,17 @@ def publish(proposal, settings):
     return {'id': proposal['id'], 'url': state['url'], 'sha': sha}
 
 
-def run():
+def run(include_patches=True, suggestion_result=None):
     """Caller owns the RSI lock; publication failure never undoes local application."""
     settings = config()
     if not settings.get('enabled'):
         return {'skipped': 'publication disabled'}
-    result = {'published': [], 'blocked': []}
+    result = {'published': [], 'blocked': [],
+              'suggestions': suggestions(settings) if suggestion_result is None else suggestion_result}
     pending = [p for p in review.all_proposals() if p.get('type') == 'skill_patch'
                and p.get('status') == 'applied' and (p.get('publication') or {}).get('state') != 'published']
     pending.sort(key=lambda p: (p.get('publication') or {}).get('updated', ''))
-    for proposal in pending[:20]:
+    for proposal in pending[:20] if include_patches else []:
         try:
             result['published'].append(publish(proposal, settings))
         except Exception as exc:

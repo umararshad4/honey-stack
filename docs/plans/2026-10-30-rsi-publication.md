@@ -1,6 +1,6 @@
 # RSI publication plan
 
-**Goal:** Push validated shareable RSI skill changes to GitHub and open a reviewable PR automatically.
+**Goal:** Publish pending RSI suggestions as GitHub issues automatically, then publish validated skill changes as PRs.
 **Approach:** HOLD scope. Reuse evaluation, local application, the RSI lock and proposal storage. Add opt-in publication after local application, with a separate public commit containing only the skill file.
 **Design:** none; user requested publication as part of the flow.
 
@@ -19,6 +19,8 @@
 - `README.md`, `CHANGELOG.md`: controls and publication boundaries (modify).
 
 ## Tasks
+- [x] Publish pending toolkit, new-skill and upstream suggestions as issues independently of automatic application; test duplicate prevention, private-evidence exclusion and failure recovery.
+- [x] Publish the current eligible backlog and read back the GitHub issues; prepare the verified update for the existing PR.
 - [x] Add CLI configuration and publish a locally applied evaluated skill using a clean commit containing only its skill file. Prove with a real disposable Git remote and synthetic private evaluation text.
 - [x] Retry push/PR failures without duplicates or losing local application; reject drift and unpublished local runtime history. Prove with negative integration tests.
 - [x] Wire automatic and explicit application, show publication receipts, document behavior; run `python3 tests/run.py`, `python3 scripts/release.py --check`, `git diff --check`.
@@ -38,7 +40,7 @@
 - Automatically resolving changed evaluation baselines: requires new evaluation.
 
 ## Verification
-- `python3 tests/test_rsi_publish.py`: 12 integration tests passed; real disposable Git push with a mocked GitHub API.
+- `python3 tests/test_rsi_publish.py`: 20 integration tests passed; real disposable Git push with a mocked GitHub API.
 - `python3 tests/run.py`: all 33 test scripts passed on Python 3.14.7.
 - `python3 scripts/release.py --check`: version 0.11.0 consistent.
 - `git diff --check`: clean.
@@ -47,3 +49,8 @@
 ## Delivery
 - Implementation pushed to `feat/rsi-auto-publish`; PR https://github.com/umararshad4/honey-stack/pull/5 targets `main`.
 - Publication is configured for `umararshad4/honey-stack`; the running installation still needs the merged implementation.
+
+## Suggestion publication verification
+- Live backlog: all 13 suggestions published to issues #6 through #18 and read back from GitHub. Local receipts match each URL and all local proposals remain pending.
+- A second live publication run returned no new issues and no blocked items.
+- A live CLI flag mismatch was reproduced, covered with a regression test, and corrected by parsing paginated API responses in Python.
