@@ -8,19 +8,19 @@ import sys
 
 def statusline() -> int:
     """Claude statusLine command: [HONEY] badge plus pending RSI review count."""
-    from honey import paths
+    from honey import modes, paths
     from honey.rsi import review, store
     try:
         payload = json.loads(sys.stdin.read() or "{}")
     except ValueError:
         payload = {}
     st = store.read_json(paths.path("state", "sessions", paths.session_key("claude", payload.get("session_id", "")) + ".json"), {}) or {}
+    if not isinstance(st, dict):
+        st = {}
     if st.get("off"):
         badge = "[HONEY off]"
     else:
-        extra = [x for x in (st.get("scope", "full") != "full" and st["scope"].upper(),
-                             st.get("process") == "strict" and "strict", st.get("voice") == "normal" and "normal") if x]
-        badge = "[HONEY" + (":" + " ".join(extra) if extra else "") + "]"
+        badge = "[HONEY:" + modes.selected(st, modes.defaults()["mode"]) + "]"
     n = len(review.pending())
     print(badge + (f" rsi:{n}" if n else ""))
     return 0

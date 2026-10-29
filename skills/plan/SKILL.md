@@ -29,7 +29,7 @@ Done when: the branch is chosen and every decision the plan needs is either in h
 
 For project-size work, read `references/scope-review.md` and run it: premise check, what already exists, two or three approaches (one minimal, one ideal), then a scope mode (EXPANSION, SELECTIVE, HOLD, REDUCTION). Every scope addition is the user's opt-in, one decision brief per addition. Once a mode is chosen, commit to it for the rest of the plan.
 
-- Scope `ultra`: default to REDUCTION. Scope `lite`: default to HOLD.
+- Prefer REDUCTION when requirements are broad and HOLD when the scope is already fixed. Response mode does not change scope.
 
 Done when: the chosen approach and mode are written in the plan header.
 
@@ -73,7 +73,7 @@ What each step carries, and nothing more:
 - **Verify step**: the command and the output that means it passed. Every task ends with one.
 - **Cross-task reference**: point at the other task's Interfaces line; don't repeat its code.
 
-Add commit steps only when the user asked for commits. Process `strict`: every task opens with its failing test.
+Add commit steps only when the user asked for commits. Test-first tasks open with a failing test at a clean seam.
 
 **Engineering pass.** Read `references/eng-review.md` and apply its prime directives to every new codepath: named error paths, the nil / empty / upstream-error shadow paths, interaction edge cases, and the failure-modes table. Add the tests it surfaces to the owning tasks.
 
@@ -99,4 +99,4 @@ Done when: the spec exists and every ticket is published with its blocking edges
 
 ## 5. Hand off
 
-If the user asked for the plan itself, link it and stop. If they already asked for implementation, continue into `execute`; the plan records the authorized scope. In strict mode, ask only for an unresolved product decision or a scope expansion. Do not ask again for implementation already authorized.
+If the user asked for the plan itself, link it and stop. If they already asked for implementation, continue into `execute`; the plan records the authorized scope. Ask only for an unresolved product decision or a scope expansion. Do not ask again for implementation already authorized.

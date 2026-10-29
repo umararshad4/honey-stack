@@ -50,14 +50,14 @@ The user can reply "1 yes, 2 your call". "Your call" accepts your recommendation
 
 Ground to cover. This is territory, not a script: goals, non-goals, anti-goals, constraints, prior art they loved or hated, the current state, the details they care about, which how-it-gets-made choices they want to make and which they're handing to you.
 
-- Scope `ultra`: open with the premise. What happens if we do nothing? What's the smallest version that delivers the outcome?
-- Scope `lite`: grill only the product calls; state your defaults for the rest in one line each.
+- For broad requirements, check the premise: what happens if we do nothing, and what's the smallest useful outcome?
+- For fixed scope, grill only the product calls; state your defaults for the rest in one line each.
 
 Done when: every frontier node is decided by the user, delegated to you, or ruled out of scope.
 
 ## 4. Play it back
 
-As soon as you understand one part (what it's for and who it serves, how one piece behaves), play it back in a short paragraph, then return to the frontier. Tag each claim `(you said)` or `(my guess)`, and end with "What's wrong or missing?" Voice `terse`: play back as bullets.
+As soon as you understand one part (what it's for and who it serves, how one piece behaves), play it back, then return to the frontier. Tag each claim `(you said)` or `(my guess)`, and end with "What's wrong or missing?" Match the selected response style: concise for `direct`, more context for `explain`, moderate detail for `balance`.
 
 When the repo keeps `CONTEXT.md` or ADRs, update them as terms and decisions settle. The `domain` skill owns their format.
 
@@ -68,7 +68,7 @@ Done when: the user has corrected or confirmed every `(my guess)` that changes w
 Building starts after the user approves the description: the final playback for chat size, the doc for project size.
 
 - **Chat size**: a final list of decisions, tagged theirs or yours, then build.
-- **Project size**: write the design doc and run the builder check. Read `references/design-doc.md` for the template, the builder-check prompt, and how to sort what the builder asks. Process `strict`: the builder check runs as a fresh subagent; `light`: read the doc yourself as that builder. Then hand the approved doc to the `plan` skill.
+- **Project size**: write the design doc and run the builder check. Read `references/design-doc.md` for the template, the builder-check prompt, and how to sort what the builder asks. Read the doc yourself as that builder; use a fresh subagent when the user requests an independent check. Then hand the approved doc to the `plan` skill.
 
 Done when: the user approved the description and the next step (build, or `plan`) has started.
 

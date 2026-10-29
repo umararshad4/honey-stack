@@ -1,6 +1,6 @@
 ---
 name: honey
-description: "Pick the honey-stack skill or flow for a situation, or switch modes: status, lite, full, ultra, strict, light, terse, normal, off, on, default."
+description: "Pick the honey-stack skill or flow for a situation, or switch response modes: direct, explain, balance, status, off, on, default."
 disable-model-invocation: true
 license: MIT
 metadata:
@@ -12,7 +12,7 @@ metadata:
 
 Router and mode switch for honey-stack.
 
-- **Mode words** (`status`, `lite`, `ultra`, `strict`, `default ultra terse`, …): apply them per the Modes section and reply with one status line.
+- **Mode words** (`direct`, `explain`, `balance`, `status`, `default direct`, …): apply them per the Modes section and reply with one status line.
 - **A situation** ("I have a bug report and a half-written plan"): name the skill or flow that fits, say why in one line, then run it.
 - **Nothing**: show the main flow and the situation table below, trimmed to what fits the current repo.
 
@@ -80,24 +80,22 @@ When two rows fit, take the earlier one in the main flow: settle intent before p
 
 ## Modes
 
-Three independent axes. Combine words in one message: `honey ultra strict`.
+One response style at a time. All modes keep the same task sizing, verification, and safety rules.
 
-| Axis | Word | Effect |
-|---|---|---|
-| scope | `lite` | Build what's asked; name the lazier alternative in one line. |
-| | `full` | The ladder enforced on every addition. |
-| | `ultra` | Deletion before addition; challenge the requirement before building. |
-| process | `light` | Targeted checks per item; one review at the end. |
-| | `strict` | Failing test first, a reviewer subagent per task, builder check on designs, the user's go on plans. |
-| voice | `terse` | Fragments, receipts, no recap. |
-| | `normal` | Full sentences with short explanations. |
-| control | `status` | Print the active modes and whether each came from this session or the saved default. |
-| | `off` / `on` | Pause the whole layer (bootstrap, hooks, routing) / resume it. |
-| | `default <words>` | Save words as the default for new sessions, e.g. `honey default ultra terse`. |
+| Word | Effect |
+|---|---|
+| `direct` | Straight to the point, concise responses. |
+| `explain` | Comprehensive explanations with useful context, reasoning, and examples. |
+| `balance` | Moderate detail: answer plus key reasoning, neither comprehensive nor too brief. |
+| `status` | Print the active response mode and whether Honey is paused. |
+| `off` / `on` | Pause the whole layer (bootstrap, hooks, routing) / resume it. |
+| `default <mode>` | Save the mode for new sessions, e.g. `honey default direct`. |
 
-Shipped defaults: `full`, `light`, `terse`. Session switches last until changed or the session ends.
+The default is `direct`. Session switches last until changed or the session ends. The indicator includes the active choice, for example `🍯 HONEY · balance`. Explicit requests for more or less detail take priority over the selected style.
 
-**The hook does the switching.** Send `honey ultra` or `/honey strict` (Codex: `$honey strict`) as the whole message and the prompt hook applies it before the model runs. If this skill receives mode words instead, the hook didn't fire: honor the modes in conversation for the rest of the session and say in one line that nothing was saved.
+**The hook does the switching.** Send `honey explain` or `/honey balance` (Codex: `$honey balance`) as the whole message and the prompt hook applies it before the model runs. If this skill receives mode words instead, the hook didn't fire: honor the mode in conversation for the rest of the session and say in one line that nothing was saved.
+
+Existing saved `terse` settings read as `direct`, and `normal` as `balance`. Old scope/process choices no longer change the workflow. Saving a new default writes `mode` in the global config and removes the old `modes` field.
 
 ## Context hygiene
 

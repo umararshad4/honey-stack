@@ -107,6 +107,8 @@ SubagentStart gets a ~70-word mini-bootstrap.
 
 ### Modes (three orthogonal axes plus pause)
 
+> Historical design. Superseded by [simple response modes](../plans/2026-10-30-simple-response-modes.md): `direct`, `explain`, and `balance`. The original design below is retained as history; use the README for current commands.
+
 | Axis | Values | Default |
 |---|---|---|
 | scope | lite / full / ultra | full |

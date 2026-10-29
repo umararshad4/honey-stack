@@ -19,10 +19,10 @@ assert check("git branch -d feat") == (None, None)
 assert check("kubectl -n prod delete pod x")[1] == "ask"
 assert check("terraform -chdir=infra destroy")[1] == "ask"
 assert check("kubectl get pods") == (None, None)
-assert modes.parse_command("/honey ultra strict") == ["ultra", "strict"]
+assert modes.parse_command("/honey explain") == ["explain"]
 assert modes.parse_command("honey off") == ["off"]
 assert modes.parse_command("stop honey.") == ["off"]
 assert modes.parse_command("add a normal mode toggle") is None
 assert modes.parse_command("/honey how do I debug this") is None
-assert modes.parse_command("honey default lite") == ["default", "lite"]
+assert modes.parse_command("honey default direct") == ["default", "direct"]
 print("guard+modes ok")

@@ -1,4 +1,4 @@
-"""Session modes and the always-on bootstrap. Three orthogonal axes plus a per-session pause."""
+"""Response detail modes and the always-on bootstrap, plus a per-session pause."""
 from __future__ import annotations
 
 import os
@@ -7,9 +7,7 @@ import re
 from honey import paths
 from honey.rsi import store
 
-AXES = {"scope": ("lite", "full", "ultra"), "process": ("light", "strict"), "voice": ("terse", "normal")}
-DEFAULTS = {"scope": "full", "process": "light", "voice": "terse"}
-TOKENS = {v: axis for axis, vals in AXES.items() for v in vals}
+MODES = ("direct", "explain", "balance")
 CONTROL = {"off", "on", "status", "default"}
 
 _CMD = re.compile(r"^(?:/(?:honey:)?honey|\$honey|@honey)(?:\s+(?P<args>.+))?$")
@@ -18,11 +16,21 @@ _BARE = re.compile(r"^(?:honey\s+(?P<args>.+)|stop honey)$")
 
 def defaults() -> dict:
     cfg = store.read_json(paths.path("config.json"), {}) or {}
-    d = dict(DEFAULTS)
-    for k, v in (cfg.get("modes") or {}).items():
-        if k in AXES and v in AXES[k]:
-            d[k] = v
-    return d
+    legacy = cfg.get("modes") if isinstance(cfg, dict) else None
+    return {"mode": selected(cfg, selected(legacy))}
+
+
+def selected(state: dict, fallback: str = "direct") -> str:
+    if not isinstance(state, dict):
+        return fallback
+    mode = state.get("mode")
+    if mode in MODES:
+        return mode
+    if state.get("voice") == "normal":
+        return "balance"
+    if state.get("voice") == "terse":
+        return "direct"
+    return fallback
 
 
 def parse_command(prompt: str):
@@ -36,7 +44,12 @@ def parse_command(prompt: str):
     if p == "stop honey":
         return ["off"]
     args = (m.group("args") or "status").split()
-    if not args or any(a not in TOKENS and a not in CONTROL for a in args):
+    if not args or any(a not in MODES and a not in CONTROL for a in args):
+        return None
+    words = set(args)
+    if len(words.intersection(MODES)) > 1 or words.intersection({"off", "status"}) and len(words) > 1:
+        return None
+    if "default" in words and not words.intersection(MODES):
         return None
     return args
 
@@ -51,13 +64,18 @@ def apply_command(state: dict, args: list) -> str:
     if "on" in args:
         state["off"] = False
     for a in args:
-        if a in TOKENS:
-            state[TOKENS[a]] = a
+        if a in MODES:
+            state["mode"] = a
+    for key in ("scope", "process", "voice"):
+        state.pop(key, None)
     if persist:
         cfg = store.read_json(paths.path("config.json"), {}) or {}
-        cfg["modes"] = {k: state.get(k, DEFAULTS[k]) for k in AXES}
+        if not isinstance(cfg, dict):
+            cfg = {}
+        cfg["mode"] = selected(state)
+        cfg.pop("modes", None)
         store.write_json(paths.path("config.json"), cfg)
-    line = "HONEY MODE scope={scope} process={process} voice={voice}".format(**{k: state.get(k, DEFAULTS[k]) for k in AXES})
+    line = "HONEY MODE " + selected(state)
     if args == ["status"]:
         return line + (" (paused)" if state.get("off") else "") + ". Report this to the user in one line."
     return (line + (" (saved as default)" if persist else " (this session)") + ". Apply from now on. Confirm in one short line.\n"
@@ -65,9 +83,8 @@ def apply_command(state: dict, args: list) -> str:
 
 
 def indicator(state: dict) -> str:
-    """🍯 HONEY, plus any axis that differs from the defaults: 🍯 HONEY · ultra · strict."""
-    extra = [state.get(k) for k in AXES if state.get(k, DEFAULTS[k]) != DEFAULTS[k]]
-    return "🍯 HONEY" + "".join(f" · {e}" for e in extra)
+    """Show the active response mode, including the default."""
+    return "🍯 HONEY · " + selected(state)
 
 
 def _skill(agent: str, name: str) -> str:
@@ -78,7 +95,7 @@ def render(agent: str, state: dict, template: str = None) -> str:
     if template is None:
         with open(os.path.join(os.path.dirname(__file__), "bootstrap.md"), encoding="utf-8") as f:
             template = f.read()
-    active = {state.get(k, DEFAULTS[k]) for k in AXES}
+    active = {selected(state)}
     out = []
     for line in template.splitlines():
         m = re.match(r"^\[\[(\w+)\]\](.*)$", line)
@@ -90,14 +107,14 @@ def render(agent: str, state: dict, template: str = None) -> str:
     text = "\n".join(out).strip()
     text = re.sub(r"\{s:([\w-]+)\}", lambda m: _skill(agent, m.group(1)), text)
     router = "`$honey`" if agent == "codex" else "`/honey`"
-    return text.format(router=router, indicator=indicator(state), **{k: state.get(k, DEFAULTS[k]) for k in AXES})
+    return text.format(router=router, indicator=indicator(state), mode=selected(state))
 
 
 def mode_lines(state: dict) -> str:
     """Just the mode-specific lines, for re-announcing after a mode switch."""
     with open(os.path.join(os.path.dirname(__file__), "bootstrap.md"), encoding="utf-8") as f:
         tagged = [l for l in f.read().splitlines() if l.startswith("[[")]
-    active = {state.get(k, DEFAULTS[k]) for k in AXES}
+    active = {selected(state)}
     return "\n".join(re.sub(r"^\[\[\w+\]\]", "", l) for l in tagged if re.match(r"^\[\[(\w+)\]\]", l).group(1) in active)
 
 

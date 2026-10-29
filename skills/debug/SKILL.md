@@ -70,7 +70,7 @@ Fix in the shared function that every caller routes through, not at the one call
 
 **Regression test first, at a correct seam**, one that exercises the real bug pattern as it happens at the call site. Watch it fail, apply the fix, watch it pass, then re-run the original, un-minimised loop. If no correct seam exists, that is a finding: record it and suggest the `architecture` skill.
 
-- Process `strict`: the regression test is required. `light`: when no cheap seam exists, the phase-1 loop can serve as the regression check; say so.
+- Add a regression test where a clean seam exists. Otherwise the phase-1 loop can serve as the regression check; say why a test was impractical.
 - If bad data could re-enter through other paths, add validation at each layer it crosses. Read `references/defense-in-depth.md`.
 - Truly environmental or external causes get handling (retry, timeout, a clear error) plus a signal for next time, and only after phases 1–4 point there.
 

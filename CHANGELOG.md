@@ -19,6 +19,7 @@ Successful main CI automatically versions and publishes releases. Manual release
 - Maintained behavioral evaluation cases, fixture integrity checks and exact candidate checks before skill patches apply.
 
 ### Changed
+- Replaced scope/process/voice mode choices with `direct`, `explain`, and `balance` response styles. The indicator and status line show the active style; existing saved voice settings are read compatibly.
 - Feedback attribution uses task identity and explicit skill references, preserving uncertainty for ambiguous corrections, requirement changes, preferences and environment failures.
 - Strict test-first guidance applies to code; inspection stays read-only and system tasks use resulting-state checks.
 

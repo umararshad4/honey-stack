@@ -33,6 +33,12 @@ class Ctx:
 
 def _init_state(ctx) -> None:
     if "started" in ctx.state:
+        mode = modes.selected(ctx.state, modes.defaults()["mode"])
+        if ctx.state.get("mode") != mode or any(key in ctx.state for key in ("scope", "process", "voice")):
+            ctx.state["mode"] = mode
+            for key in ("scope", "process", "voice"):
+                ctx.state.pop(key, None)
+            ctx.dirty = True
         return
     ctx.state.update(modes.defaults())
     ctx.state.update(started=text.now(), turn=0, agent=ctx.agent,

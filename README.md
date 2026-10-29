@@ -42,18 +42,16 @@ The **`🍯 HONEY`** prefix indicates injected rules. To check whether the curre
 
 ## Modes
 
-Send as the **whole message**. Add `default` to save it (`honey ultra strict default`).
+Choose one response style. Send it as the **whole message**. Add `default` to save it for new sessions (`honey direct default`).
 
 | Mode | Does | Use when |
 |---|---|---|
-| `honey lite` | Builds what you asked, offers a smaller option in one line | The spec is fixed and isn't yours to question |
-| `honey full` *(default)* | Smallest complete change; skips unrequested extras | Everyday features and fixes |
-| `honey ultra` | Pushes back on anything the need doesn't justify; prefers deleting | Vague asks, cleanup, or you suspect overbuilding |
-| `honey light` *(default)* | Test-first where it's easy; one runnable check per non-trivial change | Normal work |
-| `honey strict` | Code: failing test first, plan before multi-file work, reviewer before done. System tasks: resulting-state checks | Payments, auth, migrations, anything costly to break |
-| `honey terse` *(default)* | No preamble, no recap, short sentences | You know the domain |
-| `honey normal` | Claude's usual voice | Learning, or you want the reasoning |
+| `honey direct` *(default)* | Straight to the point, concise responses | You want the answer and essential details |
+| `honey explain` | Comprehensive explanations with useful context and examples | You want to understand the reasoning |
+| `honey balance` | Moderate detail, neither comprehensive nor too brief | You want the answer with key reasoning |
 | `honey off` · `honey on` | Pause or resume for this session (safety guard stays on) | A task where honey's rules get in the way |
+
+The indicator shows the active choice: `🍯 HONEY · direct`. Use `honey status` to check it. These modes change response detail; task sizing, verification, and safety controls apply in every mode. Explicit requests for detail take priority. Saved legacy `terse` settings read as `direct`, and `normal` as `balance`; the old scope/process choices are retired. Saving a new default replaces the old `modes` config without changing other settings.
 
 Also: `remember: when X, Y` teaches a rule now. Scopes: `(project)` `(claude)` `(codex)` `(skill:<name>)`, e.g. `remember (project): …`. `rsi off` · `rsi on` pauses learning for this session.
 
@@ -121,7 +119,7 @@ A weekly job also checks upstream toolkits and surfaces only the changes that ma
 
 ```json
 {
-  "modes":    {"scope": "full", "process": "light", "voice": "terse"},
+  "mode": "direct",
   "budgets":  {"enabled": true, "reflection_usd": 0.15, "weekly_usd": 1.5, "monthly_usd": 5},
   "autonomy": {"min_sessions": 2, "holdout_rate": 0}
 }

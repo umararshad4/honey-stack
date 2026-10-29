@@ -39,7 +39,7 @@ Without a subagent tool, run every item inline in the same order.
 
 Keep the user's scope across turns. `continue` does not authorize new resources or destructive actions. For non-trivial work, use `honey task set` to name the operation, targets and required checks; `honey task status --json` shows the current evidence and diagnostic metrics. A new task starts without old proof. An inspection request stays read-only until the user asks for execution. These records never override host permissions.
 
-1. Implement the smallest change that satisfies the item. For code changes in process `strict`, write the failing test first with the `tdd` skill. For system tasks, check the resulting state; keep inspection tasks read-only.
+1. Implement the smallest change that satisfies the item. For code changes, use the `tdd` skill where a clean seam exists. For system tasks, check the resulting state; keep inspection tasks read-only.
 2. Run the `verify` skill with the item's check.
 3. **Pass**: tick it (`- [ ]` → `- [x]`) in the plan or `TODO.md`. For GitHub tickets, leave the issue open and list it in the report; closing is the `ship` skill's job.
 4. **Fail**: run the `debug` skill. Spend at most two fix rounds on one item, then write a blocker under it and move to the next item that doesn't depend on it:
@@ -70,8 +70,8 @@ Before stopping, finish every item that doesn't depend on the answer. Then send 
 
 The main thread reads every subagent diff (`git diff` over the worker's files); a worker's summary is a claim. Check that the diff stays inside its file boundary, does what the item says and nothing extra, and that the check output in the report is real.
 
-- Process `light`: that read is the per-item review; run the `review` skill once on the whole queue's diff at the end.
-- Process `strict`: after each item, dispatch a fresh reviewer subagent with the item text, the diff, and the global constraints. It reports **spec compliance** first (missing, extra, misunderstood), then **quality** (Critical, Important, Minor, each with `file:line`). Critical and Important findings enter the fix rounds; Minor ones go to the report. The reviewer gets the diff, not your opinion of it.
+- That read is the per-item review; run the `review` skill once on the whole queue's diff at the end.
+- When the user requests an independent review, dispatch a fresh reviewer subagent with the item text, the diff, and the global constraints. It reports **spec compliance** first (missing, extra, misunderstood), then **quality** (Critical, Important, Minor, each with `file:line`). Critical and Important findings enter the fix rounds; Minor ones go to the report. The reviewer gets the diff, not your opinion of it.
 
 After the last item, run once the broad checks the combined change warrants (full suite, typecheck, lint), rather than after every item.
 

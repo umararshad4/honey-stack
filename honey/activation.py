@@ -39,13 +39,10 @@ def context(agent: str, session=None) -> str:
     if os.environ.get('HONEY_DISABLE') == '1' or os.environ.get('RSI_CHILD') == '1':
         return 'Honey is disabled in this isolated subprocess.'
     session = session or os.environ.get('CODEX_THREAD_ID' if agent == 'codex' else 'CLAUDE_SESSION_ID')
-    state = modes.defaults()
     saved = store.read_json(paths.path('state', 'sessions', paths.session_key(agent, session) + '.json'), {}) if session else {}
     if not isinstance(saved, dict):
         saved = {}
-    for key, choices in modes.AXES.items():
-        if saved.get(key) in choices:
-            state[key] = saved[key]
+    state = {'mode': modes.selected(saved, modes.defaults()['mode'])}
     if saved.get('off'):
         return 'Honey is paused for this session. Honor honey off until the user resumes it.'
     report = health.report(agent, session)
