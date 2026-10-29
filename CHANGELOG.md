@@ -11,6 +11,7 @@ Successful main CI automatically versions and publishes releases. Manual release
 ## [Unreleased]
 
 ### Added
+- `honey task run` executes real verification commands and records snapshot-bound evidence on hosts that hide inner tool events.
 - Opt-in `honey rsi publish on/off/status/run` publishes pending suggestions as GitHub issues and applied, evaluated skill changes as PRs, with duplicate prevention, exact-head receipts and retryable failures. Private session evidence, evaluation history and local preferences stay local.
 - Automatic semantic-version releases after successful main CI, with atomic commit/tag pushes, stale-run protection and retryable GitHub publication.
 - Session-specific hook health separates installation, enablement, delivery and supported payload coverage.
@@ -24,6 +25,7 @@ Successful main CI automatically versions and publishes releases. Manual release
 - Strict test-first guidance applies to code; inspection stays read-only and system tasks use resulting-state checks.
 
 ### Fixed
+- Recognize direct “make it” implementation requests after inspection without requiring a repeated confirmation phrase.
 - Local marketplace auto-updates now fetch release tags into the source checkout and refresh installed plugins. Failed refreshes remain pending for retry and do not report a successful update.
 - Recognize modern shell/read/edit envelopes, reject conflicting success metadata, and preserve missing or opaque outcomes as unverified.
 - Keep failed, incomplete, stale and previous-task checks from verifying current work; permit explicit workspace binding for sessions started outside the project.
