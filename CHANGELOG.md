@@ -6,11 +6,12 @@ All notable changes to honey-stack. The format follows [Keep a Changelog](https:
 - **MINOR**: new skills or RSI capabilities
 - **PATCH**: fixes
 
-Releases are cut with `python3 scripts/release.py X.Y.Z --push`. GitHub Actions then publishes the release from this file.
+Successful main CI automatically versions and publishes releases. Manual releases remain available with `python3 scripts/release.py X.Y.Z --push`.
 
 ## [Unreleased]
 
 ### Added
+- Automatic semantic-version releases after successful main CI, with atomic commit/tag pushes, stale-run protection and retryable GitHub publication.
 - Session-specific hook health separates installation, enablement, delivery and supported payload coverage.
 - Task contracts record scope, workspace and operation-specific checks; completion reminders use fresh observed results instead of receipt wording alone.
 - Bounded task/session tool metrics and coach denominators for repeated reads/checks, failures, unknown results and reported durations.

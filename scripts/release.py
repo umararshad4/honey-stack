@@ -53,15 +53,22 @@ def notes(version):
     return m.group(1).strip() if m else ""
 
 
-def main(argv):
-    if "--check" in argv:
-        return check()
-    if "--notes" in argv:
-        print(notes(argv[argv.index("--notes") + 1]))
-        return
-    new = next((a for a in argv if SEMVER.match(a)), None)
-    if not new:
-        sys.exit(__doc__)
+def next_version(current, messages):
+    """Conventional commits: breaking change > feature > patch."""
+    major, minor, patch = map(int, current.split('.'))
+    if any(re.search(r'(?m)^[a-z]+(?:\([^\n)]*\))?!:|^BREAKING[ -]CHANGE:', m) for m in messages):
+        return f'{major + 1}.0.0'
+    if any(re.search(r'(?m)^feat(?:\([^\n)]*\))?:', m) for m in messages):
+        return f'{major}.{minor + 1}.0'
+    return f'{major}.{minor}.{patch + 1}'
+
+
+def prepare(new, fallback_notes=None):
+    """Update release metadata in a clean checkout; caller owns tests and delivery."""
+    if not SEMVER.fullmatch(new):
+        sys.exit('invalid release version')
+    if len(set(versions().values())) != 1:
+        sys.exit('version mismatch')
     cur = next(iter(versions().values()))
     if tuple(map(int, new.split("."))) <= tuple(map(int, cur.split("."))):
         sys.exit(f"{new} must be greater than {cur}")
@@ -69,10 +76,11 @@ def main(argv):
         sys.exit("working tree not clean")
     log = read("CHANGELOG.md")
     m = re.search(r"^## \[Unreleased\]\s*\n(.*?)(?=^## \[|\Z)", log, re.M | re.S)
-    if not m or not m.group(1).strip():
+    if not m or not (m.group(1).strip() or fallback_notes):
         sys.exit("CHANGELOG.md has nothing under ## [Unreleased]")
     today = datetime.date.today().isoformat()
-    log = log.replace(m.group(0), f"## [Unreleased]\n\n## [{new}] - {today}\n\n{m.group(1)}", 1)
+    content = m.group(1) if m.group(1).strip() else fallback_notes + '\n\n'
+    log = log.replace(m.group(0), f"## [Unreleased]\n\n## [{new}] - {today}\n\n{content}", 1)
     base = "https://github.com/umararshad4/honey-stack"
     log = re.sub(r"^\[Unreleased\]: .*$", f"[Unreleased]: {base}/compare/v{new}...HEAD\n[{new}]: {base}/compare/v{cur}...v{new}", log, count=1, flags=re.M)
     write("CHANGELOG.md", log)
@@ -81,6 +89,18 @@ def main(argv):
         d["version"] = new
         write(p, json.dumps(d, indent=2, ensure_ascii=False) + "\n")
     write(INIT, re.sub(r'__version__ = "[^"]+"', f'__version__ = "{new}"', read(INIT)))
+
+
+def main(argv):
+    if "--check" in argv:
+        return check()
+    if "--notes" in argv:
+        print(notes(argv[argv.index("--notes") + 1]))
+        return
+    new = next((a for a in argv if SEMVER.fullmatch(a)), None)
+    if not new:
+        sys.exit(__doc__)
+    prepare(new)
     if subprocess.run([sys.executable, os.path.join(ROOT, "tests", "run.py")]).returncode:
         sys.exit("tests failed; release aborted (files are bumped but not committed: git checkout . to undo)")
     subprocess.run(["git", "-C", ROOT, "commit", "-qam", f"release: v{new}"], check=True)
