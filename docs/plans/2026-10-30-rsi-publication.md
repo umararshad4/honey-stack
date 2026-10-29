@@ -22,7 +22,7 @@
 - [x] Add CLI configuration and publish a locally applied evaluated skill using a clean commit containing only its skill file. Prove with a real disposable Git remote and synthetic private evaluation text.
 - [x] Retry push/PR failures without duplicates or losing local application; reject drift and unpublished local runtime history. Prove with negative integration tests.
 - [x] Wire automatic and explicit application, show publication receipts, document behavior; run `python3 tests/run.py`, `python3 scripts/release.py --check`, `git diff --check`.
-- [ ] Review all changes, commit and push this implementation branch and open a PR.
+- [x] Review all changes, commit and push this implementation branch and open a PR.
 
 ## Failure modes
 | Failure | Handling and proof |
@@ -43,3 +43,7 @@
 - `python3 scripts/release.py --check`: version 0.11.0 consistent.
 - `git diff --check`: clean.
 - Self-review: publication allowlist, history isolation, CLI callers, partial failures, retry identity and closed-PR behavior checked.
+
+## Delivery
+- Implementation pushed to `feat/rsi-auto-publish`; PR https://github.com/umararshad4/honey-stack/pull/5 targets `main`.
+- Publication is configured for `umararshad4/honey-stack`; the running installation still needs the merged implementation.
