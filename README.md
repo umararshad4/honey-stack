@@ -79,10 +79,21 @@ Known shell/read/edit payloads, including `exec_command` with `cmd`, are normali
 The agent picks these itself:
 `grill` · `plan` · `execute` · `debug` · `tdd` · `verify` · `review` · `ship` · `deploy` · `test-design` · `tooling` · `database` · `perf` · `observability` · `api-design` · `upgrade` · `incident` · `frontend` · `stageshow` · `qa` · `security` · `docs`
 
-You call these: `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc`
+You call these: `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` · `project-verify` · `triage` · `research` · `statechart`
 
 Flow: **grill → plan → execute → verify → review → ship**. Bugs start at **debug**.
 Claude: `/honey:<skill>`. Codex: `$<skill>`.
+
+### Focused workflow support
+
+- **`project-verify`** creates or maintains a project-local verification skill: launch, readiness/ownership checks, feature journeys, observable side effects, retained evidence and safe cleanup. A generated harness is ready only after its recipe runs successfully. `verify` and `qa` reuse it; a small edit does not require a new harness.
+- **`triage`** reads complete reports, checks duplicates and existing fixes, and produces evidence-backed states and agent briefs. Its explicit reproduce/fix branch requires before/after proof and routes delivery through `ship`. RSI backlog qualification uses this same workflow; the background publisher and its opt-in settings are unchanged. This skill does not deploy a GitHub bot or automatically close, merge or release issues.
+- **`research`** answers technical and product questions from primary sources, with constraints, source dates, citations and unknowns. Uses available Exa tools for deep discovery and available search/GitHub tools as fallback. `opensrc` remains the focused option for installed dependency APIs.
+- **`statechart`** optionally checks queue, retry and workflow invariants with a model checker, records assumptions and finite bounds, and explains counterexamples. A checked model is not proof of the production code; missing checker prerequisites remain explicit.
+- **Frontend quality** stays in `frontend`, `qa`, `review` and `perf`: motion audit/review and frame diagnostics, realistic worst-case datasets, touch/viewport/safe-area checks and honest real-device coverage. `stageshow` owns mocked product illustrations and cursor demos, not the production application's component stack.
+- **`rsi retro`** is a skill workflow for evidence-backed improvements to navigation, checks and tooling; it is not a CLI subcommand. `write-skill` carries agent-writing guidance, and `perf` uses a benchmark validity checklist before making speedup claims.
+
+The four new entry points are explicitly invoked on both Claude Code and Codex; their descriptions do not expand the always-loaded workflow. Existing skills link to their relevant branches when needed.
 
 ## RSI: how it learns
 

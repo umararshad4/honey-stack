@@ -21,6 +21,8 @@ A plan records the decisions the implementer can't make alone: which files, whic
 
 Follow the repo's existing plan or spec location if it has one. Explore the code first and keep what the plan needs: file pointers, conventions, test commands, entry points. If a product decision is still open, run the `grill` skill first.
 
+Consume existing `research` notes and `triage` briefs before rediscovering the same facts. Refresh date-sensitive claims and resolve missing acceptance criteria; a label such as ready-for-agent is not proof of a reproduced bug. For queue/retry/concurrency invariants whose ordering is the main risk, offer the optional, explicitly invoked `statechart` workflow rather than requiring it for ordinary tasks.
+
 If the work covers independent subsystems, write one plan per subsystem; each should produce working, testable software on its own.
 
 Done when: the branch is chosen and every decision the plan needs is either in hand or settled by `grill`.

@@ -3,8 +3,8 @@ name: qa
 description: "Use to check a change in a real browser, QA a page or user flow, or when a UI change needs visual proof."
 license: MIT
 metadata:
-  reviewed: "2026-10-18"
-  sources: "garrytan/gstack 1.60.1.0 qa/SKILL.md.tmpl (test, fix, re-verify loop; regression test per fix; self-regulation), qa/SKILL.md (Modes: diff-aware; Workflow phases 2-5; Framework-Specific Guidance; Important Rules), qa/references/issue-taxonomy.md, qa/templates/qa-report-template.md; MCT (local) ~/.claude/MCT.md (Post-Task Verification, Strict Proof And Audit), ~/.claude/policies/automation-policy.json (postTaskVerification); tester.army/e2e docs (deterministic vs agentic steps, selector strategy, verified-step caching, explore→regression; references/e2e.md)"
+  reviewed: "2026-11-01"
+  sources: "garrytan/gstack 1.60.1.0 qa/SKILL.md.tmpl (test, fix, re-verify loop; regression test per fix; self-regulation), qa/SKILL.md (Modes: diff-aware; Workflow phases 2-5; Framework-Specific Guidance; Important Rules), qa/references/issue-taxonomy.md, qa/templates/qa-report-template.md; MCT (local) ~/.claude/MCT.md (Post-Task Verification, Strict Proof And Audit), ~/.claude/policies/automation-policy.json (postTaskVerification); tester.army/e2e docs (deterministic vs agentic steps, selector strategy, verified-step caching, explore→regression; references/e2e.md); emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/break-ui/{SKILL.md,CATALOG.md}, skills/mobile-native/SKILL.md (MIT, adapted)"
 ---
 
 # QA
@@ -12,6 +12,8 @@ metadata:
 Use the app the way a user would, in a real browser, and trust what the browser shows. Code tells you what should happen; the browser tells you what does.
 
 A request to check or test produces a report and no code changes. Fix only when the user asked for fixes or the task is to make the flow work.
+
+For worst-case data, overflow or localization stress tests, follow [UI stress testing](references/stress-ui.md). For phone/PWA issues, also use [mobile behavior](../frontend/references/mobile.md). Motion review and frame profiling live in [motion review](../frontend/references/motion-review.md) and [motion performance](../frontend/references/motion-performance.md).
 
 ## 1. Pick the browser tool
 
@@ -44,7 +46,7 @@ Run every flow at **1440x900** and **390x844**. On each page:
 
 1. Load it, take a snapshot or screenshot, and read the console and failed network requests.
 2. Use every control in the changed area. Each one does what its label says. Reach controls by role, then accessible name, then test id — the order in `references/e2e.md` — and confirm a locator resolves to exactly one element before you act on it. A control you can't reach by an accessible handle is itself an accessibility finding.
-3. Submit forms empty, invalid, with long text and unicode, and twice quickly.
+3. Submit forms empty, invalid, with realistic long text and Unicode, and twice quickly. For data-heavy or translated UI, select the applicable worst cases from [UI stress testing](references/stress-ui.md), including empty/one/many records and missing optional values.
 4. Navigate in and out: click links (client-side navigation), back and forward, deep link, reload. State that should persist survives a reload.
 5. Reach the loading, empty, error and overflow states.
 6. Tab through the controls. Focus is visible, Enter and Space activate, Escape closes overlays.
@@ -55,6 +57,8 @@ Run every flow at **1440x900** and **390x844**. On each page:
 Retry each bug once to confirm it reproduces. Spend depth on core flows (sign-up, checkout, the main dashboard, search) over secondary pages. For severity levels, issue categories and framework-specific checks, read `references/checklist.md`. This explore-then-pin loop is the heart of e2e: a flow worth checking twice is worth a regression test, and a finding isn't confirmed until a repro reproduces it — `references/e2e.md` has the discipline.
 
 Done when: every flow on the list ran at both viewports and each finding has repro steps plus a screenshot or snapshot.
+
+For a phone-specific claim, emulator results are preliminary: run the affected interaction on the target browser and real device using [mobile behavior](../frontend/references/mobile.md). Record an unavailable device as unverified, without discarding the desktop/emulated evidence.
 
 ## 4. Fix loop
 

@@ -54,7 +54,8 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | A production outage: triage, mitigate, roll back, communicate, postmortem | `incident` |
 | A skill misfired or a lesson should stick; improve honey-stack itself | `rsi` |
 | UI, layout, styling, responsive, design-system work | `frontend` |
-| Implementing animations, mocked product UI illustrations or cursor demos | `stageshow` |
+| Mocked product UI illustrations or animated cursor demos | `stageshow` |
+| Application animation, motion audit or dropped frames | `frontend` (motion references); `review` or `perf` for their respective checks |
 | Drive the real app to find bugs before users do | `qa` |
 | Auth, sessions, secrets, payments, user data, webhooks | `security` |
 | Behavior, setup, commands, or APIs changed; docs drift | `docs` |
@@ -66,6 +67,10 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Write or edit a skill | `write-skill` |
 | A design call needs a named principle (root cause, idempotency, boundaries) | `principles` |
 | Need a library's real source or docs for a declared dependency | `opensrc` |
+| Research a technical/product question against primary sources | `research` |
+| Create or maintain this project's launch/drive/evidence harness | `project-verify` |
+| Qualify issues, deduplicate reports or prepare an actionable agent brief | `triage` |
+| Model a queue, retry or workflow invariant and its counterexamples | `statechart` |
 | Understand a shipped app, binary, APK or site you don't have source for (authorized) | `reverse-engineer` |
 
 When two rows fit, take the earlier one in the main flow: settle intent before planning, plan before executing.
@@ -78,6 +83,10 @@ When two rows fit, take the earlier one in the main flow: settle intent before p
 - **`ship` vs `deploy`**: commit/push/PR → `ship`; getting it running on a server/cloud → `deploy`.
 - **`security` vs `upgrade`**: a design/code security concern or audit → `security`; patching a vulnerable dependency → `upgrade`.
 - **`docs` vs `unslop`**: writing/updating project docs → `docs`; tightening any prose of AI tells → `unslop`.
+- **`project-verify` vs `verify` vs `qa`**: author/maintain a project harness → `project-verify`; prove a particular change → `verify`; browser interaction → `qa`. Reuse the project's harness when it exists.
+- **`triage` vs `debug`**: qualify a report and prepare a brief → `triage`; investigate a confirmed failure → `debug`. A proposed fix is not verification.
+- **`research` vs `opensrc`**: broad primary-source investigation → `research`; installed dependency API context → `opensrc`.
+- **`frontend` vs `stageshow`**: application motion and UI quality → `frontend`; mocked product illustrations and cursor demos → `stageshow`. `qa` owns stress/mobile evidence.
 
 ## Modes
 

@@ -5,14 +5,16 @@ disable-model-invocation: true
 license: MIT
 metadata:
   reviewed: "2026-10-18"
-  sources: "honey-stack original; review flow after cursor/plugins pstack 0.15.25 skills/reflect (explicit approval) and BayramAnnakov/claude-reflect (Apply/Edit/Skip); learning gate after EveryInc/compound-engineering-plugin ce-compound"
+  sources: "honey-stack original; review flow after cursor/plugins pstack 0.15.25 skills/reflect (explicit approval) and BayramAnnakov/claude-reflect (Apply/Edit/Skip); learning gate after EveryInc/compound-engineering-plugin ce-compound; mattpocock/skills 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d skills/engineering/retro/SKILL.md"
 ---
 
 # rsi — the recursive self-improvement engine
 
 RSI watches every honey-stack session through hooks. Corrections, "still broken", acceptance, which skills fired and how they went are all logged to `~/.honey/` and redacted. A `remember:` note becomes a learning at once. Other learnings are promoted on their own once two or more sessions back them, and they decay when they stop applying. Review mode queues instruction edits, toolkit repairs, skill patches and guards for user decisions. With `honey rsi autonomy on`, detached session jobs apply supported proposals after validation and attempt one evidence-backed skill improvement every 24 hours within existing budgets. Budgets, evidence checks, never-list exclusions and current user instructions still apply. Unsupported repairs stay pending with reasons; do not execute free-form fix text.
 
-Run the CLI: `honey rsi <sub>`. If `honey` isn't on PATH, use `python3 "<plugin root>/bin/honey" rsi <sub>`; the plugin root is two folders above this skill's directory. Show the output compactly and invent nothing beyond what the CLI returned.
+For `retro` or a session retrospective, follow [the retrospective workflow](references/retrospective.md). For `triage` or a request to qualify the suggestion backlog, read [the triage procedure](../triage/SKILL.md) with proposal IDs and issue links. These are skill workflows, not `honey rsi` CLI subcommands. They do not change the background publisher or activate a hosted bot.
+
+For the CLI subcommands below, run `honey rsi <sub>`. If `honey` isn't on PATH, use `python3 "<plugin root>/bin/honey" rsi <sub>`; the plugin root is two folders above this skill's directory. Show the output compactly and invent nothing beyond what the CLI returned.
 
 ## Subcommands (from the user's arguments; none = `status`)
 
@@ -54,6 +56,6 @@ Run the CLI: `honey rsi <sub>`. If `honey` isn't on PATH, use `python3 "<plugin 
    - `upstream_port`: drafts a new eval-gated patch, which comes back as a `skill_patch` item.
    - `skill_new`: autonomous preparation requires verified user requests from two sessions, drafts a bounded skill and positive/negative trigger cases, then uses the evaluated child patch path. Keyword-only suggestions stay pending; manual drafting can use `write-skill`.
    - `toolkit_fix`: applies a supported structured audit repair and saves installer undo records. A diagnosis of a known skill can be prepared as an evaluated child patch using verified user evidence; other unstructured runtime diagnoses remain pending.
-6. Done when every item has a recorded decision. Report it in one line, e.g. `rsi review: 3 applied, 1 skipped, 1 never`.
+6. When qualifying unsupported diagnoses or issue-worthy suggestions, read [the triage procedure](../triage/SKILL.md) as reference guidance: deduplicate, check evidence, and prepare a brief or needs-info result before calling them implementation-ready. Its standalone command stays explicit-only. Issue publication alone supplies none of that proof. Done when every reviewed item has a recorded decision or an explicit unresolved prerequisite. Report it in one line, e.g. `rsi review: 3 applied, 1 skipped, 1 never`.
 
 In review mode, your recommendation is never approval. Ask, then record exactly what the user chose. Autonomous mode supplies standing authorization only for supported, validated RSI operations; it does not authorize unrelated work or remote pushes.

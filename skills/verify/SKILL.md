@@ -11,6 +11,8 @@ metadata:
 
 This is the gate between "I changed it" and "it's done". Prove the claim itself, not a proxy for it.
 
+For app, CLI or service behavior, first look for the repository's project-local verification skill and feature map. Reuse its launch, doctor, drive and cleanup instructions and select the changed journeys. Missing or stale harness: use `project-verify` when creation/maintenance is requested; a focused verification can still use the repo's existing checks and state the coverage gap. Do not turn every small change into harness creation.
+
 ## Task evidence
 
 For non-trivial execution, inspect `honey task status --json`. Codex uses `CODEX_THREAD_ID`; on other hosts pass `--agent claude --session <session-id>` to every command. Replace `<session-id>` and `<call-id>` with the real host identifiers. When the task's project differs from the session directory, pass `--cwd /actual/project` to `task set` before running checks.

@@ -15,6 +15,8 @@ Drain the queue to done in one continuous run. The user asked for the work, so d
 
 Take the first source that exists: what the user named, then unchecked plan tasks (`docs/plans/`), then the ticket frontier (open tickets whose blockers are done), then unchecked items in root `TODO.md`. The user's prompt wins when it conflicts with the queue.
 
+For tracker work, read the latest `triage` brief, acceptance criteria and source discussion. If a reported bug lacks a reproduction or an existing PR already addresses it, read [the triage procedure](../triage/SKILL.md) as reference guidance before authoring a competing fix; do not implicitly invoke its standalone command. Use a project-local verification harness for the relevant journeys when available.
+
 **Resume, don't redo.** Ticked items are done. After a compaction or in a new session, trust the checkboxes, ruling lines, `git log` and `git diff` over memory. Read the plan's global constraints and its design or spec once; the spec settles conflicts inside the plan.
 
 **Classify each item:**

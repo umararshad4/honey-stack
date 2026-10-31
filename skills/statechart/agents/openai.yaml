@@ -1,0 +1,5 @@
+interface:
+  display_name: "statechart"
+  short_description: "Check workflow invariants and explain failing paths"
+policy:
+  allow_implicit_invocation: false

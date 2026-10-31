@@ -1,6 +1,6 @@
 # Animation
 
-UI motion rules, distilled from Emil Kowalski's design-engineering skills (emilkowalski/skills, MIT). Load this when a change adds, reviews or fixes animation. The frontend parity rules still win on an existing surface.
+UI motion rules, distilled from Emil Kowalski's design-engineering skills (emilkowalski/skills, MIT), updated against a81dbca07f2217b7103e510c0f13f8d5b017afc9, `skills/review-animations/STANDARDS.md`. Load this when a change adds or fixes application animation. The frontend parity rules still win on an existing surface. Use [motion review](motion-review.md) for review/audit and [motion performance](motion-performance.md) for measured stutter.
 
 ## Should it animate at all?
 
@@ -27,7 +27,7 @@ Keyboard-initiated actions never animate — they must feel instant. "It looks c
 | Constant motion (marquee, progress) | `linear` |
 | Unsure | `ease-out` |
 
-The built-in CSS curves are weak; prefer a stronger custom cubic-bezier. Make the **exit faster than the enter**. Where the user is deciding (hold-to-delete), make the press slow and the release snappy.
+Reuse the product's easing token first. When no suitable token exists, upstream reference curves are `cubic-bezier(0.23, 1, 0.32, 1)` for a strong ease-out, `cubic-bezier(0.77, 0, 0.175, 1)` for on-screen movement and `cubic-bezier(0.32, 0.72, 0, 1)` for a drawer. Choose by the action, not at random. Make the **exit faster than the enter**. Where the user is deciding (hold-to-delete), make the press slow and the release snappy.
 
 ## Duration
 
@@ -36,20 +36,20 @@ Keep UI animations **under 300ms**. Faster reads as faster product.
 - Button press: 100–160ms
 - Tooltip / small popover: 125–200ms
 - Dropdown / select: 150–250ms
-- Modal / drawer: 200–500ms
+- Modal / drawer: 200–300ms by default; a longer 300–500ms physical transition needs a product-specific reason and interaction testing
 - Marketing / explanatory: can be longer
 
 ## Properties — performance
 
-- **Animate only `transform` and `opacity`.** Animating `width`, `height`, `top`, `left` etc. triggers layout + paint and stutters.
+- Prefer **`transform` and `opacity`**. Animating layout properties such as `width`, `height`, `top` and `left` can trigger layout and paint; require a measured reason when cheaper properties cannot preserve the intended effect.
 - Avoid `transition: all` — name the exact properties.
 - Don't update CSS variables on a parent during animation (recalcs every child); set `transform` directly.
-- Framer Motion's `x`/`y`/`scale` shorthands run on the main thread; use full `transform` strings when you need hardware acceleration.
+- Check the installed Motion version and rendered animation path before diagnosing shorthands. If a trace shows main-thread updates during load, compare full `transform` strings, CSS or WAAPI; property names alone do not prove acceleration or dropped frames.
 - Keep animated `blur` under ~20px (heavy blur is costly, worst in Safari).
 - Virtualize long animated lists.
 - Add `will-change: transform` only after you observe a 1px shift when motion starts — not pre-emptively.
 - Write to `ref.current.style` instead of React state to avoid re-renders mid-animation.
-- CSS animations stay smooth under load; use JS/WAAPI for dynamic, interruptible motion.
+- Prefer CSS for simple predetermined motion and the existing motion library or WAAPI for dynamic controls. Confirm smoothness under the load where the user sees the issue.
 
 ## Component patterns
 
@@ -65,6 +65,8 @@ Keep UI animations **under 300ms**. Faster reads as faster product.
 ## Springs
 
 Use for drag with momentum, interruptible gestures, decorative tracking — not for serious functional UI. Springs keep velocity when interrupted; keyframes restart. Keep bounce subtle (~0.1–0.3), and out of most UI.
+
+For gesture-driven motion, reverse direction mid-flight and release at different speeds. Preserve the current position and velocity instead of resetting to the first frame; dismissal should account for velocity as well as distance. Keep pointer capture and cancellation behavior intact.
 
 ## Accessibility
 
@@ -84,4 +86,4 @@ Use for drag with momentum, interruptible gestures, decorative tracking — not 
 | unguarded hover animation | add the hover/pointer media query |
 | same enter and exit speed | make exit faster |
 | all list items at once | stagger 30–80ms |
-| animating `width`/`top`/layout props | animate `transform`/`opacity` |
+| animating `width`/`top`/layout props | compare a `transform`/`opacity` equivalent and profile the necessary exception |

@@ -1,0 +1,5 @@
+interface:
+  display_name: "project-verify"
+  short_description: "Create or maintain real app verification harnesses"
+policy:
+  allow_implicit_invocation: false
