@@ -10,6 +10,9 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+### Added
+- Stageshow guides animation implementation and includes a React kit for product illustrations and cursor demos.
+
 ## [0.13.0] - 2026-10-29
 
 ### Added

@@ -77,7 +77,7 @@ Known shell/read/edit payloads, including `exec_command` with `cmd`, are normali
 ## Skills
 
 The agent picks these itself:
-`grill` · `plan` · `execute` · `debug` · `tdd` · `verify` · `review` · `ship` · `deploy` · `test-design` · `tooling` · `database` · `perf` · `observability` · `api-design` · `upgrade` · `incident` · `frontend` · `qa` · `security` · `docs`
+`grill` · `plan` · `execute` · `debug` · `tdd` · `verify` · `review` · `ship` · `deploy` · `test-design` · `tooling` · `database` · `perf` · `observability` · `api-design` · `upgrade` · `incident` · `frontend` · `stageshow` · `qa` · `security` · `docs`
 
 You call these: `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc`
 

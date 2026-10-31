@@ -54,6 +54,7 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | A production outage: triage, mitigate, roll back, communicate, postmortem | `incident` |
 | A skill misfired or a lesson should stick; improve honey-stack itself | `rsi` |
 | UI, layout, styling, responsive, design-system work | `frontend` |
+| Implementing animations, mocked product UI illustrations or cursor demos | `stageshow` |
 | Drive the real app to find bugs before users do | `qa` |
 | Auth, sessions, secrets, payments, user data, webhooks | `security` |
 | Behavior, setup, commands, or APIs changed; docs drift | `docs` |

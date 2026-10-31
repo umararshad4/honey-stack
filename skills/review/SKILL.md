@@ -1,6 +1,6 @@
 ---
 name: review
-description: "Code review. Use when the user asks to review code, a diff (including a pasted one), branch, PR or repo, wants a second look before merging, is handling review feedback, or asks what a change could break."
+description: "Use to review code, diffs, branches, PRs or repos; assess breakage; or handle review feedback."
 license: MIT
 metadata:
   reviewed: "2026-10-18"
