@@ -10,6 +10,8 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-10-31
+
 ### Added
 - Stageshow guides animation implementation and includes a React kit for product illustrations and cursor demos.
 
@@ -153,7 +155,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.13.0...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/umararshad4/honey-stack/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/umararshad4/honey-stack/compare/v0.12.0...v0.13.0
 [0.12.0]: https://github.com/umararshad4/honey-stack/compare/v0.11.0...v0.12.0
 [0.11.0]: https://github.com/umararshad4/honey-stack/compare/v0.10.0...v0.11.0
