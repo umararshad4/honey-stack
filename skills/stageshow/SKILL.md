@@ -1,15 +1,15 @@
 ---
 name: stageshow
-description: "Use whenever implementing animations, mocked product UI illustrations, or animated cursor demos and walkthroughs."
+description: "Use when creating mocked product UI illustrations, animated cursor demos, or staged product walkthroughs."
 license: MIT
 metadata:
   reviewed: "2026-11-01"
-  sources: "benjitaylor/skills 802057409787133703c56001080169e347305572 stageshow (vendored; routing and non-demo animation guidance modified)"
+  sources: "benjitaylor/skills 802057409787133703c56001080169e347305572 stageshow (vendored; routing modified)"
 ---
 
 # Stageshow
 
-For every animation implementation, apply the relevant principles in `references/motion.md`. For ordinary application motion, use the project's existing stack and design system, and respect reduced-motion settings. Use the product-demo workflow below for mocked product illustrations and demos.
+Use this workflow for authored product illustrations and staged demos. Ordinary application transitions, gestures, and motion audits belong to `frontend`; its [animation guidance](../frontend/references/animation.md) uses the application's existing stack. Do not import this demo kit into product controls just to animate them.
 
 Miniature product UI: a believable interface, framed in its space, as one still or a short animation in which one thing happens. The viewer recognizes the screen and sees the thing happen.
 

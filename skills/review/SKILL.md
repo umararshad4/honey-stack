@@ -24,7 +24,7 @@ Branches A to D report and change no code. Apply fixes only when the user picks 
 ## A. Change review
 
 1. **Pin the scope.** Use what the user names: staged or uncommitted changes, a commit, a branch (`git diff <base>...HEAD` plus `git log <base>..HEAD --oneline`), or a PR (`gh pr diff <n>`). With nothing named, review the uncommitted changes, or the last commit if there are none. Done when: the ref resolves and the diff is non-empty.
-2. **Read past the diff.** Read the callers of every changed function, what it calls, its tests and the README. When a signature, return value, enum or behavior changes, read every consumer. Find the expected load (README, deploy config) and state which load you assumed. Done when: you can trace data in, stored and out.
+2. **Read past the diff.** Read the callers of every changed function, what it calls, its tests and the README. When a signature, return value, enum or behavior changes, read every consumer. Find the expected load (README, deploy config) and state which load you assumed. For application motion changes, read [the motion review procedure](../frontend/references/motion-review.md); mocked product illustrations and cursor demos also use `stageshow`. Done when: you can trace data in, stored and out.
 3. **Two axes, kept separate** so that one can't mask the other:
    - **Standards:** the repo's documented rules (CONTRIBUTING, AGENTS.md or CLAUDE.md, ADRs). Cite the rule. Skip whatever tooling already enforces.
    - **Spec:** the issue, PR body or plan behind the change (`#123` in commits, docs/specs). Report requirements that are missing or partial, behavior nobody asked for, and requirements implemented wrong, quoting the spec line. With no spec, write "Spec: none found".

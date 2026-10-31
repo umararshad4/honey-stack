@@ -1,0 +1,5 @@
+interface:
+  display_name: "triage"
+  short_description: "Qualify reports and prepare verified fix briefs"
+policy:
+  allow_implicit_invocation: false

@@ -15,6 +15,8 @@ Find out what the user actually wants, and why, before anything gets built. Your
 
 Read the code, docs, `CONTEXT.md`, ADRs and recent commits for the area. Answer every question the repo can answer from the repo, citing `path:line`. What's left for the user is intent, priorities, taste and product calls.
 
+If the open question needs external technical or product evidence, read [the research procedure](../research/SKILL.md) as reference guidance and carry its sources and unknowns into the design. The standalone `research` command stays explicit-only. Product preferences remain the user's decision; research does not choose them by implication.
+
 If a question is a fact you could observe by running something (behavior, timing, layout, output), it isn't the user's to answer. Settle it with the `prototype` skill and bring the result back.
 
 Done when: you can list what the repo already settled and what only the user can.

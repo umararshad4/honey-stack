@@ -5,7 +5,7 @@ disable-model-invocation: true
 license: MIT
 metadata:
   reviewed: "2026-10-18"
-  sources: "mattpocock/skills writing-great-skills (SKILL.md, GLOSSARY.md), write-a-skill; obra/superpowers 7.0.0 skills/writing-skills (SKILL.md: SDO, match the form to the failure, RED-GREEN-REFACTOR), testing-skills-with-subagents.md; anthropics/claude-plugins-official skill-creator skills/skill-creator/SKILL.md (Apache-2.0, modified: near-miss negatives, explain the why, keep the prompt lean); cursor/plugins pstack 0.15.25 skills/principle-encode-lessons-in-structure; Codex CLI bundled ~/.codex/skills/.system/skill-creator/references/openai_yaml.md"
+  sources: "mattpocock/skills writing-great-skills (SKILL.md, GLOSSARY.md), write-a-skill; mattpocock/skills 4ae2317ddb22b046e26455e4f9c9b3aaaf62212d skills/productivity/writing-for-agents/SKILL.md; obra/superpowers 7.0.0 skills/writing-skills (SKILL.md: SDO, match the form to the failure, RED-GREEN-REFACTOR), testing-skills-with-subagents.md; anthropics/claude-plugins-official skill-creator skills/skill-creator/SKILL.md (Apache-2.0, modified: near-miss negatives, explain the why, keep the prompt lean); cursor/plugins pstack 0.15.25 skills/principle-encode-lessons-in-structure; Codex CLI bundled ~/.codex/skills/.system/skill-creator/references/openai_yaml.md"
 ---
 
 # write-skill
@@ -19,6 +19,8 @@ A skill exists to make the agent take the same process every run. Every line eit
 | "Is this skill any good?" | Run the Rules on it and report each failed ID with its line |
 
 `docs/skill-style.md` is the house style and these Rules are its checkable form. If they disagree, the style doc wins; fix this file.
+
+When editing instructions, routing descriptions or references, read [writing for agents](references/writing-for-agents.md): sharpen the condition for loading material before inlining more of it, and keep each meaning with its owner.
 
 ## Rules
 

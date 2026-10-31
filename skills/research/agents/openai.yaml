@@ -1,0 +1,5 @@
+interface:
+  display_name: "research"
+  short_description: "Research decisions with primary-source evidence"
+policy:
+  allow_implicit_invocation: false

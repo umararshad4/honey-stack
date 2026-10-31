@@ -4,12 +4,14 @@ description: "Performance engineering: profile to find the real bottleneck, fix 
 license: MIT
 metadata:
   reviewed: "2026-10-18"
-  sources: "honey-stack research 2026-10-18 (USE/RED methods, profilers per stack, caching, k6 load testing, percentiles). Details in references/."
+  sources: "honey-stack research 2026-10-18 (USE/RED methods, profilers per stack, caching, k6 load testing, percentiles); cursor/plugins 4dd1d05818d19792e7cd6e818f1667f95f7e1dbe pstack/skills/benchmark-checklist/SKILL.md. Motion details owned by frontend references."
 ---
 
 # perf
 
 Make it faster, but only where it's actually slow. The bottleneck is almost never where intuition says — measure, fix the hot path, prove the win.
+
+Before reporting a measured speedup or choosing between implementations, read [the benchmark checklist](references/benchmark-checklist.md). For stuttering application animations, read [motion performance](../frontend/references/motion-performance.md) and record frames/long tasks on the target device; source inspection alone cannot establish smoothness.
 
 ## Discipline
 1. **Baseline first** — numbers + environment + input, before any change.
