@@ -6,6 +6,8 @@
     "name": "King Umar"
   },
   "license": "MIT",
+  "homepage": "https://honey-stack.vercel.app",
+  "repository": "https://github.com/umararshad4/honey-stack",
   "skills": "./skills/",
   "hooks": "./hooks/codex-hooks.json",
   "interface": {
@@ -16,6 +18,7 @@
     "capabilities": [
       "Instructions",
       "Lifecycle hooks"
-    ]
+    ],
+    "websiteURL": "https://honey-stack.vercel.app"
   }
 }
