@@ -1,0 +1,20 @@
+# Task scope and evidence
+
+How honey records what a task may touch and which checks prove it. Back to the [README](../README.md).
+
+Hooks retain a bounded task record: inspection or execution, workspace, targets and required checks. “Continue” and status questions retain the task. Explicit inspection stays read-only for recognized edit operations until the user asks for changes. This is an evidence aid, not a permission grant or a complete sandbox; natural-language classification and command recognition are conservative heuristics.
+
+```bash
+honey task status --json
+honey task set --mode execute --operation code --cwd /actual/project --check tests --check lint
+honey task verify --check tests --tool-call <actual-test-call-id>
+honey task verify --check lint --tool-call <actual-lint-call-id>
+```
+
+Replace paths and call IDs with the actual values. Codex uses `CODEX_THREAD_ID`; otherwise add `--agent claude --session <session-id>` to each command. Bind the project before running its checks. `task set` starts a new bounded contract; it cannot promote an existing inspection task to execution without a user request.
+
+The default code check recognizes direct test/lint commands. Explicit checks link a fresh successful result; the agent must still check that the command proves the named requirement. Later edits, potentially mutating shell commands, failed reruns and incomplete results invalidate proof. When start events are delivered, checks started before a mutation or in a previous task cannot verify the new state. Completion claims without evidence trigger one reminder per evidence cycle; honest unresolved reports and inspection answers are allowed.
+
+For `--operation uninstall`, required checks are `application`, `helpers`, `startup` and `preserved-data`. Declare concrete targets with `--target`; `task verify --check application --absent /Applications/Example.app` measures and rechecks absence. `--present` checks existence. Helpers and startup require checks of their actual registrations, and preserved data requires an explicit check of what should remain. `--operation startup` requires its resulting registration to be checked.
+
+Known shell/read/edit payloads, including `exec_command` with `cmd`, are normalized. JavaScript wrappers remain opaque unless the host delivers supported inner events. Missing hooks, unobserved external edits and concurrent last-writer-wins session updates limit the evidence; `doctor` reports delivery and coverage without claiming runtime enforcement.
