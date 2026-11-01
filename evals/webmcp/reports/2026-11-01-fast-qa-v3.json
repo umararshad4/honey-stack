@@ -1,0 +1,2761 @@
+{
+  "title": "Third QA speed improvement",
+  "date": "2026-11-01",
+  "scope": "Prepared-command wall time for the same 24-case fixture (12 behaviors at 1440x900 and 390x844) with six seeded defect groups; every run audited with the verbatim v2 audit. Excludes agent reading/authoring, dependency installs and fixture server startup.",
+  "headline": {
+    "v3_webmcp_median": 3.3964817090309225,
+    "v2_webmcp_median_same_rotation": 11.214776750013698,
+    "less_wall_time_pct": 69.7,
+    "speedup_x": 3.3,
+    "vs_older_qa_less_pct": 52.9,
+    "vs_e2e_only_less_pct": 32.0,
+    "vs_same_structure_ui_setup_less_pct": 7.4,
+    "cpu_seconds_v3": 14.50921600000001,
+    "cpu_seconds_v2": 33.93968499999997
+  },
+  "decomposition_seconds": {
+    "total": 7.818295040982775,
+    "browser_path": 6.876917625020724,
+    "launch_design": 0.9413774159620516,
+    "webmcp_setup_vs_ui_setup_same_structure": 0.27034925000043586
+  },
+  "webmcp_vs_ui_setup_adjacent_pairs": {
+    "webmcp_faster": 13,
+    "pairs": 15,
+    "detail": [
+      {
+        "pass": "pass 1",
+        "round": 0,
+        "webmcp_v3": 2.9855257499730214,
+        "e2e_v3": 3.0065522079821676,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "pass 1",
+        "round": 1,
+        "webmcp_v3": 2.997239249991253,
+        "e2e_v3": 3.019075874995906,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "pass 1",
+        "round": 2,
+        "webmcp_v3": 3.0875526249874383,
+        "e2e_v3": 3.0218746670288965,
+        "webmcp_faster": false
+      },
+      {
+        "pass": "pass 1",
+        "round": 3,
+        "webmcp_v3": 3.8389276249799877,
+        "e2e_v3": 4.10715962498216,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "pass 1",
+        "round": 4,
+        "webmcp_v3": 4.370864790980704,
+        "e2e_v3": 4.277451709029265,
+        "webmcp_faster": false
+      },
+      {
+        "pass": "pass 2",
+        "round": 0,
+        "webmcp_v3": 4.019629374961369,
+        "e2e_v3": 4.154324000002816,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "pass 2",
+        "round": 1,
+        "webmcp_v3": 4.28811866696924,
+        "e2e_v3": 4.659758250054438,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "pass 2",
+        "round": 2,
+        "webmcp_v3": 4.556155416998081,
+        "e2e_v3": 4.830749624990858,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "pass 2",
+        "round": 3,
+        "webmcp_v3": 4.314718333014753,
+        "e2e_v3": 4.513661749952007,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "pass 2",
+        "round": 4,
+        "webmcp_v3": 4.336926041985862,
+        "e2e_v3": 4.791004542028531,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "final",
+        "round": 0,
+        "webmcp_v3": 3.48531954200007,
+        "e2e_v3": 3.6668309590313584,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "final",
+        "round": 1,
+        "webmcp_v3": 3.3964817090309225,
+        "e2e_v3": 3.592421875044238,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "final",
+        "round": 2,
+        "webmcp_v3": 3.555496958026197,
+        "e2e_v3": 3.8692708329763263,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "final",
+        "round": 3,
+        "webmcp_v3": 3.2176484999945387,
+        "e2e_v3": 3.9164312499924563,
+        "webmcp_faster": true
+      },
+      {
+        "pass": "final",
+        "round": 4,
+        "webmcp_v3": 3.104529750009533,
+        "e2e_v3": 3.5685264579951763,
+        "webmcp_faster": true
+      }
+    ],
+    "note": "Cyclic rotation keeps e2e_v3 immediately before webmcp_v3 in every round."
+  },
+  "final_pass": {
+    "protocol": "1 excluded warm-up round + 5 measured rounds, mode order rotated by round, sequential, 8s untimed cool-down before each command",
+    "summary": {
+      "older": {
+        "n": 5,
+        "median": 7.209191083966289,
+        "min": 7.141690874996129,
+        "max": 7.380564375023823,
+        "p95_nearest_rank": 7.380564375023823,
+        "p99_nearest_rank": 7.380564375023823,
+        "qualified": 5,
+        "cpu_median": 5.837998999999986,
+        "runner_span_median": null,
+        "pre_run_median": null,
+        "post_run_median": null
+      },
+      "e2e": {
+        "n": 5,
+        "median": 4.996812915953342,
+        "min": 4.92884879099438,
+        "max": 5.7047594169853255,
+        "p95_nearest_rank": 5.7047594169853255,
+        "p99_nearest_rank": 5.7047594169853255,
+        "qualified": 5,
+        "cpu_median": 16.526657,
+        "runner_span_median": 4.2840001583099365,
+        "pre_run_median": 0.6576578617095947,
+        "post_run_median": 0.05518507957458496
+      },
+      "v2_webmcp": {
+        "n": 5,
+        "median": 11.214776750013698,
+        "min": 10.607309875020292,
+        "max": 12.468517625005916,
+        "p95_nearest_rank": 12.468517625005916,
+        "p99_nearest_rank": 12.468517625005916,
+        "qualified": 5,
+        "cpu_median": 33.93968499999997,
+        "runner_span_median": 9.396999835968018,
+        "pre_run_median": 2.201540946960449,
+        "post_run_median": 0.11172294616699219
+      },
+      "v2_webmcp_newbrowser": {
+        "n": 5,
+        "median": 4.337859124992974,
+        "min": 3.6946194589836523,
+        "max": 5.167780084011611,
+        "p95_nearest_rank": 5.167780084011611,
+        "p99_nearest_rank": 5.167780084011611,
+        "qualified": 5,
+        "cpu_median": 14.463589000000006,
+        "runner_span_median": 3.2009999752044678,
+        "pre_run_median": 1.0740630626678467,
+        "post_run_median": 0.06281304359436035
+      },
+      "e2e_v3": {
+        "n": 5,
+        "median": 3.6668309590313584,
+        "min": 3.5685264579951763,
+        "max": 3.9164312499924563,
+        "p95_nearest_rank": 3.9164312499924563,
+        "p99_nearest_rank": 3.9164312499924563,
+        "qualified": 5,
+        "cpu_median": 14.97143699999998,
+        "runner_span_median": 2.921999931335449,
+        "pre_run_median": 0.825239896774292,
+        "post_run_median": 0.07007622718811035
+      },
+      "webmcp_v3": {
+        "n": 5,
+        "median": 3.3964817090309225,
+        "min": 3.104529750009533,
+        "max": 3.555496958026197,
+        "p95_nearest_rank": 3.555496958026197,
+        "p99_nearest_rank": 3.555496958026197,
+        "qualified": 5,
+        "cpu_median": 14.50921600000001,
+        "runner_span_median": 2.7200000286102295,
+        "pre_run_median": 0.5908639430999756,
+        "post_run_median": 0.0730900764465332
+      }
+    },
+    "results": [
+      {
+        "round": 0,
+        "mode": "older",
+        "seconds": 7.209191083966289,
+        "cpu_seconds": 5.837998999999986,
+        "runner_span": null,
+        "pre_run": null,
+        "post_run": null,
+        "exit_code": 1,
+        "workers": 1,
+        "load_before": [
+          3.04248046875,
+          4.61865234375,
+          4.67919921875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/qa.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/0-older",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 0,
+        "mode": "e2e",
+        "seconds": 4.9464555000304244,
+        "cpu_seconds": 16.526657,
+        "runner_span": 4.245999813079834,
+        "pre_run": 0.652947187423706,
+        "post_run": 0.04752922058105469,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          2.76171875,
+          4.47412109375,
+          4.6259765625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/0-e2e",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 0,
+        "mode": "v2_webmcp",
+        "seconds": 11.134399999980815,
+        "cpu_seconds": 33.273444000000005,
+        "runner_span": 9.396999835968018,
+        "pre_run": 1.628288984298706,
+        "post_run": 0.10916590690612793,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          2.3525390625,
+          4.30224609375,
+          4.5615234375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/0-v2_webmcp",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 0,
+        "mode": "v2_webmcp_newbrowser",
+        "seconds": 5.167780084011611,
+        "cpu_seconds": 14.534742999999992,
+        "runner_span": 3.239000082015991,
+        "pre_run": 1.860994815826416,
+        "post_run": 0.06783795356750488,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          13.1123046875,
+          6.6943359375,
+          5.4169921875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/0-v2_webmcp_newbrowser",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 0,
+        "mode": "e2e_v3",
+        "seconds": 3.6668309590313584,
+        "cpu_seconds": 15.240212,
+        "runner_span": 3.003999948501587,
+        "pre_run": 0.5890591144561768,
+        "post_run": 0.07380390167236328,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          15.11572265625,
+          7.34375,
+          5.662109375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/0-e2e_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 0,
+        "mode": "webmcp_v3",
+        "seconds": 3.48531954200007,
+        "cpu_seconds": 14.550574000000005,
+        "runner_span": 2.802999973297119,
+        "pre_run": 0.6092667579650879,
+        "post_run": 0.0730900764465332,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          14.38134765625,
+          7.5693359375,
+          5.77197265625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/0-webmcp_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 1,
+        "mode": "e2e",
+        "seconds": 5.64620008302154,
+        "cpu_seconds": 17.484071000000014,
+        "runner_span": 4.858999967575073,
+        "pre_run": 0.7234869003295898,
+        "post_run": 0.06375503540039062,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          14.2421875,
+          7.76416015625,
+          5.86181640625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/1-e2e",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 1,
+        "mode": "v2_webmcp",
+        "seconds": 12.147253500006627,
+        "cpu_seconds": 35.58145099999998,
+        "runner_span": 9.830999851226807,
+        "pre_run": 2.201540946960449,
+        "post_run": 0.11476302146911621,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          12.84765625,
+          7.78759765625,
+          5.9033203125
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/1-v2_webmcp",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 1,
+        "mode": "v2_webmcp_newbrowser",
+        "seconds": 4.337859124992974,
+        "cpu_seconds": 14.463589000000006,
+        "runner_span": 3.2009999752044678,
+        "pre_run": 1.0740630626678467,
+        "post_run": 0.06282496452331543,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          11.8427734375,
+          7.90771484375,
+          5.99169921875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/1-v2_webmcp_newbrowser",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 1,
+        "mode": "e2e_v3",
+        "seconds": 3.592421875044238,
+        "cpu_seconds": 15.16850700000002,
+        "runner_span": 2.921999931335449,
+        "pre_run": 0.5994892120361328,
+        "post_run": 0.07095885276794434,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          12.23486328125,
+          8.1240234375,
+          6.0908203125
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/1-e2e_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 1,
+        "mode": "webmcp_v3",
+        "seconds": 3.3964817090309225,
+        "cpu_seconds": 14.566147999999984,
+        "runner_span": 2.7200000286102295,
+        "pre_run": 0.5908639430999756,
+        "post_run": 0.08564901351928711,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          12.095703125,
+          8.30908203125,
+          6.19287109375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/1-webmcp_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 1,
+        "mode": "older",
+        "seconds": 7.265663791971747,
+        "cpu_seconds": 5.996081999999987,
+        "runner_span": null,
+        "pre_run": null,
+        "post_run": null,
+        "exit_code": 1,
+        "workers": 1,
+        "load_before": [
+          11.47216796875,
+          8.298828125,
+          6.21337890625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/qa.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/1-older",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 2,
+        "mode": "v2_webmcp",
+        "seconds": 12.468517625005916,
+        "cpu_seconds": 35.938283,
+        "runner_span": 9.851999998092651,
+        "pre_run": 2.504987955093384,
+        "post_run": 0.11157512664794922,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          10.3203125,
+          8.201171875,
+          6.21484375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/2-v2_webmcp",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 2,
+        "mode": "v2_webmcp_newbrowser",
+        "seconds": 4.52789374999702,
+        "cpu_seconds": 14.66734900000003,
+        "runner_span": 3.2300000190734863,
+        "pre_run": 1.2351019382476807,
+        "post_run": 0.06281304359436035,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          10.189453125,
+          8.32763671875,
+          6.30712890625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/2-v2_webmcp_newbrowser",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 2,
+        "mode": "e2e_v3",
+        "seconds": 3.8692708329763263,
+        "cpu_seconds": 14.97143699999998,
+        "runner_span": 2.9739999771118164,
+        "pre_run": 0.825239896774292,
+        "post_run": 0.07007622718811035,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          12.48876953125,
+          8.95654296875,
+          6.56787109375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/2-e2e_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 2,
+        "mode": "webmcp_v3",
+        "seconds": 3.555496958026197,
+        "cpu_seconds": 14.50921600000001,
+        "runner_span": 2.734999895095825,
+        "pre_run": 0.7365069389343262,
+        "post_run": 0.08402109146118164,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          11.64404296875,
+          8.8916015625,
+          6.57275390625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/2-webmcp_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 2,
+        "mode": "older",
+        "seconds": 7.380564375023823,
+        "cpu_seconds": 5.973708000000016,
+        "runner_span": null,
+        "pre_run": null,
+        "post_run": null,
+        "exit_code": 1,
+        "workers": 1,
+        "load_before": [
+          14.53271484375,
+          9.62841796875,
+          6.86279296875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/qa.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/2-older",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 2,
+        "mode": "e2e",
+        "seconds": 5.7047594169853255,
+        "cpu_seconds": 16.952791000000005,
+        "runner_span": 4.745999813079834,
+        "pre_run": 0.8881640434265137,
+        "post_run": 0.07063412666320801,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          12.75244140625,
+          9.4677734375,
+          6.8525390625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/2-e2e",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 3,
+        "mode": "v2_webmcp_newbrowser",
+        "seconds": 3.6946194589836523,
+        "cpu_seconds": 13.667166999999964,
+        "runner_span": 2.872999906539917,
+        "pre_run": 0.7671301364898682,
+        "post_run": 0.0545191764831543,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          11.95458984375,
+          9.458984375,
+          6.89453125
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/3-v2_webmcp_newbrowser",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 3,
+        "mode": "e2e_v3",
+        "seconds": 3.9164312499924563,
+        "cpu_seconds": 14.510311000000016,
+        "runner_span": 2.7790000438690186,
+        "pre_run": 1.0727508068084717,
+        "post_run": 0.06472301483154297,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          9.810546875,
+          9.10888671875,
+          6.81396484375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/3-e2e_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 3,
+        "mode": "webmcp_v3",
+        "seconds": 3.2176484999945387,
+        "cpu_seconds": 13.883523000000011,
+        "runner_span": 2.578000068664551,
+        "pre_run": 0.5779788494110107,
+        "post_run": 0.06169295310974121,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          8.609375,
+          8.87451171875,
+          6.75732421875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/3-webmcp_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 3,
+        "mode": "older",
+        "seconds": 7.153180916968267,
+        "cpu_seconds": 5.743223999999984,
+        "runner_span": null,
+        "pre_run": null,
+        "post_run": null,
+        "exit_code": 1,
+        "workers": 1,
+        "load_before": [
+          7.97412109375,
+          8.72998046875,
+          6.73046875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/qa.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/3-older",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 3,
+        "mode": "e2e",
+        "seconds": 4.92884879099438,
+        "cpu_seconds": 16.287960000000027,
+        "runner_span": 4.233999967575073,
+        "pre_run": 0.6430411338806152,
+        "post_run": 0.05182909965515137,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          6.50244140625,
+          8.3671875,
+          6.63525390625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/3-e2e",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 3,
+        "mode": "v2_webmcp",
+        "seconds": 11.214776750013698,
+        "cpu_seconds": 33.93968499999997,
+        "runner_span": 8.580999851226807,
+        "pre_run": 2.522113084793091,
+        "post_run": 0.11172294616699219,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          5.41845703125,
+          8.03759765625,
+          6.5478515625
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/3-v2_webmcp",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 4,
+        "mode": "e2e_v3",
+        "seconds": 3.5685264579951763,
+        "cpu_seconds": 14.421831999999995,
+        "runner_span": 2.671999931335449,
+        "pre_run": 0.8385090827941895,
+        "post_run": 0.05803704261779785,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          5.56689453125,
+          7.91650390625,
+          6.53955078125
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/4-e2e_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 4,
+        "mode": "webmcp_v3",
+        "seconds": 3.104529750009533,
+        "cpu_seconds": 13.726285999999988,
+        "runner_span": 2.4649999141693115,
+        "pre_run": 0.5830070972442627,
+        "post_run": 0.05654478073120117,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          4.791015625,
+          7.671875,
+          6.46826171875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/4-webmcp_v3",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 4,
+        "mode": "older",
+        "seconds": 7.141690874996129,
+        "cpu_seconds": 5.782678000000018,
+        "runner_span": null,
+        "pre_run": null,
+        "post_run": null,
+        "exit_code": 1,
+        "workers": 1,
+        "load_before": [
+          4.2080078125,
+          7.45166015625,
+          6.40380859375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/qa.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/4-older",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 4,
+        "mode": "e2e",
+        "seconds": 4.996812915953342,
+        "cpu_seconds": 16.335450999999992,
+        "runner_span": 4.2840001583099365,
+        "pre_run": 0.6576578617095947,
+        "post_run": 0.05518507957458496,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          3.63134765625,
+          7.1669921875,
+          6.3203125
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/4-e2e",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 0,
+        "failure_pngs": 13
+      },
+      {
+        "round": 4,
+        "mode": "v2_webmcp",
+        "seconds": 10.607309875020292,
+        "cpu_seconds": 33.700052,
+        "runner_span": 8.647000074386597,
+        "pre_run": 1.8414530754089355,
+        "post_run": 0.11890387535095215,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          3.6689453125,
+          7.00927734375,
+          6.279296875
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/4-v2_webmcp",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      },
+      {
+        "round": 4,
+        "mode": "v2_webmcp_newbrowser",
+        "seconds": 3.9982450419920497,
+        "cpu_seconds": 13.392558000000008,
+        "runner_span": 2.9739999771118164,
+        "pre_run": 0.9670219421386719,
+        "post_run": 0.05724811553955078,
+        "exit_code": 1,
+        "workers": 4,
+        "load_before": [
+          4.1650390625,
+          6.9580078125,
+          6.2734375
+        ],
+        "command": [
+          "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+          "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+          "tests/run-suite.mjs"
+        ],
+        "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/comparison/4-v2_webmcp_newbrowser",
+        "qualified": true,
+        "problems": [],
+        "cases": 24,
+        "passed": 11,
+        "failed": 13,
+        "known_defect_groups": 6,
+        "native_calls": 6,
+        "failure_pngs": 13
+      }
+    ],
+    "manifest": {
+      "node": "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "node_version": "v24.18.0",
+      "url": "http://127.0.0.1:57860",
+      "started": "2026-11-01T03:48:28.784349+05:00",
+      "machine": {
+        "cpu": "Apple M1",
+        "cores": "8",
+        "performance_cores": "4",
+        "memory_bytes": "8589934592",
+        "os": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+        "load_before": [
+          2.4677734375,
+          5.1591796875,
+          4.86376953125
+        ],
+        "load_after": [
+          3.9912109375,
+          6.87548828125,
+          6.248046875
+        ]
+      },
+      "sampling": "one excluded warm-up round, then 5 measured rounds with mode order rotated by round; sequential, one command at a time",
+      "cooldown_seconds_between_commands": 8.0,
+      "modes": {
+        "older": {
+          "directory": "older",
+          "workers": 1,
+          "launcher": "launcher-compat.mjs"
+        },
+        "e2e": {
+          "directory": "e2e",
+          "workers": 4,
+          "launcher": "launcher-compat.mjs"
+        },
+        "v2_webmcp": {
+          "directory": "grouped",
+          "workers": 4,
+          "launcher": "launcher-v2.mjs"
+        },
+        "v2_webmcp_newbrowser": {
+          "directory": "grouped",
+          "workers": 4,
+          "launcher": "launcher-compat.mjs"
+        },
+        "e2e_v3": {
+          "directory": "e2e_v3",
+          "workers": 4,
+          "launcher": "e2e_v3/tests/run-suite.mjs -> e2e_v3/scripts/run-webmcp.mjs"
+        },
+        "webmcp_v3": {
+          "directory": "v3",
+          "workers": 4,
+          "launcher": "v3/tests/run-suite.mjs -> v3/scripts/run-webmcp.mjs"
+        }
+      },
+      "launcher_sha256": {
+        "launcher-compat.mjs": "51a5a95979405cdd6bee94e2ce88731bc8545a3ad1a301192cd5c4aa38f8603d",
+        "launcher-v2.mjs": "78ab0531b723cc690c7cb1ec8bec6e12c8dbfb8b27993b0275cb9b7724ff8c11"
+      },
+      "source_sha256": {
+        "older/e2e.config.ts": "884cbfcaa59c2b4cca4eff63c7228006d10b2926af8fef46f7a765729a599e8f",
+        "older/tests/qa.mjs": "5e3f836b4baf0a0d86a65498c647e0ca8bbebd3f14584c9a2f2d638f09a6513d",
+        "e2e/e2e.config.ts": "884cbfcaa59c2b4cca4eff63c7228006d10b2926af8fef46f7a765729a599e8f",
+        "e2e/tests/cases.ts": "6edbd828c76d19fa1926a3b8cc80a0859e10a1a9cb16d2c3c0fa0fa18ef9af56",
+        "e2e/tests/create.e2e.ts": "ac1e1fdcc3e73f3124a8c8deddad0079c6f247898b755636993ec9981b5ed82d",
+        "e2e/tests/interactions.e2e.ts": "3244d970661622595c64303738bf62403fbc6c1a01557ab76a04e09e8936309b",
+        "e2e/tests/normalize.mjs": "a66abbdff4dc18d5f184edd9bd5d1245da975e79be7c4c72d3dcdce5378972e5",
+        "e2e/tests/persistence.e2e.ts": "243663e795870b0e0bfbcd284e3b0c31707235bc9f76c832df9691d8b4c7000d",
+        "e2e/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+        "e2e/tests/run-suite.mjs": "9950e2a6dbb8196d1fb7bea8aba81f62d871ab7a7032c6f13dd1a8b356d7b48f",
+        "e2e/tests/validation.e2e.ts": "20ee0f8858d8dba727d572653d2e7ff2553d5a058366cfefe73d4e012e7b039e",
+        "e2e/support/webmcp.ts": "30462cd48afaab3e532ea8f179b01e4dd270902b3e737e3e7954a7d1e905c49b",
+        "grouped/e2e.config.ts": "884cbfcaa59c2b4cca4eff63c7228006d10b2926af8fef46f7a765729a599e8f",
+        "grouped/tests/cases.ts": "4e75b0f28e8a3b5b9175cbfdd386e2d2d9c49d329a15a4b1d2a15d2b7325b3b9",
+        "grouped/tests/forms-and-search.e2e.ts": "aef146756d7ce8292326dcdf7ab61efa26ab9944aebe482424bec889281bbb05",
+        "grouped/tests/normalize.mjs": "1ca7812da7c711d4b594c1ae4d6dff2264c8ead5debc0012781c9d3bea23ff80",
+        "grouped/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+        "grouped/tests/run-suite.mjs": "9950e2a6dbb8196d1fb7bea8aba81f62d871ab7a7032c6f13dd1a8b356d7b48f",
+        "grouped/tests/task-lifecycle.e2e.ts": "78a7f2b2e935a9ebd34aedb40eebb2535c065eb1e94a5858a7479c703bbf993f",
+        "grouped/support/webmcp.ts": "30462cd48afaab3e532ea8f179b01e4dd270902b3e737e3e7954a7d1e905c49b",
+        "e2e_v3/e2e.config.ts": "ae71158704d1c4404976383d41c7d04c1b1811ce900983898284e99ef53dc021",
+        "e2e_v3/tests/cases.ts": "8fb691fc88200e835ac0e3947a53178c527efec35a24b6cbde9db9adceb331b6",
+        "e2e_v3/tests/forms-and-search.e2e.ts": "aef146756d7ce8292326dcdf7ab61efa26ab9944aebe482424bec889281bbb05",
+        "e2e_v3/tests/normalize.mjs": "a66abbdff4dc18d5f184edd9bd5d1245da975e79be7c4c72d3dcdce5378972e5",
+        "e2e_v3/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+        "e2e_v3/tests/run-suite.mjs": "199e8a4ed3a4aad86ba88d290c231e01632feba6ebbd087259f09c96c1dc3c35",
+        "e2e_v3/tests/task-lifecycle.e2e.ts": "78a7f2b2e935a9ebd34aedb40eebb2535c065eb1e94a5858a7479c703bbf993f",
+        "e2e_v3/support/webmcp.ts": "49442da206ef93475850cd55f4d3bcdf40b26374972d10f5b696942e946f668a",
+        "e2e_v3/scripts/run-webmcp.mjs": "5025745fa2881884f5e5105418e7f22a0f0facf1eaa52d240963f1e5c5eb48c1",
+        "v3/e2e.config.ts": "ae71158704d1c4404976383d41c7d04c1b1811ce900983898284e99ef53dc021",
+        "v3/tests/cases.ts": "4e75b0f28e8a3b5b9175cbfdd386e2d2d9c49d329a15a4b1d2a15d2b7325b3b9",
+        "v3/tests/forms-and-search.e2e.ts": "aef146756d7ce8292326dcdf7ab61efa26ab9944aebe482424bec889281bbb05",
+        "v3/tests/normalize.mjs": "1ca7812da7c711d4b594c1ae4d6dff2264c8ead5debc0012781c9d3bea23ff80",
+        "v3/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+        "v3/tests/run-suite.mjs": "199e8a4ed3a4aad86ba88d290c231e01632feba6ebbd087259f09c96c1dc3c35",
+        "v3/tests/task-lifecycle.e2e.ts": "78a7f2b2e935a9ebd34aedb40eebb2535c065eb1e94a5858a7479c703bbf993f",
+        "v3/support/webmcp.ts": "49442da206ef93475850cd55f4d3bcdf40b26374972d10f5b696942e946f668a",
+        "v3/scripts/run-webmcp.mjs": "5025745fa2881884f5e5105418e7f22a0f0facf1eaa52d240963f1e5c5eb48c1"
+      },
+      "finished": "2026-11-01T03:56:48.678204+05:00",
+      "order": [
+        {
+          "round": -1,
+          "order": [
+            "older",
+            "e2e",
+            "v2_webmcp",
+            "v2_webmcp_newbrowser",
+            "e2e_v3",
+            "webmcp_v3"
+          ]
+        },
+        {
+          "round": 0,
+          "order": [
+            "older",
+            "e2e",
+            "v2_webmcp",
+            "v2_webmcp_newbrowser",
+            "e2e_v3",
+            "webmcp_v3"
+          ]
+        },
+        {
+          "round": 1,
+          "order": [
+            "e2e",
+            "v2_webmcp",
+            "v2_webmcp_newbrowser",
+            "e2e_v3",
+            "webmcp_v3",
+            "older"
+          ]
+        },
+        {
+          "round": 2,
+          "order": [
+            "v2_webmcp",
+            "v2_webmcp_newbrowser",
+            "e2e_v3",
+            "webmcp_v3",
+            "older",
+            "e2e"
+          ]
+        },
+        {
+          "round": 3,
+          "order": [
+            "v2_webmcp_newbrowser",
+            "e2e_v3",
+            "webmcp_v3",
+            "older",
+            "e2e",
+            "v2_webmcp"
+          ]
+        },
+        {
+          "round": 4,
+          "order": [
+            "e2e_v3",
+            "webmcp_v3",
+            "older",
+            "e2e",
+            "v2_webmcp",
+            "v2_webmcp_newbrowser"
+          ]
+        }
+      ]
+    }
+  },
+  "earlier_passes": {
+    "pass 1": {
+      "note": "No cool-down. Outside load in rounds 3-4 raised CPU-seconds per run about 30% for parallel modes.",
+      "summary": {
+        "older": {
+          "n": 5,
+          "median": 7.119712749961764,
+          "min": 7.073156750004273,
+          "max": 7.204152500024065,
+          "p95_nearest_rank": 7.204152500024065,
+          "p99_nearest_rank": 7.204152500024065,
+          "qualified": 5,
+          "cpu_median": 5.669914000000006,
+          "runner_span_median": null,
+          "pre_run_median": null,
+          "post_run_median": null
+        },
+        "e2e": {
+          "n": 5,
+          "median": 4.982377708016429,
+          "min": 4.8619271669886075,
+          "max": 5.43834687495837,
+          "p95_nearest_rank": 5.43834687495837,
+          "p99_nearest_rank": 5.43834687495837,
+          "qualified": 5,
+          "cpu_median": 16.709728999999996,
+          "runner_span_median": 4.299000024795532,
+          "pre_run_median": 0.6268801689147949,
+          "post_run_median": 0.050951242446899414
+        },
+        "v2_webmcp": {
+          "n": 5,
+          "median": 10.223457875021268,
+          "min": 9.287347666977439,
+          "max": 11.914734708028845,
+          "p95_nearest_rank": 11.914734708028845,
+          "p99_nearest_rank": 11.914734708028845,
+          "qualified": 5,
+          "cpu_median": 32.78683699999999,
+          "runner_span_median": 8.009000062942505,
+          "pre_run_median": 1.80584716796875,
+          "post_run_median": 0.09065103530883789
+        },
+        "v2_webmcp_newbrowser": {
+          "n": 5,
+          "median": 3.974881500005722,
+          "min": 3.4862792909843847,
+          "max": 4.761271790950559,
+          "p95_nearest_rank": 4.761271790950559,
+          "p99_nearest_rank": 4.761271790950559,
+          "qualified": 5,
+          "cpu_median": 13.69314199999998,
+          "runner_span_median": 2.8440001010894775,
+          "pre_run_median": 0.9477059841156006,
+          "post_run_median": 0.047595977783203125
+        },
+        "e2e_v3": {
+          "n": 5,
+          "median": 3.0218746670288965,
+          "min": 3.0065522079821676,
+          "max": 4.277451709029265,
+          "p95_nearest_rank": 4.277451709029265,
+          "p99_nearest_rank": 4.277451709029265,
+          "qualified": 5,
+          "cpu_median": 13.78185400000001,
+          "runner_span_median": 2.4570000171661377,
+          "pre_run_median": 0.5238959789276123,
+          "post_run_median": 0.05520200729370117
+        },
+        "webmcp_v3": {
+          "n": 5,
+          "median": 3.0875526249874383,
+          "min": 2.9855257499730214,
+          "max": 4.370864790980704,
+          "p95_nearest_rank": 4.370864790980704,
+          "p99_nearest_rank": 4.370864790980704,
+          "qualified": 5,
+          "cpu_median": 13.823090999999991,
+          "runner_span_median": 2.4730000495910645,
+          "pre_run_median": 0.5594871044158936,
+          "post_run_median": 0.06299686431884766
+        }
+      },
+      "qualified": "30/30",
+      "qualification_issues": [],
+      "per_run": [
+        {
+          "round": 0,
+          "mode": "older",
+          "seconds": 7.073156750004273,
+          "cpu_seconds": 5.614739000000004,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "e2e",
+          "seconds": 4.982377708016429,
+          "cpu_seconds": 16.269258999999995,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "v2_webmcp",
+          "seconds": 10.223457875021268,
+          "cpu_seconds": 32.351286,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 3.76322095800424,
+          "cpu_seconds": 13.282117,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "e2e_v3",
+          "seconds": 3.0065522079821676,
+          "cpu_seconds": 13.696313999999994,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "webmcp_v3",
+          "seconds": 2.9855257499730214,
+          "cpu_seconds": 13.417986000000013,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "e2e",
+          "seconds": 4.8619271669886075,
+          "cpu_seconds": 16.141669999999998,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "v2_webmcp",
+          "seconds": 9.287347666977439,
+          "cpu_seconds": 32.51028999999999,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 3.974881500005722,
+          "cpu_seconds": 13.516117000000001,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "e2e_v3",
+          "seconds": 3.019075874995906,
+          "cpu_seconds": 13.78185400000001,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "webmcp_v3",
+          "seconds": 2.997239249991253,
+          "cpu_seconds": 13.311343,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "older",
+          "seconds": 7.119712749961764,
+          "cpu_seconds": 5.669914000000006,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "v2_webmcp",
+          "seconds": 9.364921208994929,
+          "cpu_seconds": 32.78683699999999,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 3.4862792909843847,
+          "cpu_seconds": 13.69314199999998,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "e2e_v3",
+          "seconds": 3.0218746670288965,
+          "cpu_seconds": 13.740853000000001,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "webmcp_v3",
+          "seconds": 3.0875526249874383,
+          "cpu_seconds": 13.823090999999991,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "older",
+          "seconds": 7.1307422499521635,
+          "cpu_seconds": 5.670522000000005,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "e2e",
+          "seconds": 5.43834687495837,
+          "cpu_seconds": 19.03594600000001,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 4.761271790950559,
+          "cpu_seconds": 17.57471000000001,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "e2e_v3",
+          "seconds": 4.10715962498216,
+          "cpu_seconds": 18.691171999999966,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "webmcp_v3",
+          "seconds": 3.8389276249799877,
+          "cpu_seconds": 17.84442100000004,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "older",
+          "seconds": 7.107766499975696,
+          "cpu_seconds": 5.640737999999985,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "e2e",
+          "seconds": 4.934601333050523,
+          "cpu_seconds": 16.709728999999996,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "v2_webmcp",
+          "seconds": 11.252765665994957,
+          "cpu_seconds": 38.945090000000036,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "e2e_v3",
+          "seconds": 4.277451709029265,
+          "cpu_seconds": 18.35416099999999,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "webmcp_v3",
+          "seconds": 4.370864790980704,
+          "cpu_seconds": 18.330307999999974,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "older",
+          "seconds": 7.204152500024065,
+          "cpu_seconds": 5.791787999999997,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "e2e",
+          "seconds": 5.046510624990333,
+          "cpu_seconds": 17.072546999999986,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "v2_webmcp",
+          "seconds": 11.914734708028845,
+          "cpu_seconds": 39.37062700000003,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 4.4543432500213385,
+          "cpu_seconds": 16.110592999999994,
+          "qualified": true
+        }
+      ]
+    },
+    "pass 2": {
+      "note": "No cool-down, started about one minute after pass 1. CPU-seconds per run about 30% higher throughout; 1-minute load reached 17.8.",
+      "summary": {
+        "older": {
+          "n": 5,
+          "median": 7.218054500001017,
+          "min": 7.082629542041104,
+          "max": 7.331745750037953,
+          "p95_nearest_rank": 7.331745750037953,
+          "p99_nearest_rank": 7.331745750037953,
+          "qualified": 5,
+          "cpu_median": 5.881503000000038,
+          "runner_span_median": null,
+          "pre_run_median": null,
+          "post_run_median": null
+        },
+        "e2e": {
+          "n": 5,
+          "median": 5.307274749968201,
+          "min": 4.842412125028204,
+          "max": 5.817748625006061,
+          "p95_nearest_rank": 5.817748625006061,
+          "p99_nearest_rank": 5.817748625006061,
+          "qualified": 5,
+          "cpu_median": 18.183278999999985,
+          "runner_span_median": 4.639999866485596,
+          "pre_run_median": 0.6133010387420654,
+          "post_run_median": 0.04276895523071289
+        },
+        "v2_webmcp": {
+          "n": 5,
+          "median": 12.930434166977648,
+          "min": 11.253240542020649,
+          "max": 18.586878291040193,
+          "p95_nearest_rank": 18.586878291040193,
+          "p99_nearest_rank": 18.586878291040193,
+          "qualified": 4,
+          "cpu_median": 43.62796999999999,
+          "runner_span_median": 11.148000001907349,
+          "pre_run_median": 1.8063127994537354,
+          "post_run_median": 0.11444091796875
+        },
+        "v2_webmcp_newbrowser": {
+          "n": 5,
+          "median": 5.122954416961875,
+          "min": 4.368959582992829,
+          "max": 5.504154915979598,
+          "p95_nearest_rank": 5.504154915979598,
+          "p99_nearest_rank": 5.504154915979598,
+          "qualified": 5,
+          "cpu_median": 18.57934400000005,
+          "runner_span_median": 3.861999988555908,
+          "pre_run_median": 0.9789729118347168,
+          "post_run_median": 0.06417298316955566
+        },
+        "e2e_v3": {
+          "n": 5,
+          "median": 4.659758250054438,
+          "min": 4.154324000002816,
+          "max": 4.830749624990858,
+          "p95_nearest_rank": 4.830749624990858,
+          "p99_nearest_rank": 4.830749624990858,
+          "qualified": 5,
+          "cpu_median": 20.577408000000048,
+          "runner_span_median": 3.800999879837036,
+          "pre_run_median": 0.7475659847259521,
+          "post_run_median": 0.07895612716674805
+        },
+        "webmcp_v3": {
+          "n": 5,
+          "median": 4.314718333014753,
+          "min": 4.019629374961369,
+          "max": 4.556155416998081,
+          "p95_nearest_rank": 4.556155416998081,
+          "p99_nearest_rank": 4.556155416998081,
+          "qualified": 5,
+          "cpu_median": 19.527008999999993,
+          "runner_span_median": 3.5439999103546143,
+          "pre_run_median": 0.6872739791870117,
+          "post_run_median": 0.08346223831176758
+        }
+      },
+      "qualified": "29/30",
+      "qualification_issues": [
+        {
+          "round": 1,
+          "mode": "v2_webmcp",
+          "seconds": 18.586878291040193,
+          "problems": [
+            "Failure identities differ: [('C01', 'desktop'), ('C01', 'mobile')]",
+            "Pass count differs",
+            "C11-mobile: missing validation witness"
+          ]
+        }
+      ],
+      "per_run": [
+        {
+          "round": 0,
+          "mode": "older",
+          "seconds": 7.082629542041104,
+          "cpu_seconds": 5.657316999999992,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "e2e",
+          "seconds": 4.842412125028204,
+          "cpu_seconds": 16.16242900000001,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "v2_webmcp",
+          "seconds": 11.253240542020649,
+          "cpu_seconds": 38.39505899999999,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 5.504154915979598,
+          "cpu_seconds": 16.69132500000002,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "e2e_v3",
+          "seconds": 4.154324000002816,
+          "cpu_seconds": 18.995375999999986,
+          "qualified": true
+        },
+        {
+          "round": 0,
+          "mode": "webmcp_v3",
+          "seconds": 4.019629374961369,
+          "cpu_seconds": 18.125811000000006,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "e2e",
+          "seconds": 5.817748625006061,
+          "cpu_seconds": 20.341721,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "v2_webmcp",
+          "seconds": 18.586878291040193,
+          "cpu_seconds": 47.10978800000001,
+          "qualified": false
+        },
+        {
+          "round": 1,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 5.122954416961875,
+          "cpu_seconds": 18.665818999999985,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "e2e_v3",
+          "seconds": 4.659758250054438,
+          "cpu_seconds": 20.81378900000003,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "webmcp_v3",
+          "seconds": 4.28811866696924,
+          "cpu_seconds": 19.491428999999954,
+          "qualified": true
+        },
+        {
+          "round": 1,
+          "mode": "older",
+          "seconds": 7.223373249988072,
+          "cpu_seconds": 5.909590000000009,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "v2_webmcp",
+          "seconds": 12.044593458005693,
+          "cpu_seconds": 40.100481000000016,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 5.4137523749959655,
+          "cpu_seconds": 19.15821799999999,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "e2e_v3",
+          "seconds": 4.830749624990858,
+          "cpu_seconds": 21.264752000000016,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "webmcp_v3",
+          "seconds": 4.556155416998081,
+          "cpu_seconds": 20.13243100000001,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "older",
+          "seconds": 7.331745750037953,
+          "cpu_seconds": 5.986529000000004,
+          "qualified": true
+        },
+        {
+          "round": 2,
+          "mode": "e2e",
+          "seconds": 5.307274749968201,
+          "cpu_seconds": 18.470562,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 4.368959582992829,
+          "cpu_seconds": 17.774232999999995,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "e2e_v3",
+          "seconds": 4.513661749952007,
+          "cpu_seconds": 20.39739399999995,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "webmcp_v3",
+          "seconds": 4.314718333014753,
+          "cpu_seconds": 19.630712000000003,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "older",
+          "seconds": 7.218054500001017,
+          "cpu_seconds": 5.881503000000038,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "e2e",
+          "seconds": 5.200983292015735,
+          "cpu_seconds": 18.183278999999985,
+          "qualified": true
+        },
+        {
+          "round": 3,
+          "mode": "v2_webmcp",
+          "seconds": 13.074065084045287,
+          "cpu_seconds": 43.62796999999999,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "e2e_v3",
+          "seconds": 4.791004542028531,
+          "cpu_seconds": 20.577408000000048,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "webmcp_v3",
+          "seconds": 4.336926041985862,
+          "cpu_seconds": 19.527008999999993,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "older",
+          "seconds": 7.200208584021311,
+          "cpu_seconds": 5.84669999999997,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "e2e",
+          "seconds": 5.321486958011519,
+          "cpu_seconds": 18.017227000000048,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "v2_webmcp",
+          "seconds": 12.930434166977648,
+          "cpu_seconds": 44.885595999999964,
+          "qualified": true
+        },
+        {
+          "round": 4,
+          "mode": "v2_webmcp_newbrowser",
+          "seconds": 4.902423083956819,
+          "cpu_seconds": 18.57934400000005,
+          "qualified": true
+        }
+      ]
+    }
+  },
+  "remaining_time_v3": {
+    "pre_run_median_s": 0.5908639430999756,
+    "runner_span_median_s": 2.7200000286102295,
+    "post_run_median_s": 0.0730900764465332,
+    "first_test_start_after_run_start_median_s": 0.339,
+    "per_test_median_ms": 356,
+    "per_test_p90_ms": 437,
+    "step_medians_ms": {
+      "app.open": 76,
+      "locator.tap": 62,
+      "expect.toBeVisible": 37,
+      "locator.fill": 20,
+      "locator.check": 79,
+      "app.screenshot": 71
+    }
+  },
+  "tuning": {
+    "note": "Pilot A/B medians from interleaved runs on the same machine and fixture, each run audited with the verbatim v2 audit (all runs qualified). Directional evidence for choosing the shipped design; the final claim is comparison/summary.json. For four-round pilots, \"median\" is the true median where per-run times were kept and \"upper_median\" (the higher middle value) otherwise.",
+    "pilots": [
+      {
+        "question": "Browser build and switches (v2 WebMCP suite, 4 workers, one shared browser, launcher waits for the browser)",
+        "rounds": 3,
+        "rows": [
+          {
+            "label": "full Chromium new headless, minimal switches (v2)",
+            "median": 10.368,
+            "min": 10.076,
+            "max": 10.842,
+            "cpu_median": 33.81
+          },
+          {
+            "label": "full Chromium new headless, Playwright switches",
+            "median": 9.726,
+            "min": 9.205,
+            "max": 11.54,
+            "cpu_median": 29.31
+          },
+          {
+            "label": "headless shell, minimal switches",
+            "median": 4.295,
+            "min": 4.212,
+            "max": 4.413,
+            "cpu_median": 14.44
+          },
+          {
+            "label": "headless shell, Playwright switches",
+            "median": 3.71,
+            "min": 3.685,
+            "max": 3.79,
+            "cpu_median": 14.35
+          }
+        ]
+      },
+      {
+        "question": "Files x workers (headless shell, one shared browser)",
+        "rounds": 3,
+        "rows": [
+          {
+            "label": "2 files, 4 workers",
+            "median": 3.664,
+            "min": 3.636,
+            "max": 4.786,
+            "cpu_median": 14.39
+          },
+          {
+            "label": "3 files, 6 workers",
+            "median": 3.83,
+            "min": 3.743,
+            "max": 4.295,
+            "cpu_median": 18.35
+          },
+          {
+            "label": "4 files, 8 workers",
+            "median": 4.559,
+            "min": 4.449,
+            "max": 4.731,
+            "cpu_median": 22.11
+          },
+          {
+            "label": "6 files, 12 workers",
+            "median": 5.895,
+            "min": 5.641,
+            "max": 6.014,
+            "cpu_median": 29.27
+          },
+          {
+            "label": "4 files, 4 workers",
+            "median": 4.288,
+            "min": 4.265,
+            "max": 4.38,
+            "cpu_median": 17.44
+          },
+          {
+            "label": "3 files, 3 workers",
+            "median": 4.348,
+            "min": 4.246,
+            "max": 4.642,
+            "cpu_median": 14.14
+          }
+        ]
+      },
+      {
+        "question": "Node compile cache and uncapped frame rate",
+        "rounds": 5,
+        "rows": [
+          {
+            "label": "baseline",
+            "median": 3.772,
+            "min": 3.671,
+            "max": 4.32,
+            "cpu_median": 14.57
+          },
+          {
+            "label": "NODE_COMPILE_CACHE",
+            "median": 3.62,
+            "min": 3.549,
+            "max": 4.006,
+            "cpu_median": 14.09
+          },
+          {
+            "label": "--disable-gpu-vsync --disable-frame-rate-limit (rejected)",
+            "median": 3.952,
+            "min": 3.898,
+            "max": 4.322,
+            "cpu_median": 16.28
+          },
+          {
+            "label": "both (rejected)",
+            "median": 3.792,
+            "min": 3.729,
+            "max": 4.032,
+            "cpu_median": 15.71
+          }
+        ]
+      },
+      {
+        "question": "Start e2e while the browser boots",
+        "rounds": 5,
+        "rows": [
+          {
+            "label": "launcher waits for the browser",
+            "median": 3.639,
+            "min": 3.549,
+            "max": 3.678,
+            "cpu_median": 14.06
+          },
+          {
+            "label": "early start, port-file resolver",
+            "median": 3.392,
+            "min": 3.371,
+            "max": 3.425,
+            "cpu_median": 14.22
+          }
+        ]
+      },
+      {
+        "question": "Browsers per run (early start; prototype slot mapping)",
+        "rounds": 4,
+        "rows": [
+          {
+            "label": "1 shared browser",
+            "min": 3.356,
+            "max": 3.563,
+            "cpu_median": 14.05,
+            "upper_median": 3.427,
+            "median": 3.411,
+            "runs": [
+              3.563,
+              3.427,
+              3.395,
+              3.356
+            ]
+          },
+          {
+            "label": "2 browsers",
+            "min": 3.214,
+            "max": 3.769,
+            "cpu_median": 14.05,
+            "upper_median": 3.311,
+            "median": 3.2705,
+            "runs": [
+              3.23,
+              3.214,
+              3.311,
+              3.769
+            ]
+          },
+          {
+            "label": "4 browsers",
+            "min": 3.227,
+            "max": 3.263,
+            "cpu_median": 14.53,
+            "upper_median": 3.257,
+            "median": 3.2435,
+            "runs": [
+              3.263,
+              3.23,
+              3.257,
+              3.227
+            ]
+          }
+        ]
+      },
+      {
+        "question": "Shipped launcher (about:blank start page): files x workers x browsers",
+        "rounds": 4,
+        "rows": [
+          {
+            "label": "2 files, 4 workers, 4 browsers",
+            "median": 3.077,
+            "min": 2.989,
+            "max": 3.237,
+            "cpu_median": 13.79,
+            "runs": [
+              3.237,
+              3.14,
+              3.014,
+              2.989
+            ]
+          },
+          {
+            "label": "3 files, 6 workers, 6 browsers",
+            "median": 3.1405,
+            "min": 3.068,
+            "max": 3.231,
+            "cpu_median": 17.99,
+            "runs": [
+              3.147,
+              3.231,
+              3.068,
+              3.134
+            ]
+          },
+          {
+            "label": "4 files, 8 workers, 8 browsers",
+            "median": 3.66,
+            "min": 3.65,
+            "max": 3.705,
+            "cpu_median": 21.15,
+            "runs": [
+              3.705,
+              3.65,
+              3.668,
+              3.652
+            ]
+          },
+          {
+            "label": "3 files, 6 workers, 3 browsers",
+            "median": 2.9455,
+            "min": 2.882,
+            "max": 3.019,
+            "cpu_median": 16.83,
+            "runs": [
+              2.882,
+              2.97,
+              3.019,
+              2.921
+            ]
+          }
+        ]
+      },
+      {
+        "question": "Shipped launcher (about:blank start page): browser-count grid, separate session",
+        "rounds": 4,
+        "note": "Only summaries were kept: upper_median is the higher middle wall time; pre_run and runner_span are true medians.",
+        "rows": [
+          {
+            "label": "2 files, 4 workers, 2 browsers",
+            "upper_median": 2.945,
+            "min": 2.919,
+            "max": 2.95,
+            "cpu_median": 13.12,
+            "pre_run": 0.49,
+            "runner_span": 2.396
+          },
+          {
+            "label": "2 files, 4 workers, 4 browsers",
+            "upper_median": 2.976,
+            "min": 2.97,
+            "max": 3.04,
+            "cpu_median": 13.67,
+            "pre_run": 0.579,
+            "runner_span": 2.327
+          },
+          {
+            "label": "3 files, 6 workers, 2 browsers",
+            "upper_median": 2.958,
+            "min": 2.881,
+            "max": 3.004,
+            "cpu_median": 16.89,
+            "pre_run": 0.488,
+            "runner_span": 2.397
+          },
+          {
+            "label": "3 files, 6 workers, 3 browsers",
+            "upper_median": 2.964,
+            "min": 2.947,
+            "max": 3.025,
+            "cpu_median": 17.03,
+            "pre_run": 0.53,
+            "runner_span": 2.366
+          },
+          {
+            "label": "3 files, 6 workers, 6 browsers",
+            "upper_median": 3.139,
+            "min": 3.066,
+            "max": 3.21,
+            "cpu_median": 17.99,
+            "pre_run": 0.682,
+            "runner_span": 2.343
+          }
+        ]
+      },
+      {
+        "question": "Startup page per browser",
+        "rounds": 4,
+        "rows": [
+          {
+            "label": "about:blank, 2 browsers",
+            "min": 2.92,
+            "max": 2.983,
+            "cpu_median": 13.26,
+            "pre_run": 0.49,
+            "upper_median": 2.949
+          },
+          {
+            "label": "--no-startup-window, 2 browsers",
+            "min": 2.863,
+            "max": 2.984,
+            "cpu_median": 13.01,
+            "pre_run": 0.459,
+            "upper_median": 2.958
+          },
+          {
+            "label": "about:blank, 4 browsers",
+            "min": 2.986,
+            "max": 3.002,
+            "cpu_median": 13.81,
+            "pre_run": 0.581,
+            "upper_median": 3.001
+          },
+          {
+            "label": "--no-startup-window, 4 browsers (shipped)",
+            "min": 2.889,
+            "max": 2.931,
+            "cpu_median": 13.27,
+            "pre_run": 0.527,
+            "upper_median": 2.928
+          }
+        ]
+      }
+    ],
+    "cpu_breakdown_one_run": {
+      "note": "Sampled per-process CPU seconds during one early-start run (headless shell, one shared browser); short-lived processes are undercounted.",
+      "node_e2e_cli_and_4_workers": 7.51,
+      "chrome_renderers": 2.58,
+      "chrome_browser_process": 2.27,
+      "chrome_gpu_process": 0.49,
+      "chrome_utility": 0.12
+    },
+    "rejected": [
+      "Uncapped frame rate: slower and more CPU.",
+      "More files/workers than 2 files x 4 workers: no faster on this 8-core machine.",
+      "Playwright-managed launch (launchPersistentContext with a debugging port): keeps a second CDP client attached to every browser.",
+      "In-process e2e runner API: about 60-85ms less boot, but the shipped launcher would lose the e2e CLI interface."
+    ]
+  },
+  "cross_client_adoption_probe": {
+    "question": "Does a second Playwright CDP client adopt a page another client opened in its own context?",
+    "result": {
+      "clientB_default_context_pages": [
+        "http://127.0.0.1:57860/"
+      ],
+      "adoptedByB": true
+    },
+    "source": "https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/chromium/crBrowser.ts (_onAttachedToTarget maps an unknown browserContextId to the default context and creates a CRPage)"
+  },
+  "shipped_checks": [
+    {
+      "check": "native",
+      "exitCode": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "targets": [
+        "webmcp"
+      ],
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "target": "webmcp",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "check": "fallback",
+      "exitCode": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 2,
+        "passed": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 2
+      },
+      "targets": [
+        "ordinary"
+      ],
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "target": "ordinary",
+          "status": "passed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "target": "ordinary",
+          "status": "skipped"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "target": "ordinary",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "target": "ordinary",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "check": "plain-run-without-launcher",
+      "exitCode": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 2,
+        "passed": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 2
+      },
+      "targets": [
+        "ordinary"
+      ],
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "target": "ordinary",
+          "status": "passed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "target": "ordinary",
+          "status": "skipped"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "target": "ordinary",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "target": "ordinary",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "check": "broken-ui",
+      "exitCode": 1,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 3,
+        "failed": 1,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "targets": [
+        "webmcp"
+      ],
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "target": "webmcp",
+          "status": "failed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "target": "webmcp",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "check": "native-workers-2",
+      "exitCode": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "targets": [
+        "webmcp"
+      ],
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "target": "webmcp",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "target": "webmcp",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "launcher_regression_tests": {
+    "command": "python3 tests/test_webmcp_launcher.py",
+    "result": "13/13 passed (10 launcher, 3 provider); honey verification run-1793489711720833000",
+    "against_pre_review_launcher": "repeated-interrupt and profile-removal tests fail (exit -2 with leaked profiles; exit 1 from a removal error)",
+    "against_v2_launcher": "contract tests fail (no per-browser port files)"
+  },
+  "versions": {
+    "node": "v24.18.0",
+    "e2e": "0.22.0",
+    "@e2e-dev/web": "0.15.4",
+    "playwright-core": "1.64.1",
+    "chromium": "156.0.8078.4 (headless shell and Chrome for Testing)",
+    "npm_latest_checked": "e2e 0.22.0, @e2e-dev/web 0.15.4, playwright-core 1.64.1",
+    "upstream_e2e_main": "1d671f6786b1eff4b43718ddc413b0bfa21abbcb"
+  },
+  "evidence_root": "/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH",
+  "final_files_confirmation": {
+    "note": "Shipped run.mjs and webmcp.ts after the review hardening, copied byte-for-byte into the v3 and UI-setup variants; 6 rounds, alternating order, 8s untimed cool-down; same verbatim audit.",
+    "runs": [
+      {
+        "label": "final-e2e_v3",
+        "wall": 3.924,
+        "cpu": 14.97,
+        "runner_span": 2.912,
+        "pre_run": 0.949,
+        "post_run": 0.063,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-webmcp_v3",
+        "wall": 3.238,
+        "cpu": 13.84,
+        "runner_span": 2.49,
+        "pre_run": 0.683,
+        "post_run": 0.065,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-webmcp_v3",
+        "wall": 3.61,
+        "cpu": 14.82,
+        "runner_span": 2.757,
+        "pre_run": 0.791,
+        "post_run": 0.062,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-e2e_v3",
+        "wall": 3.547,
+        "cpu": 15.01,
+        "runner_span": 2.861,
+        "pre_run": 0.616,
+        "post_run": 0.07,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-e2e_v3",
+        "wall": 3.826,
+        "cpu": 15.19,
+        "runner_span": 2.957,
+        "pre_run": 0.804,
+        "post_run": 0.065,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-webmcp_v3",
+        "wall": 3.254,
+        "cpu": 13.77,
+        "runner_span": 2.557,
+        "pre_run": 0.634,
+        "post_run": 0.063,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-webmcp_v3",
+        "wall": 3.176,
+        "cpu": 13.58,
+        "runner_span": 2.539,
+        "pre_run": 0.571,
+        "post_run": 0.066,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-e2e_v3",
+        "wall": 3.371,
+        "cpu": 14.15,
+        "runner_span": 2.722,
+        "pre_run": 0.582,
+        "post_run": 0.067,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-e2e_v3",
+        "wall": 3.27,
+        "cpu": 14.29,
+        "runner_span": 2.604,
+        "pre_run": 0.599,
+        "post_run": 0.067,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-webmcp_v3",
+        "wall": 3.063,
+        "cpu": 13.48,
+        "runner_span": 2.436,
+        "pre_run": 0.57,
+        "post_run": 0.057,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-webmcp_v3",
+        "wall": 3.058,
+        "cpu": 13.59,
+        "runner_span": 2.419,
+        "pre_run": 0.579,
+        "post_run": 0.06,
+        "qualified": true,
+        "problems": []
+      },
+      {
+        "label": "final-e2e_v3",
+        "wall": 3.515,
+        "cpu": 15.25,
+        "runner_span": 2.768,
+        "pre_run": 0.687,
+        "post_run": 0.06,
+        "qualified": true,
+        "problems": []
+      }
+    ],
+    "summary": {
+      "final-webmcp_v3": {
+        "n": 6,
+        "median": 3.207,
+        "min": 3.058,
+        "max": 3.61,
+        "cpu_median": 13.77,
+        "qualified": "6/6"
+      },
+      "final-e2e_v3": {
+        "n": 6,
+        "median": 3.531,
+        "min": 3.27,
+        "max": 3.924,
+        "cpu_median": 15.01,
+        "qualified": "6/6"
+      }
+    }
+  },
+  "shipped_checks_pre_review": [
+    {
+      "check": "native",
+      "exitCode": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "status": "passed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "status": "passed"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "check": "fallback",
+      "exitCode": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 2,
+        "passed": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 2
+      },
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "status": "passed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "status": "skipped"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "check": "broken-ui",
+      "exitCode": 1,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 3,
+        "failed": 1,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "status": "failed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "status": "passed"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "check": "native-workers-2",
+      "exitCode": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "results": [
+        {
+          "test": "native tools and visible controls agree",
+          "status": "passed"
+        },
+        {
+          "test": "tool failures and invalid inputs cannot pass",
+          "status": "passed"
+        },
+        {
+          "test": "navigation invalidates tool discovery",
+          "status": "passed"
+        },
+        {
+          "test": "batch preserves order and stops after failure or navigation",
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "review_hardening": [
+    "Forward every SIGINT/SIGTERM/SIGHUP to e2e and stay alive to delete profiles",
+    "Retry profile removal and report failures without changing the e2e exit code",
+    "Default the browser count to e2e's worker default when --workers is absent",
+    "Resolve e2e and the engine's pinned playwright-core through module resolution",
+    "Retry EBUSY while Chromium still holds its port file (Windows)",
+    "Log once when worker slots must share a browser",
+    "Documented config adds the WebMCP target only under the launcher"
+  ],
+  "not_verified": [
+    "Windows process lifecycle: Node kill() ends only the main process there"
+  ]
+}

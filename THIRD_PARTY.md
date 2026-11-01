@@ -14,6 +14,6 @@ honey-stack distills ideas and text from the projects below and vendors some ups
 | MCT toolkit | 3.2.0 | https://github.com/umararshad4/skills-hub | the author's own | King Umar |
 | Emil Kowalski skills | 2026 snapshot; motion/mobile additions at `a81dbca07f2217b7103e510c0f13f8d5b017afc9` | https://github.com/emilkowalski/skills | MIT (`licenses/emilkowalski-skills.MIT`) | Emil Kowalski |
 | Stageshow | 8020574 | https://github.com/benjitaylor/skills/tree/802057409787133703c56001080169e347305572/stageshow | MIT (`skills/stageshow/LICENSE`); third-party assets have separate terms in `skills/stageshow/NOTICE.md` | Benji Taylor and asset owners |
-| e2e (tester.army) | docs, 2026-10 | https://tester.army/e2e | docs distilled, ideas only | e2e-dev |
+| e2e (TesterArmy) | 1d671f6 (2026-11-01) | https://github.com/tester-army/e2e | Apache-2.0; skill entry filenames adapted (`skills/qa/references/tester-army/LICENSE`, `NOTICE`) | TesterArmy, Inc. |
 
 Research that shaped RSI, credited for the ideas only: ACE (arXiv 2510.04618), TRACE (2606.13174), Dynamic Cheatsheet (2504.07952), Learning on the Job (2607.22157), SkillsBench (2602.12670), Every's compound-engineering `ce-compound`, Lance Martin's Claude Diary, claude-reflect and Hermes Agent's curator.

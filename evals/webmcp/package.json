@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node ../../skills/qa/assets/webmcp/run.mjs run --target webmcp --retries 0",
+    "test:fallback": "e2e run smoke.e2e.ts --target ordinary --retries 0",
+    "benchmark": "node benchmark/run.mjs"
+  },
+  "devDependencies": {
+    "@e2e-dev/web": "0.15.4",
+    "e2e": "0.22.0",
+    "playwright-core": "1.64.1"
+  }
+}

@@ -4,90 +4,55 @@ description: "Use to check a change in a real browser, QA a page or user flow, o
 license: MIT
 metadata:
   reviewed: "2026-11-01"
-  sources: "garrytan/gstack 1.60.1.0 qa/SKILL.md.tmpl (test, fix, re-verify loop; regression test per fix; self-regulation), qa/SKILL.md (Modes: diff-aware; Workflow phases 2-5; Framework-Specific Guidance; Important Rules), qa/references/issue-taxonomy.md, qa/templates/qa-report-template.md; MCT (local) ~/.claude/MCT.md (Post-Task Verification, Strict Proof And Audit), ~/.claude/policies/automation-policy.json (postTaskVerification); tester.army/e2e docs (deterministic vs agentic steps, selector strategy, verified-step caching, explore→regression; references/e2e.md); emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/break-ui/{SKILL.md,CATALOG.md}, skills/mobile-native/SKILL.md (MIT, adapted)"
+  sources: "tester-army/e2e 1d671f6786b1eff4b43718ddc413b0bfa21abbcb skills/e2e, skills/create-verification-skill, skills/migrate-to-e2e (Apache-2.0, entry filenames adapted; see references/tester-army/UPSTREAM.md); Chrome WebMCP and Playwright 1.64 docs (references/webmcp.md); garrytan/gstack 1.60.1.0 qa; MCT Post-Task Verification; emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/break-ui/{SKILL.md,CATALOG.md}, skills/mobile-native/SKILL.md (MIT, adapted)"
 ---
 
-# QA
+# QA with e2e
 
-Use the app the way a user would, in a real browser, and trust what the browser shows. Code tells you what should happen; the browser tells you what does.
+Use tester-army/e2e's actual CLI and project MCP server. Start with an existing matching test and the project's command; do not rebuild a working test setup. A check-only request produces findings and evidence. Change application code only when authorized. Respect an explicitly requested runner/browser or host-required tool and label that exception.
 
-A request to check or test produces a report and no code changes. Fix only when the user asked for fixes or the task is to make the flow work.
+## Start with the smallest runnable scope
 
-For worst-case data, overflow or localization stress tests, follow [UI stress testing](references/stress-ui.md). For phone/PWA issues, also use [mobile behavior](../frontend/references/mobile.md). Motion review and frame profiling live in [motion review](../frontend/references/motion-review.md) and [motion performance](../frontend/references/motion-performance.md).
+Map the request and changed files to cases and relevant viewports. Create a complete case matrix before the first full run. Keep cases independent so one failure cannot hide another requirement.
 
-## 1. Pick the browser tool
+For worst-case data, overflow or localization stress tests, follow [UI stress testing](references/stress-ui.md). For phone/PWA issues, also use [mobile behavior](../frontend/references/mobile.md); emulator results are preliminary until the affected interaction runs on the target browser and a real device, and an unavailable device stays unverified. Motion review and frame profiling live in [motion review](../frontend/references/motion-review.md) and [motion performance](../frontend/references/motion-performance.md).
 
-Take the first one available in this session:
+Reuse verified configuration, versions, sessions and dependency setup from this session. For a new target, inspect the package/lockfile, `e2e.config.*`, startup and auth; run `node --version`, `npx e2e --version`, and `npx e2e list`. Prove a deterministic smoke first; an existing matching test can serve as the smoke. A missing model provider blocks agent goals, not deterministic tests.
 
-| Tool | Best for |
+Load only the reference needed for the task. Prefer the installed version's `npx e2e guide <topic>` when it differs from the bundled snapshot.
+
+| Need | Reference |
 |---|---|
-| Playwright MCP | Local flows, screenshots, viewport resizing, console and network reads |
-| Chrome DevTools MCP | Network detail, performance traces, Lighthouse |
-| claude-in-chrome, or the Codex browser plugin | The user's real Chrome profile: logged-in state, extensions, profile-dependent pages |
-| The repo's Playwright or Cypress suite | A flow that's already scripted; the regression test in step 4 |
+| Faster existing web QA, workers, reports, evidence cost | [fast QA](references/fast-qa.md) |
+| Actual CLI commands and result handling | [command guide](references/e2e.md) |
+| First-time setup or unfamiliar upstream workflow | [upstream workflow](references/tester-army/e2e/GUIDE.md) |
+| Engine, app and provider setup | [setup](references/tester-army/e2e/references/setup.md) |
+| Live inspection, locators and sessions | [MCP](references/tester-army/e2e/references/mcp.md) |
+| Write a test | [writing tests](references/tester-army/e2e/references/writing-tests.md) |
+| Agent goals, budgets and replay cache | [agent](references/tester-army/e2e/references/agent.md) |
+| Run selection and CI | [running](references/tester-army/e2e/references/running.md) |
+| Diagnose failures | [debugging](references/tester-army/e2e/references/debugging.md) |
+| Bounded exploratory goal | [explore](references/tester-army/e2e/references/explore.md) |
+| Broad bug bash | [bug bash](references/tester-army/e2e/references/bug-bash.md) |
+| App-specific verification skill | [verification generator](references/tester-army/create-verification-skill/GUIDE.md) |
+| Migrate an existing suite | [migration](references/tester-army/migrate-to-e2e/GUIDE.md) |
+| Page-provided tools for eligible setup | [WebMCP](references/webmcp.md) |
 
-honey-stack ships no browser binary or daemon, so drive the browser through these tools. If none is available, say so and record the browser check as skipped with that blocker.
+## Run, then investigate only what needs it
 
-Done when: the tool has loaded the target page once.
+- Use `screen`, `app`, `browser` and exact `expect` assertions. Do not mix raw Playwright configuration or locator signatures into e2e. `targets` owns the engine and app; `app.command` owns startup/cleanup. Keep user-owned servers and existing suites intact.
+- Separate fixture setup from acceptance actions. Existing WebMCP tools can replace setup; `webmcpBatch` handles reviewed same-page fixture calls. Keep form, keyboard, search and visual acceptance checks on the real UI. Do not execute both setup paths or add an unrelated tool-contract demo. Missing optional WebMCP support falls back to e2e; an explicit WebMCP requirement remains failed/blocked.
+- Preserve async readiness waits. After a real completion signal, compare an already-read value directly rather than polling it again. For a state transition, use the matching state option (such as `toBeChecked({ checked: false })`); negated locator matchers add a stability window. Keep that window when sustained absence is required. Never shorten waits or change an expectation merely to make a failure fast or green.
+- Use bounded workers only when browser contexts, accounts and data are isolated. e2e schedules file/target units: group independent flows into a few files with shared helpers; keep dependent steps together. Shared accounts/data or constrained targets stay serial. The WebMCP launcher starts one browser per `--workers`. See fast QA before changing concurrency.
+- Run the selected matrix once, read its native report, then narrow repairs to `file:line` or `--last-failed`. Keep verified goal names/params stable for cache reuse. After repairing an agent test, run it once with normal timeouts and `--no-cache` to prove the live path; deterministic tests need no model-based rerun.
+- Use native JSON/Markdown reports instead of writing a converter for ordinary QA. Keep required failure screenshots and distinct visual-state evidence. Full traces/video and repeated screen dumps are diagnostic choices, not mandatory for every passing action. Preserve evidence before another run replaces it.
 
-## 2. Scope the run
+If live MCP is needed, reuse its registration and session. New registration requires a new client session; a config edit alone does not prove tools loaded. Use `locate`/`run_code` and returned `Test line:` values. Close sessions when done. Native mobile uses its supported engine; desktop native apps have no e2e engine.
 
-- **Target.** Use the URL the user gave. Otherwise find the dev server port in the `dev` script or framework config and try it (commonly 3000, 5173 or 8080). If nothing is running, start the repo's dev script in the background. If that fails, ask for a URL.
-- **Diff-aware by default.** List changed files with `git diff <base>...HEAD --name-only` plus uncommitted changes, then map them to what a user sees: route and page files to their URLs, components to the pages that render them, styles to the pages that load them, API handlers to the screens that call them (and call the endpoint directly too).
-- **Nothing maps.** Smoke-test instead: the home page and the top five navigation targets, with console checks.
-- **Intent.** Read the request, commit messages and PR body. QA checks that the change does what it was meant to, not only that nothing crashes.
-- **Auth.** Use the credentials or cookie file the user provides. Write passwords as `<REDACTED>` in every step and report. For 2FA or a CAPTCHA, ask the user to complete it in the browser.
+## Close with proof
 
-Done when: you have a list of URLs and flows, each tied to a changed file or to the stated intent.
+Read the actual selected/passed/failed/flaky/skipped counts. Exit 0, an empty selection or a completed exploration alone does not prove the requested flow. Confirm each claimed bug with a failing repro; keep backend/persistence and permission checks where required. Do not suppress page errors.
 
-## 3. Explore like a user
+Report the command, versions, case/viewport coverage, outcomes, cache/live status, artifact paths and untested scope. Separate WebMCP results from UI/backend proof. State worker and trace settings in speed comparisons, and measure matched repeated workloads before claiming a gain. Carry these boundaries into generated verification skills.
 
-Run every flow at **1440x900** and **390x844**. On each page:
-
-1. Load it, take a snapshot or screenshot, and read the console and failed network requests.
-2. Use every control in the changed area. Each one does what its label says. Reach controls by role, then accessible name, then test id — the order in `references/e2e.md` — and confirm a locator resolves to exactly one element before you act on it. A control you can't reach by an accessible handle is itself an accessibility finding.
-3. Submit forms empty, invalid, with realistic long text and Unicode, and twice quickly. For data-heavy or translated UI, select the applicable worst cases from [UI stress testing](references/stress-ui.md), including empty/one/many records and missing optional values.
-4. Navigate in and out: click links (client-side navigation), back and forward, deep link, reload. State that should persist survives a reload.
-5. Reach the loading, empty, error and overflow states.
-6. Tab through the controls. Focus is visible, Enter and Space activate, Escape closes overlays.
-7. Try it logged out and as another role where access differs.
-
-**Console errors count as failures,** even when the page looks right: uncaught exceptions, unintended 4xx or 5xx responses, hydration warnings, CORS and CSP violations.
-
-Retry each bug once to confirm it reproduces. Spend depth on core flows (sign-up, checkout, the main dashboard, search) over secondary pages. For severity levels, issue categories and framework-specific checks, read `references/checklist.md`. This explore-then-pin loop is the heart of e2e: a flow worth checking twice is worth a regression test, and a finding isn't confirmed until a repro reproduces it — `references/e2e.md` has the discipline.
-
-Done when: every flow on the list ran at both viewports and each finding has repro steps plus a screenshot or snapshot.
-
-For a phone-specific claim, emulator results are preliminary: run the affected interaction on the target browser and real device using [mobile behavior](../frontend/references/mobile.md). Record an unavailable device as unverified, without discarding the desktop/emulated evidence.
-
-## 4. Fix loop
-
-When fixing, work through issues in severity order:
-
-1. **Locate.** Grep for the error text, component name or route. A cause that isn't obvious goes through the `debug` skill.
-2. **Fix minimally.** Touch only files tied to this issue.
-3. **Add a regression test** at the closest seam, matching the repo's existing test style. Logic or console errors get a unit or integration test. Broken forms and API flows get an integration test on the request and response. Interactive component bugs get a component or end-to-end test. Pure CSS fixes rely on the browser re-run. Where the seam allows, watch the test fail before the fix and pass after. When the fix needs an end-to-end test — selector strategy (role/name/test id), what to keep deterministic vs agent-driven, flaky-test and secret handling — read `references/e2e.md`.
-4. **Re-run in the browser.** Same flow, both viewports, console clean.
-5. **Classify** the fix as verified, best-effort (state what couldn't be checked) or reverted (it made things worse: undo it and defer the issue).
-
-Stop and report when a fix gets reverted, when a fix needs more than three files, or when fixes start touching unrelated code. Each is a sign the problem is bigger than a QA fix. If the user asked for commits, commit each fix separately through the `ship` skill.
-
-Done when: each fixed issue passes in the browser and has a regression test, or a stated reason it has none.
-
-## 5. Evidence and report
-
-Write one evidence line per flow, from a run after the last edit:
-
-```
-browser: <tool> <url> <viewport> "<flow>" result=pass|fail
-```
-
-```
-browser: playwright-mcp http://localhost:3000/pricing 1440x900,390x844 "toggle annual, CTA visible" result=pass
-```
-
-These lines feed the receipt and the `verify` skill's UI-proof check. Keep screenshot paths when the tool saves files, and show the user the screenshots that matter (on Claude Code, Read the image file).
-
-Report the flows tested, issues by severity with repro steps, each fix with its status and test, and what was deferred and why. End with `QA: <n> issues, <m> fixed, <k> deferred.`
-
-Done when: every flow in scope has an evidence line with its result.
+Done when every requested case has fresh evidence, cleanup is complete and all remaining failures or blockers are explicit.

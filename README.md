@@ -95,6 +95,14 @@ Claude: `/honey:<skill>`. Codex: `$<skill>`.
 
 The four new entry points are explicitly invoked on both Claude Code and Codex; their descriptions do not expand the always-loaded workflow. Existing skills link to their relevant branches when needed.
 
+`qa` uses the tester-army/e2e CLI and project MCP server by default, with bundled upstream setup, test-writing, replay-cache, debugging, mobile, CI and bug-bash guidance. The runner and engine are installed in the app being tested; Honey does not bundle browser binaries. See [the QA command guide](skills/qa/references/e2e.md).
+
+Browser QA and verification also discover existing WebMCP tools for suitable setup, exploration and contract checks. Real user interactions, visual checks and backend assertions still prove their respective requirements. Unsupported pages fall back to ordinary e2e checks. The [WebMCP guide](skills/qa/references/webmcp.md) includes an isolated Chromium runner and same-session e2e adapter; it does not add WebMCP to websites automatically.
+
+WebMCP replaces eligible setup rather than adding a second walkthrough. QA reuses existing tests and verified sessions; standalone tool-contract checks run when that contract is relevant. Performance claims use repeated runs of the same cases, viewports, timeouts and assertions.
+
+The [fast QA path](skills/qa/references/fast-qa.md) uses native reports, avoids duplicate polling after verified readiness, and schedules independent flow files across bounded workers. It keeps failure screenshots and exact case coverage; shared accounts or data keep serial execution.
+
 ## RSI: how it learns
 
 1. **Observe:** hooks log bounded, redacted user requests, corrections, "still broken" and which skills fired. Feedback distinguishes behavior, requirements, preferences and environment failures. Task identity and explicit skill references guide attribution; ambiguous feedback remains uncertain instead of blaming every recent skill.

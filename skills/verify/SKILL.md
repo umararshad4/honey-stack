@@ -3,7 +3,7 @@ name: verify
 description: "Use before saying done, fixed or passing, before a commit or PR, or when asked 'have I missed something?'"
 license: MIT
 metadata:
-  reviewed: "2026-10-18"
+  reviewed: "2026-11-01"
   sources: "obra/superpowers 7.0.0 skills/verification-before-completion; cursor/plugins pstack 0.15.25 skills/principle-prove-it-works, skills/principle-sequence-verifiable-units; garrytan/gstack 1.60.1.0 review/checklist.md (enum completeness), ship/SKILL.md.tmpl (verification gate); MCT (local) ~/.claude/MCT.md (Check Selection, Post-Task Verification, Completion Receipt), skills/have-i-missed-something, skills/testing-strategy, agents/test-runner.md"
 ---
 
@@ -59,6 +59,8 @@ Match the weight of the checks to the risk. Use the repo's own scripts (package.
 | PR-ready | The lint, typecheck and test commands the repo defines |
 
 Run a full build only for a broad or risky change, or when asked. For multi-step work such as sweeps, migrations or runs of similar edits, check each unit before starting the next. A break caught at the unit that caused it is cheap to find.
+
+For browser verification, follow [WebMCP verification](references/webmcp.md) and the `qa` skill. Reuse verified tools to replace eligible setup, then exercise the affected UI and assert independent outcomes. Reuse existing tests and preflight; add separate tool-contract tests only when that contract is in scope or required coverage is missing. WebMCP does not replace lint, types, backend tests, native mobile checks or visual proof. If unavailable, report the fallback; if required, record a failed or blocked requirement.
 
 Done when: each applicable row has run and you have read its output, or it is listed as skipped with the concrete blocker.
 
