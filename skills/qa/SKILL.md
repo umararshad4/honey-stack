@@ -38,6 +38,10 @@ Load only the reference needed for the task. Prefer the installed version's `npx
 | Migrate an existing suite | [migration](references/tester-army/migrate-to-e2e/GUIDE.md) |
 | Page-provided tools for eligible setup | [WebMCP](references/webmcp.md) |
 
+## Browser sandbox failures
+
+If the browser rejects `file://` navigation or an artifact path outside its allowed workspace, use the project's existing HTTP dev server and the runner's permitted artifact directory. Read the error for the permitted root before retrying; report both the sandbox constraint and the saved artifact path. Do not repeat the blocked operation or disable the sandbox. If the host offers no permitted route, report the check as blocked.
+
 ## Run, then investigate only what needs it
 
 - Use `screen`, `app`, `browser` and exact `expect` assertions. Do not mix raw Playwright configuration or locator signatures into e2e. `targets` owns the engine and app; `app.command` owns startup/cleanup. Keep user-owned servers and existing suites intact.

@@ -184,6 +184,23 @@ class Continuous(unittest.TestCase):
             cli.status(True)
         self.assertEqual(json.loads(out.getvalue())['recent_improvement']['result'], {'skipped': 'budget'})
 
+    def test_applied_changes_name_concrete_edit_in_run_and_status(self):
+        item = review.add(1, 'instr_line', 'Keep the direct answer first', '', '', [], 'visible')
+        item['edit'] = {'file': 'claude', 'action': 'add', 'line': '- Answer the question first.'}
+        store.write_json(paths.path('proposals', item['id'] + '.json'), item)
+        with store.lock():
+            result = autonomy.run()
+        change = next(c for c in result['changes'] if c['id'] == item['id'])
+        self.assertEqual(change['title'], item['title'])
+        self.assertEqual(change['type'], 'instr_line')
+        self.assertIn('updated', change['result'])
+        output = io.StringIO()
+        with contextlib.redirect_stdout(output):
+            cli.status()
+        self.assertIn(item['title'], output.getvalue())
+        self.assertIn(item['id'], output.getvalue())
+        self.assertIn(change['result'], output.getvalue())
+
     def test_skill_with_rejected_child_is_not_redrafted_from_scorecard(self):
         from honey.rsi import improve, patch
         p = self.proposal()

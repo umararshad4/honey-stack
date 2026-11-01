@@ -3,10 +3,15 @@ from __future__ import annotations
 
 import glob
 import os
+import re
 import time
 
 from honey import paths
 from honey.rsi import curate, review, signals, store, text
+
+DELEGATED_REQUEST = re.compile(
+    r"^\s*(?:amcp\s+command\s+delegated\b|"
+    r"(?:act(?:\s+as)?|you\s+are)\b[^\n.]{0,100}\b(?:sub-agent|subagent|worker\s+agent)\b)", re.I)
 
 MIN_N = 5
 PATCH_MIN_INV, PATCH_NEG_RATE, PATCH_MIN_NEG, DESC_FIX_MIN = 4, 0.4, 2, 2
@@ -49,15 +54,17 @@ def request_clusters(days: int = 30) -> list:
         skill_turns = {r.get("t") for r in rows if r.get("e") == "skill"}
         for r in rows:
             quote = r.get("q", "")
+            keywords = text.keywords(quote)
             if (r.get("e") == "prompt" and r.get("origin") == "user" and not r.get("xc")
-                    and r.get("ts", "") >= cutoff and len(r.get("kw", [])) >= 3 and r.get("t") not in skill_turns
+                    and r.get("ts", "") >= cutoff and r.get("t") not in skill_turns
                     and quote and signals.origin(quote) == "user" and not text.injection_hit(quote)
-                    and len(text.keywords(quote)) >= 3 and not {"continue", "accept"} & set(signals.classify(quote))
+                    and len(keywords) >= 3 and not DELEGATED_REQUEST.search(quote)
+                    and not {"continue", "accept"} & set(signals.classify(quote))
                     and not quote.strip().lower().startswith(("[attached image", "[attached file", "attached image:", "attached file:"))):
                 sid = os.path.basename(fp)[:-6]
                 evidence = {"sid": sid, "ts": r["ts"], "q": text.redact(r.get("q", ""), 300),
                             "event": "prompt", "origin": r.get("origin"), "quarantined": bool(r.get("xc"))}
-                asks.append((sid, set(r["kw"]), evidence))
+                asks.append((sid, set(keywords), evidence))
     clusters = []
     for sess, kw, evidence in asks:
         for c in clusters:

@@ -108,6 +108,10 @@ The default is `direct`. Session switches last until changed or the session ends
 
 Existing saved `terse` settings read as `direct`, and `normal` as `balance`. Old scope/process choices no longer change the workflow. Saving a new default writes `mode` in the global config and removes the old `modes` field.
 
+## Explain active rules
+
+When asked what Honey applied, identify the relevant bootstrap, skill or learned preference and the evidence of its use. `honey doctor --agent codex --json` (or `--agent claude`) reports observed hook delivery; `honey task status --json` reports task evidence. Instruction loading alone does not prove enforcement. A response-mode change only changes presentation; preserve learned preferences unless the user explicitly asks to change or forget them.
+
 ## Context hygiene
 
 - **One unbroken thread for grill → plan**, so the plan argues from the same thinking. Compact or clear after the plan is written, not during grilling.

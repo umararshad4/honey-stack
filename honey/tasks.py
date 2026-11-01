@@ -19,6 +19,7 @@ INSPECT = re.compile(r"\b(read.only|only (?:tell|explain|inspect|review)|(?:firs
                      r"(?:do not|don't) (?:implement\b|(?:change|edit|modify) (?:any |the )?(?:files?|code|anything)\b|"
                      r"(?:change|edit|modify)\s*[.!?]?$))", re.I)
 ACTION = re.compile(r'\b(implement|fix|build|create|add|write|refactor|update|rename|run|restart|install|change|edit|remove|uninstall|delete|disable|enable|configure|commit|push|merge|deploy)\b|\bmake\s+(?:it|that|this)\b', re.I)
+DIRECT_ACTION = re.compile(r'^\s*(?:please\s+|yes[, ]+)?(?:do it|go ahead)[.!\s]*$', re.I)
 FOLLOWUP = re.compile(r'^\s*(?:also\b|but\b|no[, ]|that\b|it\b|same\b)', re.I)
 QUESTION = re.compile(r'^\s*(?:what|why|how|which|tell me|explain|inspect)\b', re.I)
 STATUS = re.compile(r'^\s*(?:what(?:\s+is|\'s)\s+(?:the\s+)?(?:status|progress)|any\s+(?:updates?|progress)|status\??$|how\s+is\s+it\s+going)', re.I)
@@ -37,7 +38,6 @@ def create(state, request, mode, operation, cwd, targets=(), checks=None, approv
             'checks': list(checks if checks is not None else CHECKS[operation])[:12] if mode == 'execute' else [],
             'mutation': 0, 'evidence': {}, 'calls': [], 'seen_calls': [], 'check_outcomes': {}}
     state['task'] = task
-    state['evidence_nagged'] = False
     return task
 
 
@@ -47,14 +47,15 @@ def advance(ctx, prompt):
     if old and STATUS.search(prompt) and not INSPECT.search(prompt):
         return
     inspect = bool(INSPECT.search(prompt) or QUESTION.search(prompt))
+    has_action = bool(ACTION.search(prompt) or DIRECT_ACTION.fullmatch(prompt))
     continuation = bool(set(signals.classify(prompt)) & {'continue', 'accept'}) or bool(FOLLOWUP.match(prompt))
-    if old and continuation and not inspect and not (old['mode'] == 'inspect' and ACTION.search(prompt)):
+    if old and continuation and not inspect and not (old['mode'] == 'inspect' and has_action):
         for action in list(old['approved_actions']):
             if re.search(r"\b(?:no|not|never|don't|without)\s+(?:\w+\s+){0,2}" + action + r'\b', prompt, re.I):
                 old['approved_actions'].remove(action)
                 ctx.dirty = True
         return
-    mode = 'inspect' if inspect or not ACTION.search(prompt) else 'execute'
+    mode = 'inspect' if inspect or not has_action else 'execute'
     operation = ('uninstall' if re.search(r'\b(uninstall|remove).{0,60}(app|software|completely)', prompt, re.I)
                  else 'startup' if re.search(r'\b(startup|login items?)\b', prompt, re.I)
                  else 'code' if re.search(r'\b(fix|implement|code|parser|function|bug|refactor|build)\b', prompt, re.I)
@@ -157,8 +158,6 @@ def _invalidate(ctx, task, preserve_runner=False):
     task['mutation'] += 1
     task['evidence'] = {name: proof for name, proof in task['evidence'].items()
                         if preserve_runner and proof.get('source') == 'runner'}
-    ctx.state['nagged'] = False
-    ctx.state['evidence_nagged'] = False
     ctx.dirty = True
 
 
