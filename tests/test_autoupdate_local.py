@@ -1,15 +1,20 @@
 """Exercise a cached install whose marketplace points at a local Git checkout."""
 import json
 import os
+import contextlib
+import io
+import fcntl
 import subprocess
 import sys
 import tempfile
+import shutil
+import time
 import unittest
 from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from honey import autoupdate, dispatch, install, paths  # noqa: E402
+from honey import autoupdate, cli, dispatch, install, paths  # noqa: E402
 from honey.rsi import store  # noqa: E402
 
 GIT = ["git", "-c", "user.name=Test", "-c", "user.email=test@example.com",
@@ -50,6 +55,8 @@ elif args == ["plugin", "add", "honey@honey-stack"]:
     if (root / "fail-refresh").exists():
         sys.exit(1)
     source = root / "source checkout"
+    if pathlib.Path.cwd().resolve() != source.resolve():
+        sys.exit(3)
     version = json.loads((source / ".codex-plugin" / "plugin.json").read_text())["version"]
     cache = root / "codex" / "plugins" / "cache" / "honey-stack" / "honey" / version
     cache.mkdir(parents=True, exist_ok=True)
@@ -97,6 +104,119 @@ else:
         self.assertEqual((self.cache.parent / "1.1.0" / "installed-version").read_text(), "1.1.0")
         self.assertEqual(store.read_json(paths.path("synced.json"))["head"], new_head)
         self.assertIn("1.0.0 → 1.1.0", autoupdate.notice())
+
+    def test_explicit_check_finds_release_despite_recent_automatic_check(self):
+        self.assertEqual(autoupdate.run()['status'], 'current')
+        new_head = self.release()
+        result = autoupdate.run(force=True)
+        self.assertEqual(result.get('status'), 'updated', result)
+        self.assertEqual(self.git(self.checkout, 'rev-parse', 'HEAD'), new_head)
+        self.assertEqual((self.cache.parent / '1.1.0' / 'installed-version').read_text(), '1.1.0')
+
+    def test_cli_exposes_explicit_release_check(self):
+        with patch.object(autoupdate, 'run', return_value={'status': 'current'}) as run:
+            with contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(cli.main(['autoupdate', '--now']), 0)
+        run.assert_called_once_with(force=True)
+
+    def test_cli_now_updates_a_local_marketplace_after_recent_check(self):
+        source_root = Path(__file__).resolve().parents[1]
+        shutil.copytree(source_root / 'honey', self.cache / 'honey', ignore=shutil.ignore_patterns('__pycache__'))
+        (self.cache / 'bin').mkdir()
+        shutil.copy2(source_root / 'bin' / 'honey', self.cache / 'bin' / 'honey')
+        toolbin = self.root / 'tools'
+        toolbin.mkdir()
+        shutil.copy2(self.codex, toolbin / 'codex')
+        store.write_json(paths.path('state', 'autoupdate.json'), {'checked': time.time()})
+        self.release()
+        env = dict(os.environ, PATH=str(toolbin) + os.pathsep + os.environ.get('PATH', ''))
+        result = subprocess.run([sys.executable, str(self.cache / 'bin' / 'honey'), 'autoupdate', '--now'],
+                                cwd=self.root, env=env, capture_output=True, text=True, check=True)
+        self.assertEqual(json.loads(result.stdout)['to'], '1.1.0')
+        self.assertEqual((self.cache.parent / '1.1.0' / 'installed-version').read_text(), '1.1.0')
+
+    def test_explicit_check_does_not_run_alongside_an_update(self):
+        lockfile = Path(paths.path('state', 'autoupdate.lock'))
+        lockfile.parent.mkdir(parents=True, exist_ok=True)
+        with lockfile.open('w') as lock:
+            fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            result = autoupdate.run(force=True)
+        self.assertEqual(result['status'], 'skipped')
+        self.assertIn('in progress', result['reason'])
+
+    def test_explicit_check_refreshes_cache_when_checkout_is_current(self):
+        result = autoupdate.run(force=True)
+        self.assertEqual(result.get('status'), 'current', result)
+        self.assertTrue(result.get('refreshed'), result)
+        self.assertEqual((self.cache / 'installed-version').read_text(), '1.0.0')
+        self.assertEqual(autoupdate.notice(), '')
+
+    def test_explicit_check_does_not_install_unreleased_main(self):
+        (self.origin / 'unreleased.txt').write_text('unreleased')
+        self.git(self.origin, 'add', 'unreleased.txt')
+        self.git(self.origin, 'commit', '-qm', 'unreleased main')
+        self.git(self.checkout, 'pull', '--ff-only', '-q')
+        result = autoupdate.run(force=True)
+        self.assertEqual(result['status'], 'skipped')
+        self.assertIn('release tag', result['reason'])
+        self.assertFalse((self.cache / 'installed-version').exists())
+
+    def test_explicit_check_does_not_refresh_an_older_tagged_release(self):
+        (self.origin / '.codex-plugin' / 'plugin.json').write_text('{"name":"honey","version":"0.9.0"}')
+        (self.origin / 'honey' / '__init__.py').write_text('__version__ = "0.9.0"\n')
+        self.git(self.origin, 'add', '.codex-plugin/plugin.json', 'honey/__init__.py')
+        self.git(self.origin, 'commit', '-qm', 'older version on main')
+        self.git(self.origin, 'tag', 'v0.9.0')
+        self.git(self.checkout, 'pull', '--ff-only', '-q', '--tags')
+        result = autoupdate.run(force=True)
+        self.assertEqual(result['status'], 'skipped')
+        self.assertIn('release tag', result['reason'])
+        self.assertFalse((self.cache / 'installed-version').exists())
+
+    def test_explicit_check_respects_auto_update_opt_out(self):
+        store.write_json(paths.path('config.json'), {'autoupdate': False})
+        self.release()
+        result = autoupdate.run(force=True)
+        self.assertEqual(result['status'], 'skipped')
+        self.assertEqual(self.git(self.checkout, 'rev-parse', 'HEAD'), self.old_head)
+
+    def test_explicit_check_does_not_update_a_dirty_checkout(self):
+        self.release()
+        (self.checkout / 'honey' / '__init__.py').write_text('# local edit\n')
+        result = autoupdate.run(force=True)
+        self.assertEqual(result['status'], 'skipped')
+        self.assertIn('local changes', result['reason'])
+        self.assertEqual(self.git(self.checkout, 'rev-parse', 'HEAD'), self.old_head)
+        self.assertFalse((self.cache.parent / '1.1.0').exists())
+
+    def test_current_release_refresh_failure_remains_retryable(self):
+        (self.root / 'fail-refresh').touch()
+        result = autoupdate.run(force=True)
+        self.assertEqual(result['status'], 'skipped')
+        self.assertTrue(store.read_json(paths.path('state', 'autoupdate.json'))['pending_refresh']['refresh_only'])
+        (self.root / 'fail-refresh').unlink()
+        state = store.read_json(paths.path('state', 'autoupdate.json'))
+        state['checked'] = 0
+        store.write_json(paths.path('state', 'autoupdate.json'), state)
+        result = autoupdate.run()
+        self.assertEqual(result, {'status': 'current', 'refreshed': True})
+        self.assertEqual(autoupdate.notice(), '')
+        self.assertNotIn('pending_refresh', store.read_json(paths.path('state', 'autoupdate.json')))
+
+    def test_explicit_check_continues_past_pending_refresh_to_latest_release(self):
+        self.release()
+        (self.root / 'fail-refresh').touch()
+        self.assertEqual(autoupdate.run()['status'], 'skipped')
+        (self.root / 'fail-refresh').unlink()
+        (self.origin / '.codex-plugin' / 'plugin.json').write_text('{"name":"honey","version":"1.2.0"}')
+        (self.origin / 'honey' / '__init__.py').write_text('__version__ = "1.2.0"\n')
+        self.git(self.origin, 'add', '.codex-plugin/plugin.json', 'honey/__init__.py')
+        self.git(self.origin, 'commit', '-qm', 'third release')
+        self.git(self.origin, 'tag', 'v1.2.0')
+        result = autoupdate.run(force=True)
+        self.assertEqual(result.get('to'), '1.2.0', result)
+        self.assertEqual(self.git(self.checkout, 'rev-parse', 'HEAD'), self.git(self.origin, 'rev-parse', 'HEAD'))
+        self.assertEqual((self.cache.parent / '1.2.0' / 'installed-version').read_text(), '1.2.0')
 
     def test_feature_branch_is_not_reported_ready_when_release_is_current(self):
         self.git(self.checkout, 'switch', '-c', 'feature/local-work')

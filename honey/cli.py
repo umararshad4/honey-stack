@@ -48,8 +48,12 @@ def main(argv: list) -> int:
     if cmd == "statusline":
         return statusline()
     if cmd == "autoupdate":
+        import argparse
         from honey import autoupdate
-        print(json.dumps(autoupdate.run()))
+        parser = argparse.ArgumentParser(prog="honey autoupdate")
+        parser.add_argument("--now", action="store_true", help="check immediately instead of waiting for the hourly interval")
+        args = parser.parse_args(rest)
+        print(json.dumps(autoupdate.run(force=True) if args.now else autoupdate.run()))
         return 0
     if cmd in ("install", "uninstall", "sync", "update"):
         from honey import install

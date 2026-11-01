@@ -176,8 +176,11 @@ Personal preferences, instruction files, machine repairs, guards, session logs, 
 
 honey checks for updates at session start, at most once an hour. For local Git marketplaces it fetches the newest `vX.Y.Z` release tag reachable from `main`, fast-forwards the checkout, and refreshes the installed plugin copies. It leaves local changes, feature branches and diverged checkouts untouched, reporting them as skipped even when they already contain the latest release tag. If a plugin refresh fails, it retries on a later session; the update notice appears after the refresh succeeds. The new version loads in a subsequent session. Remote plugin marketplaces use the agent's own marketplace update commands and follow the marketplace's configured ref. Turn updates off with `{"autoupdate": false}` in `~/.honey/config.json`. Codex checks the installed plugin contents as well as hook commands. Any plugin update, including an evaluated skill patch, can require fresh review in `/hooks`; Honey does not approve changed plugin code automatically.
 
+For a one-time agent-assisted update and Honey-only hook review in Codex, say `update hooks` or `$honey update hooks`. This authorizes the agent to review and approve Honey for that run, check the release immediately, and report the result. It does not approve unrelated hooks or future releases.
+
 ```bash
 honey update                                   # update now; then /reload-plugins in Claude
+honey autoupdate --now                         # check release tags without waiting for the hourly interval
 honey uninstall --dry-run && honey uninstall   # keeps ~/.honey; add --purge to delete it
 ```
 

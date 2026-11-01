@@ -13,6 +13,7 @@ metadata:
 Router and mode switch for honey-stack.
 
 - **Mode words** (`direct`, `explain`, `balance`, `status`, `default direct`, …): apply them per the Modes section and reply with one status line.
+- **`update hooks`**: follow `references/update-hooks.md` for a one-time Honey release check and Codex hook review.
 - **A situation** ("I have a bug report and a half-written plan"): name the skill or flow that fits, say why in one line, then run it.
 - **Nothing**: show the main flow and the situation table below, trimmed to what fits the current repo.
 

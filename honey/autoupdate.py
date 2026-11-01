@@ -29,6 +29,11 @@ def _key(tag: str):
     return tuple(int(x) for x in RELEASE.match(tag).groups())
 
 
+def _release_tags(repo: str):
+    releases = sorted((t for t in _git(repo, "tag", "--list", "v*").stdout.split() if RELEASE.match(t)), key=_key)
+    return [t for t in releases if _git(repo, "merge-base", "--is-ancestor", t, "refs/remotes/origin/main").returncode == 0]
+
+
 def enabled() -> bool:
     if os.environ.get("HONEY_NO_AUTOUPDATE"):
         return False
@@ -51,8 +56,7 @@ def update_checkout(repo: str) -> dict:
         return {"status": "skipped", "reason": "not honey-stack's own git root"}  # a copy inside someone else's repo
     if _git(repo, "fetch", "--tags", "--quiet", "origin").returncode != 0:
         return {"status": "skipped", "reason": "fetch failed (offline?)"}
-    releases = sorted((t for t in _git(repo, "tag", "--list", "v*").stdout.split() if RELEASE.match(t)), key=_key)
-    releases = [t for t in releases if _git(repo, "merge-base", "--is-ancestor", t, "refs/remotes/origin/main").returncode == 0]
+    releases = _release_tags(repo)
     if not releases:
         return {"status": "skipped", "reason": "no release tags on origin/main"}
     newest = releases[-1]
@@ -202,19 +206,35 @@ def _refresh_local(source: str, pending: dict, agents: list) -> dict:
         if agent not in agents or not exe:
             return {"status": "skipped", "reason": f"{agent} local marketplace changed while refresh was pending"}
         cmd = ["plugin", "add", install.PLUGIN] if agent == "codex" else ["plugin", "update", install.PLUGIN]
-        if subprocess.run([exe, *cmd], capture_output=True, text=True, timeout=180, env=GIT_ENV).returncode != 0:
+        if subprocess.run([exe, *cmd], cwd=source, capture_output=True, text=True, timeout=180, env=GIT_ENV).returncode != 0:
             return {"status": "skipped", "reason": f"{agent} plugin refresh failed; will retry"}
     store.write_json(paths.path("synced.json"), {"ts": time.strftime("%Y%m%dT%H%M%S"),
                                                  "head": pending["head"], "source_repo": source})
     return {"status": "updated", "from": pending["from"], "to": pending["to"]}
 
 
-def run() -> dict:
-    """The detached job. Throttled, opt-out aware, and never raises into the session."""
+def run(force: bool = False) -> dict:
+    """Run at most one update check at a time, including explicit checks."""
     if not enabled():
         return {"status": "skipped", "reason": "autoupdate off"}
+    import fcntl
+    lock_path = paths.path("state", "autoupdate.lock")
+    try:
+        store.ensure_dir(os.path.dirname(lock_path))
+        with os.fdopen(os.open(lock_path, os.O_CREAT | os.O_RDWR, 0o600), "r+") as lock:
+            try:
+                fcntl.flock(lock.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                return {"status": "skipped", "reason": "update check already in progress"}
+            return _run(force)
+    except OSError as exc:
+        return {"status": "skipped", "reason": f"update lock failed: {exc}"}
+
+
+def _run(force: bool) -> dict:
+    """The detached job, serialized by run()."""
     state = store.read_json(_state_file(), {}) or {}
-    if time.time() - state.get("checked", 0) < CHECK_EVERY:
+    if not force and time.time() - state.get("checked", 0) < CHECK_EVERY:
         return {"status": "skipped", "reason": "checked recently"}
     state = dict(state, checked=time.time())
     store.write_json(_state_file(), state)  # stamp first so a crash cannot loop
@@ -230,26 +250,53 @@ def run() -> dict:
         else:
             source, agents = repo, []  # isolated checkout override used in tests
         pending = state.get("pending_refresh")
+        resumed = None
         if pending:
             if not source or source != pending["source"]:
                 result = {"status": "skipped", "reason": "local marketplace changed while plugin refresh was pending"}
             else:
                 result = _refresh_local(source, pending, agents)
-        elif not source:
-            result = _update_plugins(repo)
-        else:
-            result = update_checkout(source)
-            if result["status"] == "updated" and agents:
-                head = _git(source, "rev-parse", "HEAD").stdout.strip()
-                pending = dict(result, source=source, head=head, agents=agents)
-                state["pending_refresh"] = pending
-                store.write_json(_state_file(), state)  # survive interruption after checkout moves
-                result = _refresh_local(source, pending, agents)
+                if force and result["status"] == "updated":
+                    resumed = ({"status": "current", "refreshed": True} if pending.get("refresh_only") else result)
+                    state.pop("pending_refresh", None)
+                    store.write_json(_state_file(), state)
+                    pending = None
+        if not pending:
+            if not source:
+                result = _update_plugins(repo)
+            else:
+                result = update_checkout(source)
+                if result["status"] == "updated" and agents:
+                    head = _git(source, "rev-parse", "HEAD").stdout.strip()
+                    pending = dict(result, source=source, head=head, agents=agents)
+                    state["pending_refresh"] = pending
+                    store.write_json(_state_file(), state)  # survive interruption after checkout moves
+                    result = _refresh_local(source, pending, agents)
+                elif force and result["status"] == "current" and agents and not resumed:
+                    tags = _release_tags(source)
+                    tag = tags[-1] if tags else None
+                    head = _git(source, "rev-parse", "HEAD").stdout.strip()
+                    tagged = _git(source, "rev-parse", tag + "^{commit}").stdout.strip() if tag else ""
+                    manifest = store.read_json(os.path.join(source, ".codex-plugin", "plugin.json"), {}) or {}
+                    if not tag or not head or tagged != head or not isinstance(manifest, dict) or manifest.get("version") != tag[1:]:
+                        result = {"status": "skipped", "reason": "checkout is not at a matching release tag"}
+                    else:
+                        pending = {"source": source, "head": head,
+                                   "agents": agents, "from": tag[1:], "to": tag[1:], "refresh_only": True}
+                        state["pending_refresh"] = pending
+                        store.write_json(_state_file(), state)
+                        result = _refresh_local(source, pending, agents)
+                if resumed and result["status"] == "current":
+                    result = resumed
     except Exception as e:  # network, git or CLI trouble must never break a session
         result = {"status": "skipped", "reason": f"{type(e).__name__}: {e}"}
     state = dict(store.read_json(_state_file(), {}) or {}, last=result)
-    if result["status"] == "updated":
+    if result["status"] == "updated" and pending and pending.get("refresh_only"):
+        result = {"status": "current", "refreshed": True}
+        state["last"] = result
+    if result["status"] == "updated" or result.get("refreshed"):
         state.pop("pending_refresh", None)
+    if result["status"] == "updated":
         state["pending_notice"] = result
     store.write_json(_state_file(), state)
     return result
