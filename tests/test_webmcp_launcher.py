@@ -24,13 +24,20 @@ CORES = int(subprocess.run([NODE, "-p", "require('node:os').availableParallelism
                            capture_output=True, text=True).stdout) if NODE else 1
 
 BROWSER = """#!/usr/bin/env node
-import { chmodSync, mkdirSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 const profile = process.argv.find(a => a.startsWith('--user-data-dir=')).split('=').slice(1).join('=');
 const audit = { pid: process.pid, profile, argv: process.argv.slice(1) };
 const save = () => writeFileSync(join(process.env.HONEY_TEST_AUDIT, `${process.pid}.json`), JSON.stringify(audit));
 save();
-if (process.env.HONEY_TEST_BROWSER_FAIL === '1') process.exit(3);
+if (process.env.HONEY_TEST_BROWSER_FAIL === '1') {
+  if (process.env.HONEY_TEST_WAIT_RUNNER === '1') {
+    while (!existsSync(join(process.env.HONEY_TEST_AUDIT, 'runner-started'))) {
+      await new Promise(resolve => setTimeout(resolve, 5));
+    }
+  }
+  process.exit(3);
+}
 if (process.env.HONEY_TEST_LOCK === '1') {
   mkdirSync(join(profile, 'locked'));
   writeFileSync(join(profile, 'locked', 'file'), '');
@@ -60,6 +67,7 @@ process.on('SIGTERM', () => {
   record.terms += 1; record.terminated = true; save();
   setTimeout(() => process.exit(130), Number(process.env.HONEY_TEST_TERM_DELAY ?? 0));
 });
+writeFileSync(join(process.env.HONEY_TEST_AUDIT, 'runner-started'), '');
 const deadline = Date.now() + 5000;
 const poll = () => {
   if (files.length && files.every(f => existsSync(f) && readFileSync(f, 'utf8').startsWith('43210'))) {
@@ -129,7 +137,7 @@ class WebMCPLauncherTests(unittest.TestCase):
         self.assertEqual(list(self.tmp.glob("honey-webmcp-*")), [], "Owned profiles were not removed")
         return browsers
 
-    def run_launcher(self, *args, expect=0, **env):
+    def run_launcher(self, *args, expect=0, audit_optional=False, **env):
         started = time.monotonic()
         result = subprocess.run(
             [NODE, str(LAUNCHER), "run", *args], cwd=self.root,
@@ -142,7 +150,8 @@ class WebMCPLauncherTests(unittest.TestCase):
         else:
             self.assertEqual(result.returncode, expect, result.stderr)
         browsers = self.assert_cleaned_up()
-        runner = json.loads((self.audit / "e2e.json").read_text())
+        audit = self.audit / "e2e.json"
+        runner = None if audit_optional and not audit.exists() else json.loads(audit.read_text())
         return browsers, runner, result, finished_at, time.monotonic() - started
 
     def test_completed_browser_does_not_wait_for_unused_shutdown_deadline(self):
@@ -184,8 +193,18 @@ class WebMCPLauncherTests(unittest.TestCase):
 
     def test_browser_startup_failure_stops_the_run(self):
         _, runner, result, _, elapsed = self.run_launcher(
-            "--workers", "1", expect=None, HONEY_TEST_BROWSER_FAIL="1")
+            "--workers", "1", expect=None, HONEY_TEST_BROWSER_FAIL="1", HONEY_TEST_WAIT_RUNNER="1")
         self.assertTrue(runner.get("terminated"), "e2e kept waiting for a browser that had exited")
+        self.assertLess(elapsed, 4)
+        self.assertIn("WebMCP browser stopped", result.stderr)
+
+    def test_browser_failure_before_runner_audit_still_cleans_up(self):
+        # Model a runner terminated before it can initialize its audit writer.
+        (self.root / "node_modules/e2e/cli.cjs").write_text(
+            "process.on('SIGTERM', () => process.exit(143)); setInterval(() => {}, 10000);\n")
+        _, runner, result, _, elapsed = self.run_launcher(
+            "--workers", "1", expect=None, audit_optional=True, HONEY_TEST_BROWSER_FAIL="1")
+        self.assertIsNone(runner)
         self.assertLess(elapsed, 4)
         self.assertIn("WebMCP browser stopped", result.stderr)
 
