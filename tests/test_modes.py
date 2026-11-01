@@ -71,6 +71,12 @@ class ResponseModes(unittest.TestCase):
                 self.assertNotIn('scope=', output)
                 self.assertNotIn('process=', output)
 
+    def test_bootstrap_routes_update_hooks_even_when_hooks_are_unverified(self):
+        output = self.cli('bootstrap', '--agent', 'codex', '--session', 'missing')
+        self.assertIn('hooks unverified', output)
+        self.assertIn('update hooks', output)
+        self.assertIn('skills/honey/references/update-hooks.md', output)
+
     def test_existing_session_choice_wins_over_the_global_default(self):
         (self.home / 'config.json').write_text('{"mode":"explain"}')
         state = self.home / 'state/sessions/claude-legacy.json'

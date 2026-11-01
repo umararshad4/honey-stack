@@ -10,6 +10,15 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+### Changed
+- QA now defaults to the tester-army/e2e CLI and project MCP workflow, with complete upstream command references and focused, cache-aware reruns.
+- Browser QA and verification discover WebMCP tools, with a same-session e2e adapter, isolated Chromium runner, explicit fallback and independent UI-proof requirements.
+- QA replaces eligible setup with WebMCP, reuses verified sessions and tests, and limits separate contract checks to relevant work. Speed comparisons require matched workloads and repeated runs.
+- QA can batch reviewed same-page WebMCP setup calls, builds complete case matrices before running, and avoids duplicate setup screenshots while retaining failure evidence.
+- Fast QA uses native e2e reports, bounded isolated workers and deliberate tracing, and avoids polling values already read after confirmed readiness.
+- WebMCP's browser launcher cancels its unused shutdown timer instead of adding two seconds of idle exit time. Fast QA distinguishes current-state assertions from negation stability windows and balances file/target units before adding workers.
+- WebMCP QA runs on Playwright's headless Chromium build and automation switches, starts e2e while its browsers boot, gives each worker its own browser through an e2e browser provider, and enables Node's compile cache. The matched 24-case run is about 3.3x faster than the previous WebMCP flow.
+
 ## [0.15.0] - 2026-10-31
 
 ### Changed

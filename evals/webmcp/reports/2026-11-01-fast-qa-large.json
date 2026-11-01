@@ -1,0 +1,982 @@
+{
+ "scope": "6 setup-heavy behaviors x 2 viewports; x1 seeds 204 and x4 seeds 816 records per run; acceptance actions identical across workflows; 1 excluded warm-up + 5 rotated rounds, 5s untimed cool-down",
+ "evidence_root": "/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH",
+ "tiers": {
+  "x1": {
+   "summary": {
+    "older": {
+     "n": 5,
+     "median": 17.2838706659968,
+     "min": 17.197588541021105,
+     "max": 17.47811399999773,
+     "cpu_median": 10.220312999999983,
+     "qualified": 5
+    },
+    "e2e_only": {
+     "n": 5,
+     "median": 7.0373015840305015,
+     "min": 6.809903249959461,
+     "max": 7.450235500000417,
+     "cpu_median": 21.838092000000003,
+     "qualified": 5
+    },
+    "webmcp_v2": {
+     "n": 5,
+     "median": 6.30611870798748,
+     "min": 5.953413166978862,
+     "max": 6.699708957981784,
+     "cpu_median": 20.036008000000002,
+     "qualified": 5
+    },
+    "webmcp_v3": {
+     "n": 5,
+     "median": 2.40298775001429,
+     "min": 2.27141520899022,
+     "max": 2.479147667007055,
+     "cpu_median": 9.650149999999996,
+     "qualified": 5
+    }
+   },
+   "results": [
+    {
+     "round": 0,
+     "mode": "older",
+     "seconds": 17.2838706659968,
+     "cpu_seconds": 9.73583,
+     "load_before": [
+      4.09619140625,
+      3.42724609375,
+      3.0703125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/0-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 0,
+     "mode": "e2e_only",
+     "seconds": 7.044318416039459,
+     "cpu_seconds": 21.838092000000003,
+     "load_before": [
+      3.7734375,
+      3.3798828125,
+      3.0576171875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/0-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 0,
+     "mode": "webmcp_v2",
+     "seconds": 6.699708957981784,
+     "cpu_seconds": 20.283417999999994,
+     "load_before": [
+      4.72802734375,
+      3.59326171875,
+      3.13818359375
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/0-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 0,
+     "mode": "webmcp_v3",
+     "seconds": 2.45463416603161,
+     "cpu_seconds": 9.859762999999997,
+     "load_before": [
+      4.98974609375,
+      3.666015625,
+      3.16650390625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/0-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 1,
+     "mode": "e2e_only",
+     "seconds": 7.0373015840305015,
+     "cpu_seconds": 21.97052,
+     "load_before": [
+      5.00341796875,
+      3.7099609375,
+      3.18798828125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/1-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 1,
+     "mode": "webmcp_v2",
+     "seconds": 5.9608193329768255,
+     "cpu_seconds": 20.036008000000002,
+     "load_before": [
+      4.40478515625,
+      3.64111328125,
+      3.171875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/1-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 1,
+     "mode": "webmcp_v3",
+     "seconds": 2.40298775001429,
+     "cpu_seconds": 9.650149999999996,
+     "load_before": [
+      4.4521484375,
+      3.66357421875,
+      3.18212890625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/1-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 1,
+     "mode": "older",
+     "seconds": 17.210840374988038,
+     "cpu_seconds": 10.233482000000002,
+     "load_before": [
+      4.03271484375,
+      3.62548828125,
+      3.1806640625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/1-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 2,
+     "mode": "webmcp_v2",
+     "seconds": 5.953413166978862,
+     "cpu_seconds": 19.72957200000001,
+     "load_before": [
+      4.1875,
+      3.67041015625,
+      3.201171875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/2-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 2,
+     "mode": "webmcp_v3",
+     "seconds": 2.479147667007055,
+     "cpu_seconds": 9.859748999999994,
+     "load_before": [
+      4.25244140625,
+      3.6923828125,
+      3.21142578125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/2-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 2,
+     "mode": "older",
+     "seconds": 17.197588541021105,
+     "cpu_seconds": 10.163322000000008,
+     "load_before": [
+      3.91259765625,
+      3.65283203125,
+      3.2099609375
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/2-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 2,
+     "mode": "e2e_only",
+     "seconds": 6.809903249959461,
+     "cpu_seconds": 21.326068999999983,
+     "load_before": [
+      3.5380859375,
+      3.5810546875,
+      3.189453125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/2-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 3,
+     "mode": "webmcp_v3",
+     "seconds": 2.27141520899022,
+     "cpu_seconds": 9.528994000000019,
+     "load_before": [
+      4.57568359375,
+      3.7939453125,
+      3.2685546875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/3-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 3,
+     "mode": "older",
+     "seconds": 17.436097124998923,
+     "cpu_seconds": 10.220312999999983,
+     "load_before": [
+      3.86181640625,
+      3.67822265625,
+      3.23779296875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/3-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 3,
+     "mode": "e2e_only",
+     "seconds": 7.450235500000417,
+     "cpu_seconds": 22.184636999999995,
+     "load_before": [
+      3.56201171875,
+      3.62158203125,
+      3.22314453125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/3-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 3,
+     "mode": "webmcp_v2",
+     "seconds": 6.4733631670242175,
+     "cpu_seconds": 20.451346,
+     "load_before": [
+      4.18798828125,
+      3.75390625,
+      3.27734375
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/3-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 4,
+     "mode": "older",
+     "seconds": 17.47811399999773,
+     "cpu_seconds": 10.290081,
+     "load_before": [
+      3.85498046875,
+      3.7041015625,
+      3.26953125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/4-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 4,
+     "mode": "e2e_only",
+     "seconds": 6.881978749996051,
+     "cpu_seconds": 21.01690800000003,
+     "load_before": [
+      4.09423828125,
+      3.76611328125,
+      3.298828125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/4-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 204
+    },
+    {
+     "round": 4,
+     "mode": "webmcp_v2",
+     "seconds": 6.30611870798748,
+     "cpu_seconds": 20.000355999999982,
+     "load_before": [
+      4.00537109375,
+      3.7568359375,
+      3.30078125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/4-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    },
+    {
+     "round": 4,
+     "mode": "webmcp_v3",
+     "seconds": 2.30485666700406,
+     "cpu_seconds": 9.439217999999997,
+     "load_before": [
+      3.6845703125,
+      3.6943359375,
+      3.28125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x1/4-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 204,
+     "records_seeded": 204
+    }
+   ]
+  },
+  "x4": {
+   "summary": {
+    "older": {
+     "n": 5,
+     "median": 58.02528362500016,
+     "min": 57.98465004202444,
+     "max": 58.25945737498114,
+     "cpu_median": 30.901023000000052,
+     "qualified": 5
+    },
+    "e2e_only": {
+     "n": 5,
+     "median": 21.10557570902165,
+     "min": 20.165121917030774,
+     "max": 21.80708445800701,
+     "cpu_median": 57.14750000000002,
+     "qualified": 5
+    },
+    "webmcp_v2": {
+     "n": 5,
+     "median": 6.751973583013751,
+     "min": 6.288592334021814,
+     "max": 6.846146250027232,
+     "cpu_median": 21.088651999999968,
+     "qualified": 5
+    },
+    "webmcp_v3": {
+     "n": 5,
+     "median": 2.6738824589992873,
+     "min": 2.5646211249986663,
+     "max": 2.746061292011291,
+     "cpu_median": 11.034343999999948,
+     "qualified": 5
+    }
+   },
+   "results": [
+    {
+     "round": 0,
+     "mode": "older",
+     "seconds": 57.98465004202444,
+     "cpu_seconds": 31.024972999999996,
+     "load_before": [
+      3.22119140625,
+      3.87451171875,
+      3.4580078125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/0-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 0,
+     "mode": "e2e_only",
+     "seconds": 21.687412875005975,
+     "cpu_seconds": 60.23330199999999,
+     "load_before": [
+      3.50146484375,
+      3.87158203125,
+      3.466796875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/0-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 0,
+     "mode": "webmcp_v2",
+     "seconds": 6.568065791972913,
+     "cpu_seconds": 21.070234999999997,
+     "load_before": [
+      3.92333984375,
+      3.94287109375,
+      3.4990234375
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/0-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 0,
+     "mode": "webmcp_v3",
+     "seconds": 2.637233915971592,
+     "cpu_seconds": 11.027839999999998,
+     "load_before": [
+      3.60888671875,
+      3.876953125,
+      3.478515625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/0-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 1,
+     "mode": "e2e_only",
+     "seconds": 21.10557570902165,
+     "cpu_seconds": 57.14750000000002,
+     "load_before": [
+      3.705078125,
+      3.87158203125,
+      3.4873046875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/1-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 1,
+     "mode": "webmcp_v2",
+     "seconds": 6.288592334021814,
+     "cpu_seconds": 21.168044999999992,
+     "load_before": [
+      3.80029296875,
+      3.87841796875,
+      3.49609375
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/1-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 1,
+     "mode": "webmcp_v3",
+     "seconds": 2.7254114999668673,
+     "cpu_seconds": 11.124234000000001,
+     "load_before": [
+      3.73583984375,
+      3.86376953125,
+      3.4931640625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/1-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 1,
+     "mode": "older",
+     "seconds": 58.02528362500016,
+     "cpu_seconds": 31.043858999999983,
+     "load_before": [
+      3.744140625,
+      3.83154296875,
+      3.505859375
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/1-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 2,
+     "mode": "webmcp_v2",
+     "seconds": 6.846146250027232,
+     "cpu_seconds": 21.05588300000001,
+     "load_before": [
+      4.12255859375,
+      3.90380859375,
+      3.53466796875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/2-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 2,
+     "mode": "webmcp_v3",
+     "seconds": 2.746061292011291,
+     "cpu_seconds": 11.129674999999978,
+     "load_before": [
+      3.869140625,
+      3.85693359375,
+      3.52197265625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/2-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 2,
+     "mode": "older",
+     "seconds": 57.989478458999656,
+     "cpu_seconds": 30.901023000000052,
+     "load_before": [
+      3.1806640625,
+      3.6669921875,
+      3.47265625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/2-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 2,
+     "mode": "e2e_only",
+     "seconds": 20.165121917030774,
+     "cpu_seconds": 54.528347,
+     "load_before": [
+      3.076171875,
+      3.6103515625,
+      3.4580078125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/2-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 3,
+     "mode": "webmcp_v3",
+     "seconds": 2.5646211249986663,
+     "cpu_seconds": 10.681977999999972,
+     "load_before": [
+      3.3232421875,
+      3.640625,
+      3.4697265625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/3-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 3,
+     "mode": "older",
+     "seconds": 58.25546174996998,
+     "cpu_seconds": 30.434640000000016,
+     "load_before": [
+      3.22802734375,
+      3.54052734375,
+      3.4404296875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/3-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 3,
+     "mode": "e2e_only",
+     "seconds": 21.80708445800701,
+     "cpu_seconds": 59.32870299999999,
+     "load_before": [
+      5.96630859375,
+      4.2109375,
+      3.68798828125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/3-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 3,
+     "mode": "webmcp_v2",
+     "seconds": 6.770937499997672,
+     "cpu_seconds": 21.088651999999968,
+     "load_before": [
+      5.5224609375,
+      4.1708984375,
+      3.67919921875
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/3-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 4,
+     "mode": "older",
+     "seconds": 58.25945737498114,
+     "cpu_seconds": 30.63343000000006,
+     "load_before": [
+      3.72216796875,
+      3.87060546875,
+      3.59814453125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-compat.mjs",
+      "tests/qa-large.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/4-older",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 4,
+     "mode": "e2e_only",
+     "seconds": 20.6135763329803,
+     "cpu_seconds": 54.950079999999986,
+     "load_before": [
+      3.49658203125,
+      3.80078125,
+      3.57958984375
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/4-e2e_only",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 0,
+     "records_seeded": 816
+    },
+    {
+     "round": 4,
+     "mode": "webmcp_v2",
+     "seconds": 6.751973583013751,
+     "cpu_seconds": 21.270834000000008,
+     "load_before": [
+      4.060546875,
+      3.90673828125,
+      3.61962890625
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/launcher-v2.mjs",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/4-webmcp_v2",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    },
+    {
+     "round": 4,
+     "mode": "webmcp_v3",
+     "seconds": 2.6738824589992873,
+     "cpu_seconds": 11.034343999999948,
+     "load_before": [
+      4.470703125,
+      3.9931640625,
+      3.65283203125
+     ],
+     "command": [
+      "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+      "tests/run-suite.mjs"
+     ],
+     "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-v3-xWPDTH/large-x4/4-webmcp_v3",
+     "qualified": true,
+     "problems": [],
+     "cases": 12,
+     "passed": 12,
+     "native_calls": 816,
+     "records_seeded": 816
+    }
+   ]
+  }
+ }
+}

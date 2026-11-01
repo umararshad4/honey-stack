@@ -1,0 +1,347 @@
+{
+  "summary": {
+    "older": {
+      "median": 14.222389916016255,
+      "min": 14.152241249976214,
+      "max": 14.409994499990717,
+      "runs": 5
+    },
+    "e2e": {
+      "median": 13.210932250018232,
+      "min": 12.92057079199003,
+      "max": 13.2836334159947,
+      "runs": 5
+    },
+    "fast": {
+      "median": 12.85595724999439,
+      "min": 12.738178958010394,
+      "max": 13.2446627090103,
+      "runs": 5
+    }
+  },
+  "measurements": [
+    {
+      "pair": 0,
+      "mode": "older",
+      "seconds": 14.222389916016255,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 1,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/0-older"
+    },
+    {
+      "pair": 0,
+      "mode": "fast",
+      "seconds": 12.85595724999439,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/0-fast"
+    },
+    {
+      "pair": 1,
+      "mode": "fast",
+      "seconds": 12.739881584013347,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/1-fast"
+    },
+    {
+      "pair": 1,
+      "mode": "older",
+      "seconds": 14.300491333007812,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 1,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/1-older"
+    },
+    {
+      "pair": 2,
+      "mode": "older",
+      "seconds": 14.152241249976214,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 1,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/2-older"
+    },
+    {
+      "pair": 2,
+      "mode": "fast",
+      "seconds": 12.738178958010394,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/2-fast"
+    },
+    {
+      "pair": 3,
+      "mode": "fast",
+      "seconds": 12.967977208958473,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/3-fast"
+    },
+    {
+      "pair": 3,
+      "mode": "older",
+      "seconds": 14.168664500000887,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 1,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/3-older"
+    },
+    {
+      "pair": 4,
+      "mode": "older",
+      "seconds": 14.409994499990717,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 1,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/4-older"
+    },
+    {
+      "pair": 4,
+      "mode": "fast",
+      "seconds": 13.2446627090103,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/4-fast"
+    },
+    {
+      "pair": 0,
+      "mode": "e2e",
+      "seconds": 13.2836334159947,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/0-e2e"
+    },
+    {
+      "pair": 1,
+      "mode": "e2e",
+      "seconds": 12.973826000001281,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/1-e2e"
+    },
+    {
+      "pair": 2,
+      "mode": "e2e",
+      "seconds": 12.92057079199003,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/2-e2e"
+    },
+    {
+      "pair": 3,
+      "mode": "e2e",
+      "seconds": 13.23689291701885,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/3-e2e"
+    },
+    {
+      "pair": 4,
+      "mode": "e2e",
+      "seconds": 13.210932250018232,
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "workers": 4,
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz/measurements/4-e2e"
+    }
+  ],
+  "audit": [
+    {
+      "mode": "older",
+      "pair": 0,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "fast",
+      "pair": 0,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 6,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "fast",
+      "pair": 1,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 6,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "older",
+      "pair": 1,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "older",
+      "pair": 2,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "fast",
+      "pair": 2,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 6,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "fast",
+      "pair": 3,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 6,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "older",
+      "pair": 3,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "older",
+      "pair": 4,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "fast",
+      "pair": 4,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 6,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "e2e",
+      "pair": 0,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "e2e",
+      "pair": 1,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "e2e",
+      "pair": 2,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "e2e",
+      "pair": 3,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    },
+    {
+      "mode": "e2e",
+      "pair": 4,
+      "cases": 24,
+      "pass": 11,
+      "expected_fail": 13,
+      "missing_or_unexpected": 0,
+      "native_tool_calls": 0,
+      "failure_pngs_verified": true
+    }
+  ],
+  "source_sha256": {
+    "older/tests/qa.mjs": "5e3f836b4baf0a0d86a65498c647e0ca8bbebd3f14584c9a2f2d638f09a6513d",
+    "fast/tests/create.e2e.ts": "ac1e1fdcc3e73f3124a8c8deddad0079c6f247898b755636993ec9981b5ed82d",
+    "fast/tests/interactions.e2e.ts": "3244d970661622595c64303738bf62403fbc6c1a01557ab76a04e09e8936309b",
+    "fast/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+    "fast/tests/normalize.mjs": "1ca7812da7c711d4b594c1ae4d6dff2264c8ead5debc0012781c9d3bea23ff80",
+    "fast/tests/validation.e2e.ts": "20ee0f8858d8dba727d572653d2e7ff2553d5a058366cfefe73d4e012e7b039e",
+    "fast/tests/cases.ts": "3bcb1d8749b80bfb0732ce919fb11cf74bf71b605811779596102ef96b3e20a5",
+    "fast/tests/run-suite.mjs": "9950e2a6dbb8196d1fb7bea8aba81f62d871ab7a7032c6f13dd1a8b356d7b48f",
+    "fast/tests/persistence.e2e.ts": "243663e795870b0e0bfbcd284e3b0c31707235bc9f76c832df9691d8b4c7000d",
+    "e2e/tests/create.e2e.ts": "ac1e1fdcc3e73f3124a8c8deddad0079c6f247898b755636993ec9981b5ed82d",
+    "e2e/tests/interactions.e2e.ts": "3244d970661622595c64303738bf62403fbc6c1a01557ab76a04e09e8936309b",
+    "e2e/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+    "e2e/tests/normalize.mjs": "a66abbdff4dc18d5f184edd9bd5d1245da975e79be7c4c72d3dcdce5378972e5",
+    "e2e/tests/validation.e2e.ts": "20ee0f8858d8dba727d572653d2e7ff2553d5a058366cfefe73d4e012e7b039e",
+    "e2e/tests/cases.ts": "6edbd828c76d19fa1926a3b8cc80a0859e10a1a9cb16d2c3c0fa0fa18ef9af56",
+    "e2e/tests/run-suite.mjs": "9950e2a6dbb8196d1fb7bea8aba81f62d871ab7a7032c6f13dd1a8b356d7b48f",
+    "e2e/tests/persistence.e2e.ts": "243663e795870b0e0bfbcd284e3b0c31707235bc9f76c832df9691d8b4c7000d"
+  },
+  "artifact_root": "/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-speed-fix-bpls2_jz",
+  "ordering": "Older/WebMCP alternating paired runs first; e2e-only control afterward. One excluded warm-up per mode."
+}

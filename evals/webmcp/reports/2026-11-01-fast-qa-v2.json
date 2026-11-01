@@ -1,0 +1,596 @@
+{
+  "summary": {
+    "older": {
+      "n": 5,
+      "median": 13.728245292033534,
+      "min": 13.68014004197903,
+      "max": 13.842302208009642,
+      "p95_nearest_rank": 13.842302208009642,
+      "p99_nearest_rank": 13.842302208009642,
+      "qualified": 5
+    },
+    "e2e": {
+      "n": 5,
+      "median": 11.124082792026456,
+      "min": 10.868679874984082,
+      "max": 11.316319250036031,
+      "p95_nearest_rank": 11.316319250036031,
+      "p99_nearest_rank": 11.316319250036031,
+      "qualified": 5
+    },
+    "previous_webmcp": {
+      "n": 5,
+      "median": 10.710113874985836,
+      "min": 10.513875667005777,
+      "max": 11.054059416987002,
+      "p95_nearest_rank": 11.054059416987002,
+      "p99_nearest_rank": 11.054059416987002,
+      "qualified": 4
+    },
+    "webmcp": {
+      "n": 5,
+      "median": 9.968198458023835,
+      "min": 9.873326583008748,
+      "max": 10.34381058398867,
+      "p95_nearest_rank": 10.34381058398867,
+      "p99_nearest_rank": 10.34381058398867,
+      "qualified": 5
+    }
+  },
+  "manifest": {
+    "node": "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+    "node_version": "v24.18.0",
+    "url": "http://127.0.0.1:57860",
+    "launcher_sha256": "78ab0531b723cc690c7cb1ec8bec6e12c8dbfb8b27993b0275cb9b7724ff8c11",
+    "sampling": "one excluded warmup and 5 rotated-order measured runs per mode",
+    "modes": {
+      "older": {
+        "workers": 1,
+        "directory": "older"
+      },
+      "e2e": {
+        "workers": 4,
+        "directory": "e2e"
+      },
+      "previous_webmcp": {
+        "workers": 4,
+        "directory": "previous"
+      },
+      "webmcp": {
+        "workers": 4,
+        "directory": "grouped"
+      }
+    },
+    "source_sha256": {
+      "older/e2e.config.ts": "884cbfcaa59c2b4cca4eff63c7228006d10b2926af8fef46f7a765729a599e8f",
+      "older/tests/qa.mjs": "5e3f836b4baf0a0d86a65498c647e0ca8bbebd3f14584c9a2f2d638f09a6513d",
+      "e2e/e2e.config.ts": "884cbfcaa59c2b4cca4eff63c7228006d10b2926af8fef46f7a765729a599e8f",
+      "e2e/tests/create.e2e.ts": "ac1e1fdcc3e73f3124a8c8deddad0079c6f247898b755636993ec9981b5ed82d",
+      "e2e/tests/interactions.e2e.ts": "3244d970661622595c64303738bf62403fbc6c1a01557ab76a04e09e8936309b",
+      "e2e/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+      "e2e/tests/normalize.mjs": "a66abbdff4dc18d5f184edd9bd5d1245da975e79be7c4c72d3dcdce5378972e5",
+      "e2e/tests/validation.e2e.ts": "20ee0f8858d8dba727d572653d2e7ff2553d5a058366cfefe73d4e012e7b039e",
+      "e2e/tests/cases.ts": "6edbd828c76d19fa1926a3b8cc80a0859e10a1a9cb16d2c3c0fa0fa18ef9af56",
+      "e2e/tests/run-suite.mjs": "9950e2a6dbb8196d1fb7bea8aba81f62d871ab7a7032c6f13dd1a8b356d7b48f",
+      "e2e/tests/persistence.e2e.ts": "243663e795870b0e0bfbcd284e3b0c31707235bc9f76c832df9691d8b4c7000d",
+      "previous/e2e.config.ts": "884cbfcaa59c2b4cca4eff63c7228006d10b2926af8fef46f7a765729a599e8f",
+      "previous/tests/create.e2e.ts": "ac1e1fdcc3e73f3124a8c8deddad0079c6f247898b755636993ec9981b5ed82d",
+      "previous/tests/interactions.e2e.ts": "3244d970661622595c64303738bf62403fbc6c1a01557ab76a04e09e8936309b",
+      "previous/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+      "previous/tests/normalize.mjs": "1ca7812da7c711d4b594c1ae4d6dff2264c8ead5debc0012781c9d3bea23ff80",
+      "previous/tests/validation.e2e.ts": "20ee0f8858d8dba727d572653d2e7ff2553d5a058366cfefe73d4e012e7b039e",
+      "previous/tests/cases.ts": "3bcb1d8749b80bfb0732ce919fb11cf74bf71b605811779596102ef96b3e20a5",
+      "previous/tests/run-suite.mjs": "9950e2a6dbb8196d1fb7bea8aba81f62d871ab7a7032c6f13dd1a8b356d7b48f",
+      "previous/tests/persistence.e2e.ts": "243663e795870b0e0bfbcd284e3b0c31707235bc9f76c832df9691d8b4c7000d",
+      "grouped/e2e.config.ts": "884cbfcaa59c2b4cca4eff63c7228006d10b2926af8fef46f7a765729a599e8f",
+      "grouped/tests/task-lifecycle.e2e.ts": "78a7f2b2e935a9ebd34aedb40eebb2535c065eb1e94a5858a7479c703bbf993f",
+      "grouped/tests/probe.observation.ts": "7f0ec5d070697a3340e5a2533d96aa98bcaf49e3bdf6fa559f7bbf5b2383d48a",
+      "grouped/tests/normalize.mjs": "1ca7812da7c711d4b594c1ae4d6dff2264c8ead5debc0012781c9d3bea23ff80",
+      "grouped/tests/cases.ts": "4e75b0f28e8a3b5b9175cbfdd386e2d2d9c49d329a15a4b1d2a15d2b7325b3b9",
+      "grouped/tests/run-suite.mjs": "9950e2a6dbb8196d1fb7bea8aba81f62d871ab7a7032c6f13dd1a8b356d7b48f",
+      "grouped/tests/forms-and-search.e2e.ts": "aef146756d7ce8292326dcdf7ab61efa26ab9944aebe482424bec889281bbb05"
+    }
+  },
+  "runs": [
+    {
+      "round": 0,
+      "mode": "older",
+      "seconds": 13.728245292033534,
+      "exit_code": 1,
+      "workers": 1,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/qa.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/0-older",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 0,
+      "mode": "e2e",
+      "seconds": 11.316319250036031,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/0-e2e",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 0,
+      "mode": "previous_webmcp",
+      "seconds": 10.513875667005777,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/0-previous_webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 0,
+      "mode": "webmcp",
+      "seconds": 10.34381058398867,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/0-webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 1,
+      "mode": "e2e",
+      "seconds": 11.165332249947824,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/1-e2e",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 1,
+      "mode": "previous_webmcp",
+      "seconds": 10.58087812497979,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/1-previous_webmcp",
+      "qualified": false,
+      "problems": [
+        "Failure identities differ: [('C07', 'desktop')]",
+        "Pass count differs",
+        "C07-desktop: missing toggle witness"
+      ],
+      "cases": 24,
+      "passed": 10,
+      "failed": 14,
+      "known_defect_groups": null,
+      "native_calls": 6,
+      "failure_pngs": 14
+    },
+    {
+      "round": 1,
+      "mode": "webmcp",
+      "seconds": 9.873326583008748,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/1-webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 1,
+      "mode": "older",
+      "seconds": 13.680542584042996,
+      "exit_code": 1,
+      "workers": 1,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/qa.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/1-older",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 2,
+      "mode": "previous_webmcp",
+      "seconds": 11.054059416987002,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/2-previous_webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 2,
+      "mode": "webmcp",
+      "seconds": 10.295597999996971,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/2-webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 2,
+      "mode": "older",
+      "seconds": 13.746979499992449,
+      "exit_code": 1,
+      "workers": 1,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/qa.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/2-older",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 2,
+      "mode": "e2e",
+      "seconds": 11.124082792026456,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/2-e2e",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 3,
+      "mode": "webmcp",
+      "seconds": 9.968198458023835,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/3-webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 3,
+      "mode": "older",
+      "seconds": 13.68014004197903,
+      "exit_code": 1,
+      "workers": 1,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/qa.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/3-older",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 3,
+      "mode": "e2e",
+      "seconds": 10.977109125000425,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/3-e2e",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 3,
+      "mode": "previous_webmcp",
+      "seconds": 10.841967707965523,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/3-previous_webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 4,
+      "mode": "older",
+      "seconds": 13.842302208009642,
+      "exit_code": 1,
+      "workers": 1,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/qa.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/4-older",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 4,
+      "mode": "e2e",
+      "seconds": 10.868679874984082,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/4-e2e",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 0,
+      "failure_pngs": 13
+    },
+    {
+      "round": 4,
+      "mode": "previous_webmcp",
+      "seconds": 10.710113874985836,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/4-previous_webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    },
+    {
+      "round": 4,
+      "mode": "webmcp",
+      "seconds": 9.925540582975373,
+      "exit_code": 1,
+      "workers": 4,
+      "command": [
+        "/Users/m1pro/.vite-plus/js_runtime/node/24.18.0/bin/node",
+        "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/launcher-fixed.mjs",
+        "tests/run-suite.mjs"
+      ],
+      "evidence": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g/comparison/4-webmcp",
+      "qualified": true,
+      "problems": [],
+      "cases": 24,
+      "passed": 11,
+      "failed": 13,
+      "known_defect_groups": 6,
+      "native_calls": 6,
+      "failure_pngs": 13
+    }
+  ],
+  "false_alarms": {
+    "older": 0,
+    "e2e": 0,
+    "previous_webmcp": 1,
+    "webmcp": 0
+  },
+  "artifact_root": "/private/var/folders/66/kk0psrmd69g4rphqdcc33tsh0000gn/T/honey-qa-next-97rmz39g",
+  "shipped_launcher_checks": [
+    {
+      "name": "native",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--output",
+        "/Users/m1pro/.t3/worktrees/honey-stack/t3-c014188e/evals/webmcp/.e2e/shipped-verification/native"
+      ],
+      "exit_code": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 4,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "path": "/Users/m1pro/.t3/worktrees/honey-stack/t3-c014188e/evals/webmcp/.e2e/shipped-verification/native"
+    },
+    {
+      "name": "fallback",
+      "command": [
+        "npm",
+        "run",
+        "test:fallback",
+        "--",
+        "--output",
+        "/Users/m1pro/.t3/worktrees/honey-stack/t3-c014188e/evals/webmcp/.e2e/shipped-verification/fallback"
+      ],
+      "exit_code": 0,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 2,
+        "passed": 2,
+        "failed": 0,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 2
+      },
+      "path": "/Users/m1pro/.t3/worktrees/honey-stack/t3-c014188e/evals/webmcp/.e2e/shipped-verification/fallback"
+    },
+    {
+      "name": "broken-ui",
+      "command": [
+        "npm",
+        "test",
+        "--",
+        "--output",
+        "/Users/m1pro/.t3/worktrees/honey-stack/t3-c014188e/evals/webmcp/.e2e/shipped-verification/broken-ui"
+      ],
+      "exit_code": 1,
+      "summary": {
+        "discovered": 4,
+        "selected": 4,
+        "executed": 4,
+        "passed": 3,
+        "failed": 1,
+        "interrupted": 0,
+        "flaky": 0,
+        "skipped": 0
+      },
+      "path": "/Users/m1pro/.t3/worktrees/honey-stack/t3-c014188e/evals/webmcp/.e2e/shipped-verification/broken-ui"
+    }
+  ]
+}
