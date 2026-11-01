@@ -4,6 +4,7 @@
   "scripts": {
     "test": "node ../../skills/qa/assets/webmcp/run.mjs run --target webmcp --retries 0",
     "test:fallback": "e2e run smoke.e2e.ts --target ordinary --retries 0",
+    "test:delta": "e2e run --config e2e.delta.config.ts --retries 0",
     "benchmark": "node benchmark/run.mjs"
   },
   "devDependencies": {

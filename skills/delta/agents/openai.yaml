@@ -1,0 +1,5 @@
+interface:
+  display_name: "delta"
+  short_description: "Read Delta history and preserve handoff references"
+policy:
+  allow_implicit_invocation: false

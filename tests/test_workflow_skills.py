@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ENTRY_POINTS = ("project-verify", "triage", "research", "statechart")
+ENTRY_POINTS = ("project-verify", "triage", "research", "statechart", "delta")
 
 
 class WorkflowSkills(unittest.TestCase):
@@ -40,6 +40,13 @@ class WorkflowSkills(unittest.TestCase):
                         continue
                     with self.subTest(source=str(path), target=target):
                         self.assertTrue((path.parent / target.split("#")[0]).exists())
+
+    def test_delta_handoff_preserves_the_local_summary_and_explicit_reference(self):
+        handoff = (ROOT / "skills/handoff/SKILL.md").read_text()
+        self.assertIn("../delta/SKILL.md", handoff)
+        self.assertIn("honey delta read", (ROOT / "skills/delta/SKILL.md").read_text())
+        self.assertIn("local handoff", handoff)
+        self.assertIn("supplied", handoff)
 
 
 if __name__ == "__main__":

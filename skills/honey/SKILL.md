@@ -62,6 +62,7 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Behavior, setup, commands, or APIs changed; docs drift | `docs` |
 | Text reads like AI wrote it; tighten a message, post, prompt or doc | `unslop` |
 | Thread is long or branching; carry state to a fresh session | `handoff` |
+| Explicitly recall Delta history, configure capture, or attach history to a handoff | `delta` |
 | Codebase hard to change or test; deepen modules, find seams | `architecture` |
 | Name the domain terms, keep `CONTEXT.md` and ADRs | `domain` |
 | Learn a concept over several sessions | `teach` |
