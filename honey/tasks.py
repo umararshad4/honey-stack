@@ -15,13 +15,22 @@ from honey.rsi import signals, store, text
 CHECKS = {'code': ['verification'], 'generic': ['verification'],
           'uninstall': ['application', 'helpers', 'startup', 'preserved-data'],
           'startup': ['startup']}
+# Read-only is opt-in: only an explicit request (or a pure question) blocks edits.
 INSPECT = re.compile(r"\b(read.only|only (?:tell|explain|inspect|review)|(?:first|just) tell|"
+                     r"(?:recommendations?|suggestions?|advice|ideas|feedback|analysis|opinions?) only\b|"
+                     r"no (?:code |file )?changes\b|without (?:changing|editing|modifying)\b|"
                      r"(?:do not|don't) (?:implement\b|(?:change|edit|modify) (?:any |the )?(?:files?|code|anything)\b|"
                      r"(?:change|edit|modify)\s*[.!?]?$))", re.I)
-ACTION = re.compile(r'\b(implement|fix|build|create|add|write|refactor|update|rename|run|restart|install|change|edit|remove|uninstall|delete|disable|enable|configure|commit|push|merge|deploy)\b|\bmake\s+(?:it|that|this)\b', re.I)
-DIRECT_ACTION = re.compile(r'^\s*(?:please\s+|yes[, ]+)?(?:do it|go ahead)[.!\s]*$', re.I)
+_VERBS = (r'implement|fix|build|create|add|write|refactor|update|rename|run|restart|install|change|edit|remove|'
+          r'uninstall|delete|disable|enable|configure|commit|push|merge|deploy|ship|release|publish|apply|use|'
+          r'replace|move|improve|redo|make')
+ACTION = re.compile(r'\b(?:' + _VERBS + r')\b', re.I)
+_FILLER = r'(?:(?:please|pls|ok(?:ay)?|yes|yeah|yep|sure|alright|now|then|so|and|also|just|bro|right)[,!.]?\s+)*'
+# A confirmation, typos and trailing words included: "do it than", "go ahead and make these changes".
+DIRECT_ACTION = re.compile(r'^\s*' + _FILLER + r"(?:do it|go ahead|go for it|proceed|ship it|let'?s (?:go|do it))\b", re.I)
+IMPERATIVE = re.compile(r'^\s*' + _FILLER + r'(?:' + _VERBS + r')\b', re.I)
 FOLLOWUP = re.compile(r'^\s*(?:also\b|but\b|no[, ]|that\b|it\b|same\b)', re.I)
-QUESTION = re.compile(r'^\s*(?:what|why|how|which|tell me|explain|inspect)\b', re.I)
+QUESTION = re.compile(r'^\s*(?:what|why|how|which|tell me|explain|inspect)\b|\?', re.I)
 STATUS = re.compile(r'^\s*(?:what(?:\s+is|\'s)\s+(?:the\s+)?(?:status|progress)|any\s+(?:updates?|progress)|status\??$|how\s+is\s+it\s+going)', re.I)
 NAME = re.compile(r'^[a-z][a-z0-9-]{0,39}$')
 
@@ -30,9 +39,9 @@ def _absolute(path, cwd):
     return os.path.abspath(os.path.join(cwd, os.path.expanduser(path)))
 
 
-def create(state, request, mode, operation, cwd, targets=(), checks=None, approved=()):
+def create(state, request, mode, operation, cwd, targets=(), checks=None, approved=(), read_only=False):
     task = {'id': 't' + str(state.get('turn', 0)) + '-' + str(time.time_ns()),
-            'mode': mode, 'operation': operation, 'request': text.redact(request, 300),
+            'mode': mode, 'read_only': read_only, 'operation': operation, 'request': text.redact(request, 300),
             'cwd': os.path.abspath(cwd), 'targets': list(targets)[:20],
             'approved_actions': list(approved)[:10],
             'checks': list(checks if checks is not None else CHECKS[operation])[:12] if mode == 'execute' else [],
@@ -46,16 +55,23 @@ def advance(ctx, prompt):
     old = ctx.state.get('task')
     if old and STATUS.search(prompt) and not INSPECT.search(prompt):
         return
-    inspect = bool(INSPECT.search(prompt) or QUESTION.search(prompt))
-    has_action = bool(ACTION.search(prompt) or DIRECT_ACTION.fullmatch(prompt))
+    explicit = bool(INSPECT.search(prompt))
+    direct = bool(DIRECT_ACTION.match(prompt))
+    imperative = direct or any(IMPERATIVE.match(part) for part in re.split(r'[.?!\n;]+', prompt))
+    question = bool(QUESTION.search(prompt)) and not imperative
+    has_action = direct or bool(ACTION.search(prompt))
     continuation = bool(set(signals.classify(prompt)) & {'continue', 'accept'}) or bool(FOLLOWUP.match(prompt))
-    if old and continuation and not inspect and not (old['mode'] == 'inspect' and has_action):
+    # An explicit read-only request holds until the user asks for an action; "yes"/"continue" only
+    # unlocks inspection that came from a question.
+    held = bool(old) and old['mode'] == 'inspect' and old.get('read_only', True) and not has_action
+    unlock = bool(old) and old['mode'] == 'inspect' and (has_action or not old.get('read_only', True))
+    if old and (continuation or held) and not explicit and not question and not unlock:
         for action in list(old['approved_actions']):
             if re.search(r"\b(?:no|not|never|don't|without)\s+(?:\w+\s+){0,2}" + action + r'\b', prompt, re.I):
                 old['approved_actions'].remove(action)
                 ctx.dirty = True
         return
-    mode = 'inspect' if inspect or not has_action else 'execute'
+    mode = 'inspect' if explicit or question else 'execute'
     operation = ('uninstall' if re.search(r'\b(uninstall|remove).{0,60}(app|software|completely)', prompt, re.I)
                  else 'startup' if re.search(r'\b(startup|login items?)\b', prompt, re.I)
                  else 'code' if re.search(r'\b(fix|implement|code|parser|function|bug|refactor|build)\b', prompt, re.I)
@@ -64,7 +80,8 @@ def advance(ctx, prompt):
     approved = [a for a in ('commit', 'push', 'merge', 'deploy', 'remove', 'disable')
                 if mode == 'execute' and re.search(r'\b' + a + r'\b', prompt, re.I)
                 and not re.search(r"\b(?:no|not|never|don't|without)\s+(?:\w+\s+){0,2}" + a + r'\b', prompt, re.I)]
-    create(ctx.state, prompt, mode, operation, ctx.payload.get('cwd') or os.getcwd(), approved=approved)
+    create(ctx.state, prompt, mode, operation, ctx.payload.get('cwd') or os.getcwd(), approved=approved,
+           read_only=explicit)
     ctx.dirty = True
 
 
