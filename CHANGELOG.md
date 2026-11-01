@@ -10,6 +10,13 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+## [0.16.4] - 2026-11-01
+
+### Changed
+- Merge pull request #29 from umararshad4/fix/intent-defaults-to-execute
+- fix(tasks): honor negated edit verbs and keep read-only on task set
+- fix(tasks): stop treating ordinary requests as read-only
+
 ## [0.16.3] - 2026-11-01
 
 ### Changed
@@ -190,7 +197,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.16.3...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.16.4...HEAD
+[0.16.4]: https://github.com/umararshad4/honey-stack/compare/v0.16.3...v0.16.4
 [0.16.3]: https://github.com/umararshad4/honey-stack/compare/v0.16.2...v0.16.3
 [0.16.2]: https://github.com/umararshad4/honey-stack/compare/v0.16.1...v0.16.2
 [0.16.1]: https://github.com/umararshad4/honey-stack/compare/v0.16.0...v0.16.1
