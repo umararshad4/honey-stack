@@ -19,7 +19,7 @@ CHECKS = {'code': ['verification'], 'generic': ['verification'],
 INSPECT = re.compile(r"\b(read.only|only (?:tell|explain|inspect|review)|(?:first|just) tell|"
                      r"(?:recommendations?|suggestions?|advice|ideas|feedback|analysis|opinions?) only\b|"
                      r"no (?:code |file )?changes\b|without (?:changing|editing|modifying)\b|"
-                     r"(?:do not|don't) (?:implement\b|(?:change|edit|modify) (?:any |the )?(?:files?|code|anything)\b|"
+                     r"(?:do not|don't|never) (?:implement\b|fix\b|touch\b|(?:change|edit|modify) (?:any |the )?(?:files?|code|anything)\b|"
                      r"(?:change|edit|modify)\s*[.!?]?$))", re.I)
 _VERBS = (r'implement|fix|build|create|add|write|refactor|update|rename|run|restart|install|change|edit|remove|'
           r'uninstall|delete|disable|enable|configure|commit|push|merge|deploy|ship|release|publish|apply|use|'
@@ -322,7 +322,8 @@ def _operate(a, file, command):
                 raise ValueError('task workspace must be an existing directory')
             task = create(state, (task or {}).get('request', ''), a.mode, a.operation, cwd,
                           [_absolute(t, cwd) for t in a.target], a.check or None,
-                          (task or {}).get('approved_actions', []))
+                          (task or {}).get('approved_actions', []),
+                          read_only=a.mode == 'inspect' and (task or {}).get('read_only', False))
         elif a.action == 'verify':
             if not task or task.get('mode') != 'execute' or len(a.check) != 1 or a.check[0] not in task['checks']:
                 raise ValueError('choose one required check from an execution task')

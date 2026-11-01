@@ -82,6 +82,9 @@ class TaskEvidence(unittest.TestCase):
         self.event('UserPromptSubmit', prompt='Only inspect the parser')
         self.event('UserPromptSubmit', prompt='i want it simpler')
         self.assertEqual(self.state()['task']['mode'], 'inspect')
+        for prompt in ("don't fix it yet, just look", 'never touch the parser'):
+            self.event('UserPromptSubmit', prompt=prompt)
+            self.assertEqual(self.state()['task']['mode'], 'inspect', prompt)
 
     def test_questions_stay_read_only_until_any_confirmation(self):
         for prompt in ('getting this error, why is that?', 'What should we change in this file?',
@@ -179,6 +182,12 @@ class TaskEvidence(unittest.TestCase):
         self.assertEqual(self.event('PreToolUse', tool_name='exec_command', tool_input={'cmd': 'cat app.py'}), {})
         result = self.cli('set', '--mode', 'execute')
         self.assertNotEqual(result.returncode, 0)
+
+    def test_agent_task_set_keeps_explicit_read_only(self):
+        self.event('UserPromptSubmit', prompt='Only inspect the parser')
+        self.assertEqual(self.cli('set', '--mode', 'inspect').returncode, 0)
+        self.event('UserPromptSubmit', prompt='yes')
+        self.assertEqual(self.state()['task']['mode'], 'inspect')
 
     def test_tool_mapping_rejects_failed_stale_and_unrelated_call_ids(self):
         self.begin_code()
