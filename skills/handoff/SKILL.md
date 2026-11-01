@@ -71,6 +71,8 @@ status: in-progress | blocked | ready-for-review
 
 Done when: the file is saved, every thread has a status tag, and every next step names a file, command or ticket.
 
+If the user supplied a Delta reference, or this session already identifies its own Delta thread, follow the [Delta handoff reference procedure](../delta/SKILL.md#3-handoff-reference) after saving the local handoff.
+
 ### 3. Report
 
 Give the absolute path and the line to start the next session with: "Run `handoff restore`" (or "Read `<path>` and continue from Next steps"). The user opens the fresh session with `/clear` on Claude or `/new` on Codex.
@@ -90,6 +92,8 @@ Done when: one handoff is chosen and its path stated.
 ### 2. Check it against live state
 
 Read the whole doc. It is a snapshot, so compare its `branch`, files and `saved` time with the current `git rev-parse --abbrev-ref HEAD`, `git status --short` and `git log --since=<saved>`. Name any drift in one line (other branch, new commits, files changed since).
+
+When a saved Delta reference is relevant to the next step, follow the [Delta handoff reference procedure](../delta/SKILL.md#3-handoff-reference).
 
 Done when: drift is listed, or confirmed none.
 

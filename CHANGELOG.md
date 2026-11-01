@@ -10,6 +10,11 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+### Added
+- Optional Delta history integration for Claude Code and Codex, with scoped search, bounded decision recall and fresh summary checks.
+- Local handoff references that verify Git state and saved evidence, plus explicit capture-policy previews and separate upload readiness.
+- Delta installation and usage guides, CLI regression tests and synthetic before/after QA.
+
 ## [0.16.4] - 2026-11-01
 
 ### Changed
