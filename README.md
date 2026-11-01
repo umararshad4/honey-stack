@@ -5,6 +5,7 @@
 [![ci](https://github.com/umararshad4/honey-stack/actions/workflows/ci.yml/badge.svg)](https://github.com/umararshad4/honey-stack/actions/workflows/ci.yml)
 [![release](https://img.shields.io/github/v/release/umararshad4/honey-stack)](https://github.com/umararshad4/honey-stack/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![docs](https://img.shields.io/badge/docs-honey--stack.vercel.app-f3b544)](https://honey-stack.vercel.app)
 
 honey-stack combines the best of [Superpowers](https://github.com/obra/superpowers), [Ponytail](https://github.com/DietrichGebert/ponytail), [Matt Pocock's skills](https://github.com/mattpocock/skills), [pstack](https://github.com/cursor/plugins/tree/main/pstack) and [gstack](https://github.com/garrytan/gstack) in one small layer, then adds **RSI** (recursive self-improvement): it learns from your corrections and can apply validated improvements on its own.
 
@@ -97,6 +98,8 @@ honey uninstall --dry-run && honey uninstall   # keeps ~/.honey; add --purge to 
 ```
 
 ## Docs
+
+**Documentation site: [honey-stack.vercel.app](https://honey-stack.vercel.app)** — every feature, explained with interactive diagrams. The guides below are the in-repo source.
 
 | Guide | Covers |
 |---|---|
