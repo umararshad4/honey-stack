@@ -1,6 +1,6 @@
 ---
 name: ship
-description: "Use when the user asks to commit, push, open or prepare a PR, resolve a merge conflict, set up a worktree, or finish a branch."
+description: "Use when asked to commit, push, open or prepare a PR, resolve conflicts, set up a worktree, or finish a branch; not for explanatory questions."
 license: MIT
 metadata:
   reviewed: "2026-10-18"
@@ -10,6 +10,8 @@ metadata:
 # Ship
 
 Do exactly the git action the user asked for. A commit, a push and a PR are three separate requests. "Prepare a PR" means drafting the title and body in chat, without pushing or creating anything.
+
+An explanatory question such as "How would I deploy this?" requests guidance only. An action request phrased as a question, such as "Can you push these changes?", authorizes that named action. Preserve authorization already given in the conversation; do not infer extra publication actions from a skill being loaded.
 
 ## Safety rules
 

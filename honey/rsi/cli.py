@@ -70,6 +70,9 @@ def status(as_json=False):
     if recent:
         print(f"  last automatic pass: {len(recent.get('applied', []))} applied, "
               f"{len(recent.get('blocked', []))} blocked, {len(recent.get('deferred', []))} deferred")
+        for change in recent.get("changes", []):
+            print(f"    {change['id']} ({change.get('type', '')}): {change.get('title', '')}")
+            print(f"      {change.get('result', '')}")
 
 
 def why(bid, as_json=False):

@@ -12,16 +12,16 @@ UNRESOLVED = re.compile(r"\b(not (?:yet )?(?:done|fixed|complete)|(?:remains?|st
 
 def check(payload: dict, state: dict):
     """Reason to block the stop, or None. Blocks at most once per turn."""
-    if payload.get("stop_hook_active") or state.get("off"):
+    if payload.get("stop_hook_active") or state.get("off") or state.get("nagged"):
         return None
     msg = (payload.get("last_assistant_message") or "").strip()
     missing = tasks.missing(state)
-    if msg and DONE.search(msg) and not UNRESOLVED.search(msg) and missing and not state.get('evidence_nagged'):
-        state['evidence_nagged'] = True
+    if msg and DONE.search(msg) and not UNRESOLVED.search(msg) and missing:
+        state['nagged'] = True
         return ('honey: completion lacks fresh observed evidence for: ' + ', '.join(missing)
                 + '. Run the checks and link their results with `honey task verify`, or state what remains unverified. '
-                'A receipt sentence alone is not evidence.')
-    if not state.get("edited") or state.get("nagged"):
+                'A receipt sentence alone is not evidence. Briefly explain this verification gap to the user before continuing.')
+    if not state.get("edited"):
         return None
     if not msg or RECEIPT.search(msg) or msg.rstrip("*_ `").endswith("?"):
         return None

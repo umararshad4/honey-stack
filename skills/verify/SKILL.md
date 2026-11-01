@@ -83,7 +83,7 @@ Done when: every line is true or recorded.
 
 ## 4. Report
 
-Close with the receipt line:
+Answer the user's question first: for a coverage or yes/no question, state the answer and its limits before the evidence. Close an execution report with the receipt line; a read-only lookup does not need an execution receipt:
 
 ```
 Checks run: <cmd> pass, <cmd> fail (<n>). Skipped: <check> (<concrete reason>). Risk: <thing>.

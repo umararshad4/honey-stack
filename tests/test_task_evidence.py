@@ -56,6 +56,36 @@ class TaskEvidence(unittest.TestCase):
         self.event('UserPromptSubmit', prompt="also don't push")
         self.assertNotIn('push', self.state()['task']['approved_actions'])
 
+    def test_direct_action_confirmation_exits_inspection_without_magic_phrase(self):
+        for prompt in ('do it', 'go ahead', 'please do it', 'yes, do it'):
+            self.event('UserPromptSubmit', prompt='Only inspect the parser')
+            self.event('UserPromptSubmit', prompt=prompt)
+            self.assertEqual(self.state()['task']['mode'], 'execute', prompt)
+        self.event('UserPromptSubmit', prompt='Only inspect the parser')
+        for prompt in ('continue', 'yes', 'yup', 'go ahead but do not change files'):
+            self.event('UserPromptSubmit', prompt=prompt)
+            self.assertEqual(self.state()['task']['mode'], 'inspect', prompt)
+
+    def test_stop_gate_nags_once_across_both_reasons_and_later_edits(self):
+        self.begin_code()
+        blocked = self.event('Stop', last_assistant_message='Fixed.')
+        self.assertEqual(blocked.get('decision'), 'block')
+        self.assertIn('verification', blocked['reason'])
+        self.assertIn('explain this verification gap to the user', blocked['reason'])
+        self.assertEqual(self.event('Stop', last_assistant_message='Fixed.'), {})
+        self.event('PostToolUse', tool_name='Edit', tool_input={'file_path': '/tmp/a', 'new_string': 'again'})
+        self.assertEqual(self.event('Stop', last_assistant_message='Fixed.'), {})
+        self.event('UserPromptSubmit', prompt='continue')
+        self.assertEqual(self.event('Stop', last_assistant_message='Fixed.').get('decision'), 'block')
+
+    def test_failed_read_command_does_not_invalidate_successful_check(self):
+        self.begin_code()
+        self.check()
+        for i in range(3):
+            self.event('PostToolUseFailure', tool_name='exec_command', tool_input={'cmd': 'pwd'},
+                       error='shell initialization failed: zoxide', tool_use_id='read-' + str(i))
+        self.assertEqual(self.event('Stop', last_assistant_message='Fixed. Checks run: unittest pass.'), {})
+
     def test_receipt_words_without_observed_check_do_not_verify_code(self):
         self.begin_code()
         result = self.event('Stop', last_assistant_message='Fixed. Checks run: all passed.')

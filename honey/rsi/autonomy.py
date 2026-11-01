@@ -159,7 +159,7 @@ def run() -> dict:
     announced = publish.run(include_patches=False)
     if not enabled():
         return {"skipped": "autonomy disabled", "publication": announced}
-    out = {"applied": [], "blocked": [], "deferred": []}
+    out = {"applied": [], "changes": [], "blocked": [], "deferred": []}
     queue = sorted(review.pending(), key=lambda p: (p.get("last_attempt_ns", 0), p.get("created", ""), p["id"]))
     for proposal in queue[:MAX_PER_RUN]:
         try:
@@ -180,6 +180,8 @@ def run() -> dict:
                          last_attempt_ns=time.time_ns(), attempt_state="applied")
             store.write_json(paths.path("proposals", saved["id"] + ".json"), saved)
             out["applied"].append(saved["id"])
+            out["changes"].append({"id": saved["id"], "type": saved.get("type", ""),
+                                   "title": saved.get("title", ""), "result": result})
         except (Exception, SystemExit) as exc:
             saved = store.read_json(paths.path("proposals", proposal["id"] + ".json"), proposal)
             if not isinstance(saved, dict) or saved.get("id") != proposal["id"]:

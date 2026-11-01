@@ -45,6 +45,27 @@ class CoachEvidence(unittest.TestCase):
                 self.requests(quote, origin)
                 self.assertEqual(coach.request_clusters(), [])
 
+    def test_delegated_task_wrappers_are_not_repeated_user_requests(self):
+        for quote in (
+                "AMCP command delegated delegated-task node task reconcile invoice totals",
+                "amcp command delegated delegated-task node task",
+                "act fixture-user read-only sub-agent task files",
+                "Act as a read-only sub-agent. Task: reconcile invoice totals.",
+                "You are a worker agent. Your task is to reconcile invoice totals."):
+            with self.subTest(quote=quote):
+                self.requests(quote)
+                self.assertEqual(coach.request_clusters(), [])
+
+    def test_clusters_use_quote_keywords_instead_of_legacy_cached_keywords(self):
+        self.requests()
+        for name in ("claude-one", "codex-two"):
+            fp = paths.path("events", "2026-10", name + ".jsonl")
+            rows = store.read_jsonl(fp)
+            for row in rows:
+                row["kw"] = ["amcp", "command", "delegated", "node"]
+            store.write_jsonl(fp, rows)
+        self.assertEqual(coach.request_clusters()[0]["kw"], set(text.keywords(self.quote)))
+
     def test_external_content_on_prompt_is_excluded(self):
         self.requests()
         for name in ("claude-one", "codex-two"):
