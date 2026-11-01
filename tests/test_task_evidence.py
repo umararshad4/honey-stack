@@ -66,6 +66,36 @@ class TaskEvidence(unittest.TestCase):
             self.event('UserPromptSubmit', prompt=prompt)
             self.assertEqual(self.state()['task']['mode'], 'inspect', prompt)
 
+    def test_ordinary_requests_and_casual_confirmations_can_edit(self):
+        actions = ('do it than', 'do it then', 'go ahead and make these changes', 'ok go ahead bro',
+                   'make the buttons white', 'use white text on the buttons', 'why is the button text dark? make it white',
+                   'fix this bro and merge in the main and also install after it shipped')
+        for prompt in actions:
+            self.event('UserPromptSubmit', prompt='Only inspect the parser')
+            self.event('UserPromptSubmit', prompt=prompt)
+            self.assertEqual(self.state()['task']['mode'], 'execute', prompt)
+        # Inspection that came from a question never traps a plain request.
+        for prompt in actions + ('i want white text on the buttons', 'the cta text should be white', 'continue'):
+            self.event('UserPromptSubmit', prompt='why is the button text dark?')
+            self.event('UserPromptSubmit', prompt=prompt)
+            self.assertEqual(self.state()['task']['mode'], 'execute', prompt)
+        self.event('UserPromptSubmit', prompt='Only inspect the parser')
+        self.event('UserPromptSubmit', prompt='i want it simpler')
+        self.assertEqual(self.state()['task']['mode'], 'inspect')
+        for prompt in ("don't fix it yet, just look", 'never touch the parser'):
+            self.event('UserPromptSubmit', prompt=prompt)
+            self.assertEqual(self.state()['task']['mode'], 'inspect', prompt)
+
+    def test_questions_stay_read_only_until_any_confirmation(self):
+        for prompt in ('getting this error, why is that?', 'What should we change in this file?',
+                       'how does the parser work', 'Make recommendations only', 'no code changes, just review it'):
+            self.event('UserPromptSubmit', prompt=prompt)
+            self.assertEqual(self.state()['task']['mode'], 'inspect', prompt)
+        self.event('UserPromptSubmit', prompt='Can you make the buttons white?')
+        self.assertEqual(self.state()['task']['mode'], 'inspect')
+        self.event('UserPromptSubmit', prompt='yes')
+        self.assertEqual(self.state()['task']['mode'], 'execute')
+
     def test_stop_gate_nags_once_across_both_reasons_and_later_edits(self):
         self.begin_code()
         blocked = self.event('Stop', last_assistant_message='Fixed.')
@@ -152,6 +182,12 @@ class TaskEvidence(unittest.TestCase):
         self.assertEqual(self.event('PreToolUse', tool_name='exec_command', tool_input={'cmd': 'cat app.py'}), {})
         result = self.cli('set', '--mode', 'execute')
         self.assertNotEqual(result.returncode, 0)
+
+    def test_agent_task_set_keeps_explicit_read_only(self):
+        self.event('UserPromptSubmit', prompt='Only inspect the parser')
+        self.assertEqual(self.cli('set', '--mode', 'inspect').returncode, 0)
+        self.event('UserPromptSubmit', prompt='yes')
+        self.assertEqual(self.state()['task']['mode'], 'inspect')
 
     def test_tool_mapping_rejects_failed_stale_and_unrelated_call_ids(self):
         self.begin_code()
