@@ -10,6 +10,8 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-11-01
+
 ### Changed
 - QA now defaults to the tester-army/e2e CLI and project MCP workflow, with complete upstream command references and focused, cache-aware reruns.
 - Browser QA and verification discover WebMCP tools, with a same-session e2e adapter, isolated Chromium runner, explicit fallback and independent UI-proof requirements.
@@ -170,7 +172,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.16.0...HEAD
+[0.16.0]: https://github.com/umararshad4/honey-stack/compare/v0.15.0...v0.16.0
 [0.15.0]: https://github.com/umararshad4/honey-stack/compare/v0.14.0...v0.15.0
 [0.14.0]: https://github.com/umararshad4/honey-stack/compare/v0.13.0...v0.14.0
 [0.13.0]: https://github.com/umararshad4/honey-stack/compare/v0.12.0...v0.13.0
