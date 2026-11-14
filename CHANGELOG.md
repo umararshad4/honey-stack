@@ -10,6 +10,8 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-14
+
 ### Removed (breaking)
 - delta: the `delta` skill, `honey delta` commands, the Delta capture observer and the handoff integration are gone. `honey delta` now explains the removal and exits 2. Use the Delta CLI directly if you still need history.
 - The old `dev.honey.delta-capture` LaunchAgent is cleaned up automatically. The next time launchd runs it, `honey delta` moves its definition to `~/.honey/backups` and unloads it; `honey install` does the same. `honey uninstall` leaves it retired, because its command no longer exists. Data in `~/.honey/delta` is no longer read and can be deleted.
@@ -256,7 +258,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v0.18.3...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/umararshad4/honey-stack/compare/v0.18.3...v1.0.0
 [0.18.3]: https://github.com/umararshad4/honey-stack/compare/v0.18.2...v0.18.3
 [0.18.2]: https://github.com/umararshad4/honey-stack/compare/v0.18.1...v0.18.2
 [0.18.1]: https://github.com/umararshad4/honey-stack/compare/v0.18.0...v0.18.1
