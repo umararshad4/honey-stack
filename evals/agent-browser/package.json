@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "benchmark": "node run.mjs"
+  },
+  "devDependencies": {
+    "@playwright/mcp": "0.0.85",
+    "agent-browser": "0.43.0"
+  }
+}

@@ -10,6 +10,9 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+### Added
+- qa: agent-browser reference for live, agent-driven browser QA, with a matched benchmark against Playwright MCP in `evals/agent-browser`. Wall time ties; the agent reads 4.6× less snapshot text.
+
 ### Fixed
 - rsi: new-skill suggestion issues no longer publish the user's prompt keywords in their titles.
 - rsi: automatic delivery merges only PRs with an approving review; an empty review decision now waits.
