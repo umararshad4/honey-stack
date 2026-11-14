@@ -10,8 +10,14 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+### Removed (breaking)
+- delta: the `delta` skill, `honey delta` commands, the Delta capture observer and the handoff integration are gone. `honey delta` now explains the removal and exits 2. Use the Delta CLI directly if you still need history.
+- The old `dev.honey.delta-capture` LaunchAgent is cleaned up automatically. The next time launchd runs it, `honey delta` moves its definition to `~/.honey/backups` and unloads it; `honey install` does the same. `honey uninstall` leaves it retired, because its command no longer exists. Data in `~/.honey/delta` is no longer read and can be deleted.
+
 ### Added
-- qa: agent-browser reference for live, agent-driven browser QA, with a matched benchmark against Playwright MCP in `evals/agent-browser`. Wall time ties; the agent reads 4.6× less snapshot text.
+- qa: agent-browser for live, agent-driven browser QA. `qa` prefers it when it is on PATH and falls back to Playwright MCP or e2e. A matched benchmark against Playwright MCP is in `evals/agent-browser`: wall time ties (3.13s median each) and the agent reads 4.6× less snapshot text (≈270 vs ≈1,231 tokens per flow).
+- doctor: a "Browser QA" section reports the agent-browser version and warns while the retired Delta service is still installed.
+- tests: `tests/test_agent_browser.py` covers qa routing, the reference's commands against the real CLI, a live browser run of the reference flow, doctor detection, and the Delta retirement path including install and uninstall.
 
 ### Fixed
 - rsi: new-skill suggestion issues no longer publish the user's prompt keywords in their titles.

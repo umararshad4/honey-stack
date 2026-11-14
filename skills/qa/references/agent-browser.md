@@ -6,11 +6,11 @@ Don't use it in place of an existing e2e suite or a requested runner. Prepared t
 
 ## Why
 
-On the honey task-desk benchmark ([report](../../../evals/agent-browser/reports/2026-11-14-agent-qa.md)), the same flow tied on wall time with Playwright MCP. The agent read 4.6× less text: about 270 tokens against 1,231. The saving shows up in model turns and context, not in browser speed.
+On the honey task-desk benchmark (`evals/agent-browser/reports/2026-11-14-agent-qa.md` in the honey-stack repository), the same flow tied on wall time with Playwright MCP. The agent read 4.6× less text: about 270 tokens against 1,231. The saving shows up in model turns and context, not in browser speed.
 
 ## Use
 
-Check for it with `command -v agent-browser`. If it's missing, use Playwright MCP or e2e. Install it only with the user's approval (`npm i -g agent-browser`), and load the version-matched guide with `agent-browser skills get core`.
+Check for it with `command -v agent-browser`. If it's missing, use Playwright MCP or e2e. Install it only with the user's approval (`npm i -g agent-browser && agent-browser install`; `install` fetches Chrome when none is present), and load the version-matched guide with `agent-browser skills get core`.
 
 ```sh
 S=qa-$$                                  # one session per task; parallel agents need distinct sessions
