@@ -6,7 +6,7 @@ Back to the [README](../README.md).
 
 **Automatic** (the agent picks them): `grill` · `plan` · `execute` · `debug` · `tdd` · `verify` · `review` · `ship` · `deploy` · `test-design` · `tooling` · `database` · `perf` · `observability` · `api-design` · `upgrade` · `incident` · `frontend` · `stageshow` · `qa` · `security` · `docs`
 
-**On demand** (you call them): `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` · `project-verify` · `triage` · `research` · `statechart`
+**On demand** (you call them): `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` · `project-verify` · `triage` · `research` · `statechart` · `gain`
 
 Invoke with `/honey:<skill>` in Claude Code or `$<skill>` in Codex.
 
@@ -16,6 +16,7 @@ Invoke with `/honey:<skill>` in Claude Code or `$<skill>` in Codex.
 - **`triage`** reads complete reports, checks duplicates and existing fixes, and produces evidence-backed states and agent briefs. Its explicit reproduce/fix branch requires before/after proof and routes delivery through `ship`. RSI backlog qualification uses this same workflow; the background publisher and its opt-in settings are unchanged. This skill does not deploy a GitHub bot or automatically close, merge or release issues.
 - **`research`** answers technical and product questions from primary sources, with constraints, source dates, citations and unknowns. Uses available Exa tools for deep discovery and available search/GitHub tools as fallback. `opensrc` remains the focused option for installed dependency APIs.
 - **`statechart`** optionally checks queue, retry and workflow invariants with a model checker, records assumptions and finite bounds, and explains counterexamples. A checked model is not proof of the production code; missing checker prerequisites remain explicit.
+- **`gain`** shows honey's measured benchmark gains (prepared QA run time, live agent QA context) as a one-shot scoreboard that cites each report. It never prints a per-repo saving; `review`'s debt scan gives real per-repo counts.
 - **Frontend quality** stays in `frontend`, `qa`, `review` and `perf`: motion audit/review and frame diagnostics, realistic worst-case datasets, touch/viewport/safe-area checks and honest real-device coverage. `stageshow` owns mocked product illustrations and cursor demos, not the production application's component stack.
 - **`rsi retro`** is a skill workflow for evidence-backed improvements to navigation, checks and tooling; it is not a CLI subcommand. `write-skill` carries agent-writing guidance, and `perf` uses a benchmark validity checklist before making speedup claims.
 

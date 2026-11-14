@@ -72,6 +72,7 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Create or maintain this project's launch/drive/evidence harness | `project-verify` |
 | Qualify issues, deduplicate reports or prepare an actionable agent brief | `triage` |
 | Model a queue, retry or workflow invariant and its counterexamples | `statechart` |
+| Show honey's measured benchmark gains | `gain` |
 | Understand a shipped app, binary, APK or site you don't have source for (authorized) | `reverse-engineer` |
 
 When two rows fit, take the earlier one in the main flow: settle intent before planning, plan before executing.

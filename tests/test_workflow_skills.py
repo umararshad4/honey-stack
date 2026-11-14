@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ENTRY_POINTS = ("project-verify", "triage", "research", "statechart")
+ENTRY_POINTS = ("project-verify", "triage", "research", "statechart", "gain")
 
 
 class WorkflowSkills(unittest.TestCase):
@@ -40,6 +40,18 @@ class WorkflowSkills(unittest.TestCase):
                         continue
                     with self.subTest(source=str(path), target=target):
                         self.assertTrue((path.parent / target.split("#")[0]).exists())
+
+    def test_gain_figures_come_from_the_cited_reports(self):
+        gain = (ROOT / "skills/gain/SKILL.md").read_text()
+        webmcp = (ROOT / "evals/webmcp/reports/2026-11-01-fast-qa-v3.md").read_text()
+        browser = (ROOT / "evals/agent-browser/reports/2026-11-14-agent-qa.md").read_text()
+        for figure, report in (("7.209s", webmcp), ("3.396s", webmcp), ("2.12×", webmcp),
+                               ("≈270", browser), ("≈1,231", browser), ("4.6×", browser), ("3.13s", browser)):
+            with self.subTest(figure=figure):
+                self.assertIn(figure, report)
+        for shown in ("7.21s", "3.40s", "2.12×", "≈270", "≈1,231", "4.6×", "3.13s"):
+            self.assertIn(shown, gain)
+        self.assertIn("Never print a per-repo saving", gain)
 
     def test_handoff_no_longer_depends_on_delta(self):
         handoff = (ROOT / "skills/handoff/SKILL.md").read_text()

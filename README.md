@@ -52,7 +52,7 @@ Modes change how much is explained, not how carefully work is done. Sizing, veri
 | Invoked | Skills |
 |---|---|
 | **Automatic** | `grill` `plan` `execute` `debug` `tdd` `verify` `review` `ship` `deploy` `test-design` `tooling` `database` `perf` `observability` `api-design` `upgrade` `incident` `frontend` `stageshow` `qa` `security` `docs` |
-| **On demand** | `honey` `rsi` `unslop` `reverse-engineer` `handoff` `prototype` `architecture` `domain` `teach` `write-skill` `principles` `opensrc` `project-verify` `triage` `research` `statechart` |
+| **On demand** | `honey` `rsi` `unslop` `reverse-engineer` `handoff` `prototype` `architecture` `domain` `teach` `write-skill` `principles` `opensrc` `project-verify` `triage` `research` `statechart` `gain` |
 
 Call a skill with `/honey:<skill>` in Claude Code or `$<skill>` in Codex. See [docs/skills.md](docs/skills.md) for focused workflows and browser QA.
 
