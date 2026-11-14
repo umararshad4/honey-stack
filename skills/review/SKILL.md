@@ -41,6 +41,7 @@ Branches A to D report and change no code. Apply fixes only when the user picks 
       - `native:` the platform does it, or a dependency was added for a few lines
       - `yagni:` an abstraction with one implementation, or config nobody sets
       - `shrink:` the same logic in fewer lines (show the form)
+   7. **Architecture**, only when the diff adds or reshapes a module boundary, or callers repeatedly reach into a module's internals or pass through shallow wrappers. Report one `architecture:` finding naming the boundary and the callers, and point to `/honey:architecture` for the redesign. Don't run that skill inline or add this lens to every review.
 5. **Check before reporting.** Each finding needs a concrete case: "this input leads to this wrong result". Re-read the lines and confirm the caller exists, the value can really be empty, or the code really is unused (grep the whole tree, including tests, config and string references). A claim that something is "handled elsewhere" needs the line cited, and "tests cover this" needs the test named. A `shortcut:` or `ponytail:` comment that names its limit is a decision, not a finding, unless the expected load already crosses that limit. Drop style taste, "consider…", and anything the diff already addresses. Done when: every finding has a case and a citation.
 
 For a large diff, or when the session context is crowded, run the Standards and Spec axes as two parallel read-only subagents using `references/reviewer-prompt.md`, then lay their reports side by side without reranking.
@@ -55,9 +56,10 @@ Should fix
 2. `lib/retry.ts:12` tested: new backoff branch has no failing-when-broken test. Fix: <test>.
 Nice to have
 3. `util/dates.ts:4` native: moment imported for one format call. `Intl.DateTimeFormat`, 0 deps.
-Standards: 4. `<file:line>` breaks "<rule>" (CONTRIBUTING.md).
-Spec: 5. missing "<quoted requirement>".
-Verdict: fix 1 and 4 first.   net: -24 lines possible.   Not checked: <what mattered and could not run>.
+4. `billing/invoice.ts:88` architecture: 5 callers read `invoice._lines` directly. A deeper Invoice interface would hide it; see `/honey:architecture`.
+Standards: 5. `<file:line>` breaks "<rule>" (CONTRIBUTING.md).
+Spec: 6. missing "<quoted requirement>".
+Verdict: fix 1 and 5 first.   net: -24 lines possible.   Not checked: <what mattered and could not run>.
 ```
 
 If nothing is found, give the summary, then `Looks good. Ship.`, then one line on what you checked.

@@ -1,0 +1,5 @@
+interface:
+  display_name: "gain"
+  short_description: "Show honey's measured benchmark gains with sources"
+policy:
+  allow_implicit_invocation: false

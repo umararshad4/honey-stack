@@ -1,0 +1,243 @@
+{
+  "results": [
+    {
+      "mode": "agent-browser-full",
+      "round": 1,
+      "ms": 1887,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 1,
+      "ms": 3064,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser",
+      "round": 1,
+      "ms": 2914,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 2,
+      "ms": 2992,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser",
+      "round": 2,
+      "ms": 2531,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 2,
+      "ms": 1849,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "agent-browser",
+      "round": 3,
+      "ms": 3894,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 3,
+      "ms": 3069,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 3,
+      "ms": 3241,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 4,
+      "ms": 3168,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 4,
+      "ms": 2876,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser",
+      "round": 4,
+      "ms": 3949,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 5,
+      "ms": 2950,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser",
+      "round": 5,
+      "ms": 4032,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 5,
+      "ms": 3351,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "agent-browser",
+      "round": 6,
+      "ms": 3940,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 6,
+      "ms": 2889,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 6,
+      "ms": 3304,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 7,
+      "ms": 2165,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 7,
+      "ms": 3129,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser",
+      "round": 7,
+      "ms": 3018,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 8,
+      "ms": 3392,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser",
+      "round": 8,
+      "ms": 3128,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 8,
+      "ms": 4012,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "agent-browser",
+      "round": 9,
+      "ms": 3088,
+      "calls": 12,
+      "chars": 1078
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 9,
+      "ms": 2178,
+      "calls": 12,
+      "chars": 2240
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 9,
+      "ms": 3281,
+      "calls": 13,
+      "chars": 4922
+    },
+    {
+      "mode": "agent-browser-full",
+      "round": 10,
+      "ms": 2193,
+      "calls": 12,
+      "chars": 2241
+    },
+    {
+      "mode": "playwright-mcp",
+      "round": 10,
+      "ms": 3082,
+      "calls": 13,
+      "chars": 4925
+    },
+    {
+      "mode": "agent-browser",
+      "round": 10,
+      "ms": 3043,
+      "calls": 12,
+      "chars": 1079
+    }
+  ],
+  "summary": {
+    "agent-browser": {
+      "runs": 10,
+      "medianMs": 3128,
+      "minMs": 2531,
+      "maxMs": 4032,
+      "calls": 12,
+      "chars": 1078,
+      "approxTokens": 270
+    },
+    "agent-browser-full": {
+      "runs": 10,
+      "medianMs": 2889,
+      "minMs": 1849,
+      "maxMs": 4012,
+      "calls": 12,
+      "chars": 2240,
+      "approxTokens": 560
+    },
+    "playwright-mcp": {
+      "runs": 10,
+      "medianMs": 3129,
+      "minMs": 2876,
+      "maxMs": 3392,
+      "calls": 13,
+      "chars": 4922,
+      "approxTokens": 1231
+    }
+  }
+}

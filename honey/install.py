@@ -44,6 +44,7 @@ class Env:
         self.claude = os.path.join(h, ".claude") if self.sandbox else paths.claude_dir()
         self.codex = os.path.join(h, ".codex") if self.sandbox else paths.codex_dir()
         self.agents = os.path.join(h, ".agents") if self.sandbox else paths.agents_dir()
+        self.home = h
         self.localbin = os.path.join(h, ".local", "bin")
         self.honey = os.path.join(h, ".honey") if self.sandbox else paths.home()
         self.only = only
@@ -264,6 +265,11 @@ def plan(env: Env) -> list:
             _plan_codex_agents(env, steps)
     if env.retire:
         _plan_retire(env, steps)
+    from honey import retired
+    plist = retired.delta_plist(env.home)
+    if os.path.isfile(plist):
+        steps.append({"kind": "move", "src": plist, "dst": os.path.join(env.backups, "launch-agents", os.path.basename(plist)),
+                      "launchd": retired.DELTA_LABEL, "summary": f"retire {plist} (honey delta was removed; moved to backups)"})
     link = os.path.join(env.localbin, 'honey')
     if not os.path.lexists(link):
         try:
@@ -322,6 +328,11 @@ def _apply(env: Env, st: dict) -> dict:
     elif k == "move":
         os.makedirs(os.path.dirname(st["dst"]), exist_ok=True)
         shutil.move(st["src"], st["dst"])
+        if st.get("launchd") and sys.platform == "darwin" and not env.sandbox:
+            try:
+                subprocess.run(["launchctl", "bootout", f"gui/{os.getuid()}/{st['launchd']}"], capture_output=True, timeout=10)
+            except (OSError, subprocess.TimeoutExpired):
+                pass  # the definition is already moved, so it won't load again
     elif k == "symlink":
         os.makedirs(os.path.dirname(st["path"]), exist_ok=True)
         os.symlink(st["target"], st["path"])
@@ -405,6 +416,8 @@ def _undo(rec: dict) -> str:
         if not os.path.lexists(rec["path"]):
             os.symlink(rec["target"], rec["path"])
         return f"recreated link {rec['path']}"
+    if k == "move" and rec.get("launchd"):
+        return f"kept {rec['src']} retired (its command no longer exists); backup at {rec['dst']}"
     if k == "move":
         if os.path.exists(rec["dst"]) and not os.path.exists(rec["src"]):
             shutil.move(rec["dst"], rec["src"])

@@ -41,7 +41,7 @@ class BudgetControl(unittest.TestCase):
 
     def test_uncapped_draft_omits_provider_limit(self):
         self.disable_caps()
-        with mock.dict(os.environ), mock.object(reflect, 'engine', return_value=('claude', '/test/claude')), \
+        with mock.dict(os.environ), mock.object(reflect, 'engines', return_value=[('claude', '/test/claude')]), \
                 mock.object(reflect.subprocess, 'run', return_value=subprocess.CompletedProcess(
                     [], 0, json.dumps({'structured_output': {}, 'total_cost_usd': 0.42}), '')) as run:
             os.environ.pop('HONEY_FAKE_LLM', None)

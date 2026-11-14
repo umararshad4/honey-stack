@@ -27,6 +27,7 @@ Read past the diff: the callers of every changed function, what it calls, and it
 3. **Load**: check-then-write races, a query per item, unbounded growth.
 4. **Tested**: risky logic with no test that fails when it breaks; tests that assert nothing or only mocks.
 5. **Lean** (the ponytail lens), each tagged with its replacement: `delete:` dead or speculative code, `reuse:` the repo already has it (path), `stdlib:` / `native:` the standard library or platform does it, `yagni:` one-implementation abstraction or unused config, `shrink:` the same logic in fewer lines.
+6. **Architecture**, only when the diff adds or reshapes a module boundary, or callers reach into internals or pass through shallow wrappers: one `architecture:` finding naming the boundary and callers, pointing to `/honey:architecture`. Don't redesign inline.
 
 Each finding needs a concrete case ("input X gives Y") and a citation; re-read the lines before reporting. A `shortcut:` comment that names its limit is a decision, not a finding. Drop style taste and "consider…".
 

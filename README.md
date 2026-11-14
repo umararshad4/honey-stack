@@ -52,56 +52,27 @@ Modes change how much is explained, not how carefully work is done. Sizing, veri
 | Invoked | Skills |
 |---|---|
 | **Automatic** | `grill` `plan` `execute` `debug` `tdd` `verify` `review` `ship` `deploy` `test-design` `tooling` `database` `perf` `observability` `api-design` `upgrade` `incident` `frontend` `stageshow` `qa` `security` `docs` |
-| **On demand** | `honey` `rsi` `unslop` `reverse-engineer` `handoff` `delta` `prototype` `architecture` `domain` `teach` `write-skill` `principles` `opensrc` `project-verify` `triage` `research` `statechart` |
+| **On demand** | `honey` `rsi` `unslop` `reverse-engineer` `handoff` `prototype` `architecture` `domain` `teach` `write-skill` `principles` `opensrc` `project-verify` `triage` `research` `statechart` `gain` |
 
 Call a skill with `/honey:<skill>` in Claude Code or `$<skill>` in Codex. See [docs/skills.md](docs/skills.md) for focused workflows and browser QA.
 
-## Delta: pick up where you left off
+## Browser QA with agent-browser
 
-Honey integrates with [Delta](https://delta.dev/cli) to find decisions in earlier conversations and carry their context into a new session. Use it to recover a decision, check what was already tried, or attach conversation history to a handoff. Honey keeps working normally without Delta.
-
-### Install Delta
-
-Install the optional Delta app and CLI on each computer where you want to use history. On macOS or Linux:
+When the agent steps through a page itself (a quick "check this page" pass, a bug repro, or exploring before you write a test), `qa` uses [agent-browser](https://github.com/vercel-labs/agent-browser) if it's on your PATH. It returns compact accessibility snapshots with `@e` refs, so each step costs the agent far less context than Playwright MCP. Existing e2e suites still run first and stay the regression proof. Without agent-browser, `qa` uses Playwright MCP or e2e as before.
 
 ```bash
-curl -fsSL https://delta.dev/install.sh -o delta-install.sh
-sh delta-install.sh
-delta auth login
-delta --version
-honey delta status
+npm i -g agent-browser && agent-browser install   # optional
+honey doctor                                     # "Browser QA" shows the detected version
 ```
 
-Use Delta 0.22.0 or newer. If it is already installed, check for updates with `delta update --check` and install an available update with `delta update`. The [official installation guide](https://delta.dev/docs/cli/get-started) covers other platforms.
+Measured on the same 12-step QA flow, 10 rounds each ([report](evals/agent-browser/reports/2026-11-14-agent-qa.md)):
 
-### Use your history
+| Tool | Median wall time | Tool calls | Text the agent reads | ≈ Tokens |
+|---|---:|---:|---:|---:|
+| **agent-browser `snapshot -i`** | 3.13s | 12 | **1,078 chars** | **≈270** |
+| Playwright MCP 0.0.85 | 3.13s | 13 | 4,922 chars | ≈1,231 |
 
-Ask for `/honey:delta` in Claude Code or `$delta` in Codex, or run these commands in your terminal:
-
-| You want to… | Run |
-|---|---|
-| Check installation, sign-in and capture settings | `honey delta status` |
-| Find an earlier decision | `honey delta recall cache expiry` |
-| Find conversations that touched a file | `honey delta search authentication --edited-path 'src/**'` |
-| Read a specific conversation | `honey delta read THREAD_ID --messages 1-1` |
-| Check whether its summary is current | `honey delta summary THREAD_ID` |
-
-Replace `THREAD_ID` with an ID returned by search, or use a Delta join link. Reads start with one message so short conversations work. Choose a larger range when needed, up to 20 messages per call. History results are JSON and default to at most 12,000 characters; shortened results say `truncated: true`.
-
-For handoffs, Honey can attach a verified thread reference, the current Git state and test-report fingerprints to your local summary. Restoring it checks what changed and keeps the summary usable if Delta is unavailable. See the [Delta guide](docs/delta.md) for `attach`, `restore`, readiness fields and troubleshooting.
-
-### Record new conversations, optionally
-
-History lookup works in both Claude Code and Codex. To record new **Claude Code** sessions, install Delta's separate official plugin:
-
-```bash
-claude plugin marketplace add zed-industries/delta-claude
-claude plugin install delta@zed-industries
-```
-
-Start a new Claude session or run `/reload-plugins`. Then use `/delta setup` in your repository to choose manual, private or organization capture. Honey can preview the manual policy with `honey delta setup --mode manual`; only an explicit `--apply` writes it. Native Codex session recording is not included.
-
-**Privacy:** installing Honey or reading history does not enable capture. Private sync uploads conversation and checkout data to Delta's servers. Organization capture shares it with that organization. Honey keeps history separate from RSI feedback and fresh verification evidence. See [Delta's capture guide](https://delta.dev/docs/cli/claude-code) before enabling uploads.
+Wall time ties; the agent reads 4.6× less. The gain is cheaper, quicker model turns and longer sessions before context fills, not a faster browser. Rerun it with `npm ci && npm run benchmark` in `evals/agent-browser`.
 
 ## RSI: how it learns
 
@@ -133,7 +104,7 @@ All keys in `~/.honey/config.json` are optional:
 }
 ```
 
-**Privacy:** Honey has no telemetry and stores redacted learning snippets of up to 300 characters locally. Explicit Delta lookups read your separate Delta account. Capture is opt-in; private Delta synchronization uploads conversations and checkout data to its servers. Honey's history reads and handoff metadata do not upload sessions or import history into RSI.
+**Privacy:** Honey has no telemetry and stores redacted learning snippets of up to 300 characters locally.
 
 ## Update and uninstall
 
@@ -151,8 +122,7 @@ honey uninstall --dry-run && honey uninstall   # keeps ~/.honey; add --purge to 
 | Guide | Covers |
 |---|---|
 | [Setup](docs/setup.md) | Install options, activation, hook checks, modes, updates |
-| [Skills](docs/skills.md) | Focused workflows, browser QA with e2e and WebMCP |
-| [Delta](docs/delta.md) | Install, find past decisions, configure capture and restore handoffs |
+| [Skills](docs/skills.md) | Focused workflows, browser QA with e2e, WebMCP and agent-browser |
 | [RSI](docs/rsi.md) | Tiers, autonomy, budgets, publishing improvements |
 | [Task evidence](docs/task-evidence.md) | `honey task` scope and proof of checks |
 | [Development](docs/development.md) | Tests, CI and automatic releases |

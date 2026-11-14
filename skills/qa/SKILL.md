@@ -3,8 +3,8 @@ name: qa
 description: "Use to check a change in a real browser, QA a page or user flow, or when a UI change needs visual proof."
 license: MIT
 metadata:
-  reviewed: "2026-11-01"
-  sources: "tester-army/e2e 1d671f6786b1eff4b43718ddc413b0bfa21abbcb skills/e2e, skills/create-verification-skill, skills/migrate-to-e2e (Apache-2.0, entry filenames adapted; see references/tester-army/UPSTREAM.md); Chrome WebMCP and Playwright 1.64 docs (references/webmcp.md); garrytan/gstack 1.60.1.0 qa; MCT Post-Task Verification; emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/break-ui/{SKILL.md,CATALOG.md}, skills/mobile-native/SKILL.md (MIT, adapted)"
+  reviewed: "2026-11-14"
+  sources: "tester-army/e2e 1d671f6786b1eff4b43718ddc413b0bfa21abbcb skills/e2e, skills/create-verification-skill, skills/migrate-to-e2e (Apache-2.0, entry filenames adapted; see references/tester-army/UPSTREAM.md); Chrome WebMCP and Playwright 1.64 docs (references/webmcp.md); garrytan/gstack 1.60.1.0 qa; MCT Post-Task Verification; emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/break-ui/{SKILL.md,CATALOG.md}, skills/mobile-native/SKILL.md (MIT, adapted); vercel-labs/agent-browser 0.43.0 CLI help and evals/agent-browser benchmark (references/agent-browser.md)"
 ---
 
 # QA with e2e
@@ -37,6 +37,7 @@ Load only the reference needed for the task. Prefer the installed version's `npx
 | App-specific verification skill | [verification generator](references/tester-army/create-verification-skill/GUIDE.md) |
 | Migrate an existing suite | [migration](references/tester-army/migrate-to-e2e/GUIDE.md) |
 | Page-provided tools for eligible setup | [WebMCP](references/webmcp.md) |
+| Agent steps through a page live (ad-hoc QA, repro, exploration) | [agent-browser](references/agent-browser.md) |
 
 ## Browser sandbox failures
 
@@ -51,7 +52,7 @@ If the browser rejects `file://` navigation or an artifact path outside its allo
 - Run the selected matrix once, read its native report, then narrow repairs to `file:line` or `--last-failed`. Keep verified goal names/params stable for cache reuse. After repairing an agent test, run it once with normal timeouts and `--no-cache` to prove the live path; deterministic tests need no model-based rerun.
 - Use native JSON/Markdown reports instead of writing a converter for ordinary QA. Keep required failure screenshots and distinct visual-state evidence. Full traces/video and repeated screen dumps are diagnostic choices, not mandatory for every passing action. Preserve evidence before another run replaces it.
 
-If live MCP is needed, reuse its registration and session. New registration requires a new client session; a config edit alone does not prove tools loaded. Use `locate`/`run_code` and returned `Test line:` values. Close sessions when done. With the Playwright MCP plugin, save screenshots and files only under its allowed output directory (paths outside, including `/tmp`, are refused), and write `browser_run_code` as plain page code: `require`/`import` are unavailable, so read files with the agent's own tools. Native mobile uses its supported engine; desktop native apps have no e2e engine.
+For live, agent-driven browsing with no matching test, prefer `agent-browser` when it is installed: it ties on wall time and the agent reads about 4.6× less snapshot text. If live MCP is needed, reuse its registration and session. New registration requires a new client session; a config edit alone does not prove tools loaded. Use `locate`/`run_code` and returned `Test line:` values. Close sessions when done. With the Playwright MCP plugin, save screenshots and files only under its allowed output directory (paths outside, including `/tmp`, are refused), and write `browser_run_code` as plain page code: `require`/`import` are unavailable, so read files with the agent's own tools. Native mobile uses its supported engine; desktop native apps have no e2e engine.
 
 ## Close with proof
 

@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-ENTRY_POINTS = ("project-verify", "triage", "research", "statechart", "delta")
+ENTRY_POINTS = ("project-verify", "triage", "research", "statechart", "gain")
 
 
 class WorkflowSkills(unittest.TestCase):
@@ -41,12 +41,31 @@ class WorkflowSkills(unittest.TestCase):
                     with self.subTest(source=str(path), target=target):
                         self.assertTrue((path.parent / target.split("#")[0]).exists())
 
-    def test_delta_handoff_preserves_the_local_summary_and_explicit_reference(self):
+    def test_gain_figures_come_from_the_cited_reports(self):
+        gain = (ROOT / "skills/gain/SKILL.md").read_text()
+        webmcp = (ROOT / "evals/webmcp/reports/2026-11-01-fast-qa-v3.md").read_text()
+        browser = (ROOT / "evals/agent-browser/reports/2026-11-14-agent-qa.md").read_text()
+        for figure, report in (("7.209s", webmcp), ("3.396s", webmcp), ("2.12×", webmcp),
+                               ("≈270", browser), ("≈1,231", browser), ("4.6×", browser), ("3.13s", browser)):
+            with self.subTest(figure=figure):
+                self.assertIn(figure, report)
+        for shown in ("7.21s", "3.40s", "2.12×", "≈270", "≈1,231", "4.6×", "3.13s"):
+            self.assertIn(shown, gain)
+        self.assertIn("Never print a per-repo saving", gain)
+
+    def test_review_and_testing_route_to_architecture_without_auto_invoking_it(self):
+        for path in ("skills/review/SKILL.md", "agents/reviewer.md", "skills/tdd/SKILL.md", "skills/test-design/SKILL.md"):
+            with self.subTest(path=path):
+                self.assertIn("/honey:architecture", (ROOT / path).read_text())
+        self.assertIn("architecture:", (ROOT / "skills/review/SKILL.md").read_text())
+        self.assertIn("missing seam", (ROOT / "skills/test-design/SKILL.md").read_text())
+        frontmatter = (ROOT / "skills/architecture/SKILL.md").read_text().split("---", 2)[1]
+        self.assertIn("disable-model-invocation: true", frontmatter)
+
+    def test_handoff_no_longer_depends_on_delta(self):
         handoff = (ROOT / "skills/handoff/SKILL.md").read_text()
-        self.assertIn("../delta/SKILL.md", handoff)
-        self.assertIn("honey delta read", (ROOT / "skills/delta/SKILL.md").read_text())
-        self.assertIn("local handoff", handoff)
-        self.assertIn("supplied", handoff)
+        self.assertNotIn("delta", handoff.lower())
+        self.assertFalse((ROOT / "skills/delta").exists())
 
 
 if __name__ == "__main__":

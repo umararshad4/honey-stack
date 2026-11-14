@@ -6,17 +6,18 @@ Back to the [README](../README.md).
 
 **Automatic** (the agent picks them): `grill` · `plan` · `execute` · `debug` · `tdd` · `verify` · `review` · `ship` · `deploy` · `test-design` · `tooling` · `database` · `perf` · `observability` · `api-design` · `upgrade` · `incident` · `frontend` · `stageshow` · `qa` · `security` · `docs`
 
-**On demand** (you call them): `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `delta` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` · `project-verify` · `triage` · `research` · `statechart`
+**On demand** (you call them): `honey` · `rsi` · `unslop` · `reverse-engineer` · `handoff` · `prototype` · `architecture` · `domain` · `teach` · `write-skill` · `principles` · `opensrc` · `project-verify` · `triage` · `research` · `statechart` · `gain`
 
 Invoke with `/honey:<skill>` in Claude Code or `$<skill>` in Codex.
 
 ## Focused workflows
 
-- **`delta`** provides optional history access through `status`, `search`, `read`, `summary` and `recall`; output defaults to 12,000 characters and summaries must be fresh. `attach`/`restore` preserve human handoffs while checking source references, Git drift and historical evidence hashes. `setup` previews a local Claude capture policy; only explicit `--apply` writes it. Missing Delta preserves the local handoff. Native Codex capture and paid queries are not included; history does not become RSI evidence. Start with the [Delta guide](delta.md); the [Delta skill](../skills/delta/SKILL.md) owns the agent workflow.
 - **`project-verify`** creates or maintains a project-local verification skill: launch, readiness/ownership checks, feature journeys, observable side effects, retained evidence and safe cleanup. A generated harness is ready only after its recipe runs successfully. `verify` and `qa` reuse it; a small edit does not require a new harness.
 - **`triage`** reads complete reports, checks duplicates and existing fixes, and produces evidence-backed states and agent briefs. Its explicit reproduce/fix branch requires before/after proof and routes delivery through `ship`. RSI backlog qualification uses this same workflow; the background publisher and its opt-in settings are unchanged. This skill does not deploy a GitHub bot or automatically close, merge or release issues.
 - **`research`** answers technical and product questions from primary sources, with constraints, source dates, citations and unknowns. Uses available Exa tools for deep discovery and available search/GitHub tools as fallback. `opensrc` remains the focused option for installed dependency APIs.
 - **`statechart`** optionally checks queue, retry and workflow invariants with a model checker, records assumptions and finite bounds, and explains counterexamples. A checked model is not proof of the production code; missing checker prerequisites remain explicit.
+- **`gain`** shows honey's measured benchmark gains (prepared QA run time, live agent QA context) as a one-shot scoreboard that cites each report. It never prints a per-repo saving; `review`'s debt scan gives real per-repo counts.
+- **`architecture`** stays on demand, but `review` and the reviewer agent raise an `architecture:` finding when a diff adds or reshapes a module boundary or callers reach into internals, and `tdd`/`test-design` name a missing test seam instead of mocking code you own. Both point to `/honey:architecture` rather than running it inline.
 - **Frontend quality** stays in `frontend`, `qa`, `review` and `perf`: motion audit/review and frame diagnostics, realistic worst-case datasets, touch/viewport/safe-area checks and honest real-device coverage. `stageshow` owns mocked product illustrations and cursor demos, not the production application's component stack.
 - **`rsi retro`** is a skill workflow for evidence-backed improvements to navigation, checks and tooling; it is not a CLI subcommand. `write-skill` carries agent-writing guidance, and `perf` uses a benchmark validity checklist before making speedup claims.
 
@@ -29,5 +30,7 @@ These focused entry points are explicitly invoked on both Claude Code and Codex;
 Browser QA and verification also discover existing WebMCP tools for suitable setup, exploration and contract checks. Real user interactions, visual checks and backend assertions still prove their respective requirements. Unsupported pages fall back to ordinary e2e checks. The [WebMCP guide](../skills/qa/references/webmcp.md) includes an isolated Chromium runner and same-session e2e adapter; it does not add WebMCP to websites automatically.
 
 WebMCP replaces eligible setup rather than adding a second walkthrough. QA reuses existing tests and verified sessions; standalone tool-contract checks run when that contract is relevant. Performance claims use repeated runs of the same cases, viewports, timeouts and assertions.
+
+For live, agent-driven browsing with no matching test, `qa` prefers [agent-browser](../skills/qa/references/agent-browser.md) when it is installed. It ties Playwright MCP on wall time, and the agent reads 4.6× less snapshot text.
 
 The [fast QA path](../skills/qa/references/fast-qa.md) uses native reports, avoids duplicate polling after verified readiness, and schedules independent flow files across bounded workers. It keeps failure screenshots and exact case coverage; shared accounts or data keep serial execution.

@@ -7,6 +7,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -39,6 +40,18 @@ def _tree_hash(root: str, parts=("hooks", "honey", "skills", "bin")) -> str:
                 with open(fp, "rb") as f:
                     h.update(f.read())
     return h.hexdigest()[:12]
+
+
+def agent_browser() -> str:
+    """Version of agent-browser on PATH, or "" when it is absent or does not answer."""
+    exe = shutil.which("agent-browser")
+    if not exe:
+        return ""
+    try:
+        r = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return ""
+    return (r.stdout.strip().split() or [""])[-1] if r.returncode == 0 else ""
 
 
 def skills_budget() -> tuple:
@@ -162,6 +175,14 @@ def main(argv: list) -> int:
         if m and (_dt.date.today() - _dt.date.fromisoformat(m.group(1))).days > 365:
             stale.append(os.path.basename(os.path.dirname(f)))
     rep.ok(not stale, "skill facts fresh (reviewed <1y)", f"skills with facts >1y old, refresh them: {stale}", warn=True)
+
+    print("Browser QA")
+    ab = agent_browser()
+    rep.ok(bool(ab), f"agent-browser {ab} (qa uses it for live agent-driven checks)",
+           "agent-browser not on PATH: qa falls back to Playwright MCP or e2e (optional: npm i -g agent-browser && agent-browser install)", warn=True)
+    from honey import retired
+    rep.ok(not os.path.isfile(retired.delta_plist()), "no retired Delta capture service",
+           f"retired Delta capture service still installed at {retired.delta_plist()} (run honey install or honey delta to remove it)", warn=True)
 
     print("RSI")
     h = paths.home()
