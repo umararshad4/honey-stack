@@ -54,7 +54,7 @@ If no cheap test path exists (it would need a broad harness, production-only sta
 | Problem | Move |
 |---|---|
 | Can't see how to test it | Write the call you wish existed, then the assertion, then make it real. |
-| Setup is huge or everything needs a mock | The design is too coupled. Inject the boundary dependency and simplify the interface. |
+| Setup is huge or everything needs a mock | The design is too coupled. Name the missing seam (the boundary a test should enter through) and point to `/honey:architecture` for a behavior-preserving refactor that creates it, instead of mocking every collaborator. |
 | Test passes on its first run | It tests existing behavior or nothing. Fix the test before writing code. |
 
 ## Explicit strict TDD

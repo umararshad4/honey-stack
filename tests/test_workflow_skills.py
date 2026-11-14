@@ -53,6 +53,15 @@ class WorkflowSkills(unittest.TestCase):
             self.assertIn(shown, gain)
         self.assertIn("Never print a per-repo saving", gain)
 
+    def test_review_and_testing_route_to_architecture_without_auto_invoking_it(self):
+        for path in ("skills/review/SKILL.md", "agents/reviewer.md", "skills/tdd/SKILL.md", "skills/test-design/SKILL.md"):
+            with self.subTest(path=path):
+                self.assertIn("/honey:architecture", (ROOT / path).read_text())
+        self.assertIn("architecture:", (ROOT / "skills/review/SKILL.md").read_text())
+        self.assertIn("missing seam", (ROOT / "skills/test-design/SKILL.md").read_text())
+        frontmatter = (ROOT / "skills/architecture/SKILL.md").read_text().split("---", 2)[1]
+        self.assertIn("disable-model-invocation: true", frontmatter)
+
     def test_handoff_no_longer_depends_on_delta(self):
         handoff = (ROOT / "skills/handoff/SKILL.md").read_text()
         self.assertNotIn("delta", handoff.lower())

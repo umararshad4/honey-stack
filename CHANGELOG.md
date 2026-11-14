@@ -18,6 +18,7 @@ Successful main CI automatically versions and publishes releases. Manual release
 - qa: agent-browser for live, agent-driven browser QA. `qa` prefers it when it is on PATH and falls back to Playwright MCP or e2e. A matched benchmark against Playwright MCP is in `evals/agent-browser`: wall time ties (3.13s median each) and the agent reads 4.6× less snapshot text (≈270 vs ≈1,231 tokens per flow).
 - doctor: a "Browser QA" section reports the agent-browser version and warns while the retired Delta service is still installed.
 - gain: an on-demand skill (`/honey:gain`, `$gain`) that shows honey's measured benchmark gains as a one-shot scoreboard, adapted from Ponytail's ponytail-gain. It cites each report and never prints a per-repo saving.
+- review, tdd, test-design: an `architecture:` lens. `review` and the reviewer agent flag reshaped module boundaries or callers reaching into internals, and testing names a missing seam instead of mocking code you own. Both point to `/honey:architecture`, which stays on demand.
 - tests: `tests/test_agent_browser.py` covers qa routing, the reference's commands against the real CLI, a live browser run of the reference flow, doctor detection, and the Delta retirement path including install and uninstall.
 
 ### Fixed
