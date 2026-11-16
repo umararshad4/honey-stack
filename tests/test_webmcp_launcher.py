@@ -85,6 +85,7 @@ poll();
 
 
 @unittest.skipUnless(NODE, "WebMCP launcher needs Node.js")
+@unittest.skipIf(os.name == 'nt', 'launcher cleanup tests rely on POSIX signals and process groups')
 class WebMCPLauncherTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()

@@ -13,6 +13,7 @@ from helpers import REPO
 from honey import codex_hooks, doctor, paths
 
 
+@unittest.skipIf(os.name == 'nt', 'fake CLI fixture is an extensionless script; Windows only runs .exe/.cmd')
 class CodexHooks(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

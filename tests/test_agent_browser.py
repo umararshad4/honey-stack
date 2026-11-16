@@ -107,6 +107,7 @@ class LiveFlow(unittest.TestCase):
 
 
 class Doctor(unittest.TestCase):
+    @unittest.skipIf(os.name == 'nt', 'fake CLI fixture is an extensionless script; Windows only runs .exe/.cmd')
     def test_detects_agent_browser_version_on_path(self):
         from honey import doctor
         bindir = tempfile.mkdtemp()
