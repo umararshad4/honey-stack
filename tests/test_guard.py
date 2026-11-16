@@ -70,4 +70,12 @@ assert check("source /dev/stdin <<EOF\nrm -rf ~\nEOF")[1] == "deny"
 assert check("find -L / -name x -delete")[1] == "deny"
 assert check("find -O3 -D exec ~ -delete")[1] == "deny"
 assert check("find -H /tmp/cache -delete") == (None, None)
+assert check("echo hi # <<EOF\nrm -rf /\nEOF")[1] == "deny"         # << inside a comment is no heredoc
+assert check("cat <<EOF\nhello $(rm -rf /)\nEOF")[1] == "deny"        # unquoted delimiter expands $( )
+assert check("cat <<EOF\nhello `rm -rf ~`\nEOF")[1] == "deny"
+assert check("cat <<'EOF'\nhello $(rm -rf /)\nEOF") == (None, None)   # quoted delimiter: literal data
+assert check("cat > a.txt <<EOF\nbuilt on $(date)\nEOF") == (None, None)
+assert check("cat <<'EOF' |bash;\nrm -rf /\nEOF")[1] == "deny"     # consumer followed by a metachar
+assert check("cat <<'EOF' | sh)\nrm -rf ~\nEOF")[1] == "deny"
+assert check("echo $'a\\' <<EOF'\nrm -rf /\nEOF")[1] == "deny"      # $'...' hides << from bash
 print("guard+modes ok")

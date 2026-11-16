@@ -172,12 +172,18 @@ _SHELL_CONSUMERS = INTERPRETERS | {"eval", "source", ".", "xargs"}
 
 
 def _unquoted(prefix: str) -> bool:
-    """True when `prefix` ends outside any quote, so a following `<<` is a real operator."""
+    """True when `prefix` ends outside any quote and comment, so a following `<<` is a real operator.
+    ANSI-C / locale quoting (`$'...'`, `$"..."`) parses differently in shlex than in bash: treat as quoted,
+    which keeps the following lines under inspection."""
+    if "$'" in prefix or '$"' in prefix:
+        return False
     try:
-        shlex.split(prefix)
-        return True
+        return shlex.split(prefix, comments=True) == shlex.split(prefix)
     except ValueError:
         return False
+
+
+_SUBSTITUTION_RE = re.compile(r"\$\(([^()]*)\)|`([^`]*)`")
 
 
 def _split_heredocs(command: str) -> tuple[str, list[str]]:
@@ -205,7 +211,11 @@ def _split_heredocs(command: str) -> tuple[str, list[str]]:
             i = end + 1
             head, tail = line[:m.start()], line[m.end():]
             before = re.split(r"[;&|(`]", head)[-1].split()
-            piped = re.search(r"\|\s*(?:\S*/)?(" + "|".join(re.escape(c) for c in sorted(_SHELL_CONSUMERS)) + r")(?:\s|$)", tail)
+            piped = re.search(r"\|\s*(?:\S*/)?(" + "|".join(re.escape(c) for c in sorted(_SHELL_CONSUMERS)) + r")(?=[\s;&|()<>`]|$)", tail)
+            if not m.group(2) and ("$(" in body or "`" in body):
+                # Unquoted delimiter: bash runs command substitutions inside the body.
+                shell_bodies.append(body)
+                shell_bodies.extend(a or b for a, b in _SUBSTITUTION_RE.findall(body))
             if piped or "$(" in head or "`" in head or (before and before[0].rsplit("/", 1)[-1] in _SHELL_CONSUMERS):
                 shell_bodies.append(body)
     return "\n".join(kept), shell_bodies
