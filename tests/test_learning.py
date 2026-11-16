@@ -1,6 +1,7 @@
 """Reflection loop with a canned reflector: evidence gate, promotion after 2 sessions, labels, decay, scorecards."""
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -60,6 +61,9 @@ import time
 
 def settle():
     """Wait for detached session-end jobs (they hold the lock) to finish."""
+    if not shutil.which("pgrep"):  # Windows: no pgrep; give detached jobs a moment
+        time.sleep(3)
+        return
     for _ in range(50):
         r = subprocess.run(["pgrep", "-f", "rsi session-end"], capture_output=True, text=True, encoding="utf-8")
         if not r.stdout.strip():

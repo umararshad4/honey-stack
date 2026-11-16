@@ -188,6 +188,7 @@ class AutonomyJobs(unittest.TestCase):
                          "ponytail@ponytail": False, "my-plugin@example": True})
         self.assert_settings_backup(saved, original)
 
+    @unittest.skipIf(os.name == 'nt', 'broken skill symlinks are a POSIX install artifact')
     def test_broken_link_repair_preserves_live_link_and_undo_target(self):
         directory = os.path.join(paths.claude_dir(), "skills")
         os.makedirs(directory)
@@ -232,6 +233,7 @@ class AutonomyJobs(unittest.TestCase):
         self.assertEqual(result["blocked"][0]["id"], item["id"])
         self.assertEqual(store.read_json(fp), current)
 
+    @unittest.skipIf(os.name == 'nt', 'broken skill symlinks are a POSIX install artifact')
     def test_changed_broken_link_blocks_and_preserves_new_target(self):
         directory = os.path.join(paths.claude_dir(), "skills")
         os.makedirs(directory)

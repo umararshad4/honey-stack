@@ -1,5 +1,6 @@
 """Offline fixture/JS-grader checks; these do not run or prove model behavior."""
 import json
+import os
 import re
 import shutil
 from pathlib import Path
@@ -11,6 +12,7 @@ from helpers import REPO
 from honey.rsi import behavioral
 
 
+@unittest.skipIf(os.name == 'nt', 'eval fixtures are bash setup scripts for the POSIX eval harness')
 class MaintainedFixtures(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()

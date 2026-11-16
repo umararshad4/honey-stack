@@ -4,6 +4,7 @@ import io
 import os
 import tempfile
 import threading
+import time
 import unittest
 from unittest.mock import patch as mock
 
@@ -40,8 +41,10 @@ class ReflectionQueue(Isolated):
         self.assertEqual(reflect.budget_block('claude'), 'daily reflection failure cap')
 
     def test_repeatedly_failing_session_is_retired_and_others_go_first(self):
-        for key in ('claude-old', 'claude-new'):
+        for age, key in ((60, 'claude-old'), (0, 'claude-new')):
             store.append_jsonl(paths.path('events', '2026-11', key + '.jsonl'), {'e': 'end'})
+            stamp = time.time() - age  # explicit mtimes: Windows timestamps can tie for back-to-back writes
+            os.utime(paths.path('events', '2026-11', key + '.jsonl'), (stamp, stamp))
         with mock.object(reflect.digest, 'worth_reflecting', return_value=True), \
                 mock.object(reflect.digest, 'build', return_value=('body', [], {})), \
                 mock.object(reflect, 'reflect_call', side_effect=RuntimeError('claude -p failed')):

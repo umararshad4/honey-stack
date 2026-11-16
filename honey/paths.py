@@ -37,7 +37,8 @@ def source_checkout(candidate, own=False):
         except (OSError, ValueError, AttributeError):
             return None
     result = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=5)
-    return root if result.returncode == 0 and os.path.realpath(result.stdout.strip()) == root else None
+    top = os.path.normcase(os.path.realpath(result.stdout.strip())) if result.returncode == 0 else None
+    return root if top == os.path.normcase(root) else None  # Windows git prints C:/…, realpath gives C:\…
 
 
 def source_repo() -> str:

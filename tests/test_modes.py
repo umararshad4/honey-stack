@@ -1,6 +1,7 @@
 """Response modes through the public hook and CLI entrypoints."""
 import json
 import os
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -14,9 +15,9 @@ from honey import modes
 
 class ResponseModes(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
-        self.addCleanup(self.tmp.cleanup)
-        self.home = Path(self.tmp.name)
+        self.home = Path(tempfile.mkdtemp())
+        # A detached RSI job may still hold logs/jobs.log open (Windows refuses to delete it then).
+        self.addCleanup(shutil.rmtree, self.home, ignore_errors=True)
         self.env = patch.dict(os.environ, HONEY_HOME=str(self.home), HONEY_NO_AUTOUPDATE='1')
         self.env.start()
         self.addCleanup(self.env.stop)

@@ -297,7 +297,7 @@ def _runtime_files(root: str) -> dict:
     def add(fp):
         if os.path.islink(fp):
             raise ValueError("runtime snapshot cannot include symlinks: " + os.path.relpath(fp, root))
-        relative = os.path.relpath(fp, root)
+        relative = os.path.relpath(fp, root).replace(os.sep, "/")  # keys match "skills/<name>/SKILL.md" on Windows too
         if os.path.isfile(fp) and not relative.endswith((".pyc", ".pyo")):
             with open(fp, "rb") as stream:
                 files[relative] = (os.stat(fp).st_mode & 0o777, stream.read())

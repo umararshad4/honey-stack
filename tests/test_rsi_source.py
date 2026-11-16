@@ -43,14 +43,14 @@ class SourceCheckout(unittest.TestCase):
         store.write_json(paths.path('synced.json'), {'source_repo': str(self.repo)})
         with mock.object(paths, 'REPO', str(self.cache)):
             self.assertEqual(paths.source_repo(), str(self.repo))
-            self.assertEqual(patch.git('rev-parse', '--show-toplevel'), str(self.repo))
+            self.assertEqual(os.path.normcase(os.path.normpath(patch.git('rev-parse', '--show-toplevel'))), os.path.normcase(str(self.repo)))
 
     def test_cached_git_metadata_never_becomes_editable_source(self):
         subprocess.run(['git', 'clone', '-q', str(self.repo), str(self.cache)], check=True, capture_output=True)
         store.write_json(paths.path('synced.json'), {'source_repo': str(self.repo)})
         with mock.object(paths, 'REPO', str(self.cache)):
             self.assertEqual(paths.source_repo(), str(self.repo))
-            self.assertEqual(patch.git('rev-parse', '--show-toplevel'), str(self.repo))
+            self.assertEqual(os.path.normcase(os.path.normpath(patch.git('rev-parse', '--show-toplevel'))), os.path.normcase(str(self.repo)))
         for metadata in ({}, {'source_repo': str(self.cache)}, {'source_repo': str(self.root / 'missing')}):
             store.write_json(paths.path('synced.json'), metadata)
             with mock.object(paths, 'REPO', str(self.cache)):

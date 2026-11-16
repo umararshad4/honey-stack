@@ -63,7 +63,7 @@ class GlobalActivation(unittest.TestCase):
     def test_uninstall_preserves_later_personal_edits(self):
         with contextlib.redirect_stdout(io.StringIO()):
             install.install(self.env, False, True)
-        self.agent_file.write_text(self.agent_file.read_text(encoding="utf-8") + '\nLater personal instruction.\n')
+        self.agent_file.write_text(self.agent_file.read_text(encoding="utf-8") + '\nLater personal instruction.\n', encoding="utf-8")
         with contextlib.redirect_stdout(io.StringIO()):
             install.uninstall(self.env, False, True, False)
         self.assertIn('Later personal instruction.', self.agent_file.read_text(encoding="utf-8"))
