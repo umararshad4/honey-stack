@@ -88,8 +88,9 @@ def why(bid, as_json=False):
     print(curate.line(b)[2:])
     print(f"  status={b['status']} scope={b['scope']} source={b['source']} severity={b.get('severity')}")
     print(f"  helpful={b.get('helpful',0)} harmful={b.get('harmful',0)} violations={b.get('violations',0)} sessions={len(b.get('sessions',[]))}")
-    if curate.enforcer_line(b):
-        print(f"  {curate.enforcer_line(b)}")
+    enforce = curate.enforcer_line(b)
+    if enforce:
+        print(f"  {enforce}")
     for e in b.get("evidence", [])[-5:]:
         print(f"  evidence {e.get('ts','')} {e.get('sid','')}: {e.get('q','')}")
     for p in b.get("prev", []):
@@ -278,6 +279,9 @@ def main(args) -> int:
         print(f"{a.id} archived and added to never-list" if curate.forget(a.id) else f"no learning {a.id}")
         store.git_commit(f"rsi: forget {a.id}")
     elif a.cmd == "proof":
+        if not " ".join(a.evidence).strip():
+            print("proof needs evidence: the command or output that showed the check failing on the mistake")
+            return 1
         e = curate.record_proof(a.id, " ".join(a.evidence), a.level)
         if e is None:
             print(f"no learning {a.id}")

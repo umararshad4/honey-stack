@@ -208,10 +208,15 @@ def repeated(b: dict) -> bool:
 
 def attach_enforcer(b: dict) -> None:
     """Suggest an enforcer for a repeated learning that has none; re-apply the proof gate to any stored one."""
-    if not isinstance(b.get("enforcer"), dict):
+    stored = b.get("enforcer") if isinstance(b.get("enforcer"), dict) else None
+    unproven_prose = stored is not None and enforcer(b)["level"] == "prose" and not enforcer(b)["proof"]
+    if stored is None or unproven_prose:
         if not repeated(b):
+            if stored is not None:
+                b["enforcer"] = enforcer(b)
             return
-        b["enforcer"] = suggest_enforcer(b)
+        if stored is None or suggest_enforcer(b)["level"] != "prose":
+            b["enforcer"] = suggest_enforcer(b)
     b["enforcer"] = enforcer(b)
 
 
@@ -471,11 +476,13 @@ def apply_reflection(result: dict, key: str, ids_map: dict, meta: dict) -> dict:
                 for k in ("helpful", "harmful", "relevant"):
                     b[k] = target.get(k, 0)
                 b["sessions"] = sorted(set(b["sessions"]) | set(target.get("sessions", [])))
+                if isinstance(target.get("enforcer"), dict):
+                    b["enforcer"] = dict(target["enforcer"])  # a recorded proof survives a reworded rule
             rows.append(b)
             by_id[b["id"]] = b
             target = b
         proposed = c.get("enforcer") if isinstance(c.get("enforcer"), dict) else {}
-        if proposed.get("level") in ENFORCER_LEVELS and not isinstance(target.get("enforcer"), dict):
+        if proposed.get("level") in ENFORCER_LEVELS and repeated(target) and not isinstance(target.get("enforcer"), dict):
             suggestion = text.redact(str(proposed.get("suggestion") or ""), 160)
             if not text.injection_hit(suggestion):  # the reflector proposes; it can never supply proof
                 target["enforcer"] = enforcer({"enforcer": {"level": proposed["level"], "suggestion": suggestion}})

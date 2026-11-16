@@ -95,8 +95,12 @@ class Reflection(Isolated):
     def test_null_enforcer_is_accepted(self):
         self.assertNotIn("enforcer", self.apply(enforcer=None))
 
-    def test_reflector_proposal_is_kept_without_proof(self):
-        b = self.apply(enforcer={"level": "lint", "suggestion": "lint rule", "proof": "forged"})
+    def test_first_time_proposal_waits_for_a_repeat(self):
+        self.assertNotIn("enforcer", self.apply(enforcer={"level": "lint", "suggestion": "lint rule"}))
+
+    def test_reflector_proposal_on_a_repeat_is_kept_without_proof(self):
+        with mock.object(curate, "repeated", return_value=True):
+            b = self.apply(enforcer={"level": "lint", "suggestion": "lint rule", "proof": "forged"})
         self.assertEqual(b["enforcer"], {"level": "lint", "suggestion": "lint rule", "proof": "", "applied": "prose"})
 
 
@@ -141,6 +145,27 @@ class Proof(Isolated):
         b = bullet("explaining", "keep it short")
         curate.save([b])
         self.assertIsNone(curate.record_proof(b["id"], "   "))
+
+
+class ReviewFixes(Isolated):
+    def test_stored_prose_enforcer_is_upgraded_once_repeated(self):
+        b = bullet("running git commands", "never force push to main", 3, enforcer={"level": "prose", "suggestion": ""})
+        curate.attach_enforcer(b)
+        self.assertEqual(b["enforcer"]["level"], "guard")
+
+    def test_proven_prose_is_left_alone(self):
+        b = bullet("running git commands", "never force push to main", 3,
+                    enforcer={"level": "prose", "suggestion": "", "proof": "kept as prose on purpose"})
+        curate.attach_enforcer(b)
+        self.assertEqual(b["enforcer"]["level"], "prose")
+
+    def test_cli_blank_evidence_is_its_own_error(self):
+        b = bullet("explaining", "keep it short")
+        curate.save([b])
+        out = io.StringIO()
+        with contextlib.redirect_stdout(out):
+            self.assertEqual(cli.main(["proof", b["id"], " "]), 1)
+        self.assertIn("needs evidence", out.getvalue())
 
 
 if __name__ == "__main__":

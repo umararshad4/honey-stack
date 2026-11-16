@@ -30,6 +30,17 @@ class StatusBlock(unittest.TestCase):
     def test_unresolved_wording_is_not_a_contradiction(self):
         self.assertIsNone(gap("Fixed the parser but could not run the suite.\nVerdict: INCONCLUSIVE"))
 
+    def test_asks_done_under_inconclusive_is_recorded(self):
+        msg = "Asks: 1 done\nVerdict: INCONCLUSIVE\nChecks run: none. Skipped: e2e (could not start browser)."
+        self.assertEqual(gap(msg)[0], "verdict")
+        self.assertEqual(gap("Asks: 1 done · 2 not done\nVerdict: NOT VERIFIED")[0], "verdict")
+
+    def test_status_line_words_are_not_claims(self):
+        self.assertIsNone(gap("Changed the parser.\nVerdict: INCONCLUSIVE\nRisk: removed fallback untested."))
+
+    def test_bold_verdict_parses(self):
+        self.assertEqual(gap("Fixed it.\n**Verdict:** NOT VERIFIED")[0], "verdict")
+
     def test_edit_turn_without_any_block_still_flagged(self):
         self.assertEqual(gap("Changed the parser.")[0], "receipt")
 
