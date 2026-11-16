@@ -19,6 +19,8 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
       - run: git config --global user.email ci@example.com && git config --global user.name ci
+      # Test fixture repos have no .gitattributes; keep their bytes identical to POSIX runners.
+      - run: git config --global core.autocrlf false
       - run: python scripts/release.py --check
       - run: python tests/run.py
   release:
