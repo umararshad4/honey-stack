@@ -86,13 +86,15 @@ def main(argv: list) -> int:
     r = _run(["git", "commit", "-q", "-F", "-"], input=_message(a))
     if r.returncode != 0:
         return _fail("commit failed (a hook may have rejected it); nothing pushed\n" + (r.stdout + r.stderr).strip())
-    print(f"committed {_git('rev-parse', '--short', 'HEAD')} {a.message.strip()}")
+    print(f"committed {_git('rev-parse', '--short', 'HEAD')} {a.message.strip()}", flush=True)
 
     gh = os.environ.get("HONEY_GH", "gh")
     # Look up an existing PR while the push runs: the two network calls overlap.
     view = subprocess.Popen([gh, "pr", "view", "--json", "url,state"], stdout=subprocess.PIPE,
                             stderr=subprocess.DEVNULL, text=True) if a.pr else None
     upstream = _git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
+    if upstream.split("/", 1)[-1] != branch:  # none yet, or a branch cut from origin/main still tracking it
+        upstream = ""
     push = _run(["git", "push", "-q"] if upstream else ["git", "push", "-q", "-u", "origin", "HEAD"])
     if push.returncode != 0:
         if view:

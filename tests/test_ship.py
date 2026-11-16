@@ -77,6 +77,14 @@ class Ship(unittest.TestCase):
         body = Path(create[create.index("--body-file") + 1])
         self.assertFalse(body.exists())  # temp body file is cleaned up
 
+    def test_branch_tracking_main_pushes_to_its_own_name(self):
+        self.git("switch", "-q", "-c", "feat/y", "--track", "origin/main")
+        (self.repo / "b.txt").write_text("b\n")
+        r = self.ship("-m", "fix: b", "b.txt")
+        self.assertEqual(r.returncode, 0, r.stderr + r.stdout)
+        self.assertEqual(self.git("rev-parse", "--abbrev-ref", "@{u}"), "origin/feat/y")
+        self.assertNotEqual(self.git("rev-parse", "origin/main"), self.git("rev-parse", "HEAD"))  # main untouched
+
     def test_existing_pr_is_reused_not_duplicated(self):
         (self.repo / "b.txt").write_text("b\n")
         r = self.ship("-m", "fix: b", "--pr", "b.txt", FAKE_GH_PR="https://github.com/o/r/pull/3")
