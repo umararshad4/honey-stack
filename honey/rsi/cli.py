@@ -88,6 +88,8 @@ def why(bid, as_json=False):
     print(curate.line(b)[2:])
     print(f"  status={b['status']} scope={b['scope']} source={b['source']} severity={b.get('severity')}")
     print(f"  helpful={b.get('helpful',0)} harmful={b.get('harmful',0)} violations={b.get('violations',0)} sessions={len(b.get('sessions',[]))}")
+    if curate.enforcer_line(b):
+        print(f"  {curate.enforcer_line(b)}")
     for e in b.get("evidence", [])[-5:]:
         print(f"  evidence {e.get('ts','')} {e.get('sid','')}: {e.get('q','')}")
     for p in b.get("prev", []):
@@ -99,6 +101,8 @@ def list_review(as_json=False):
     review.audit()
     items = review.pending()
     proposed = [b for b in curate.load() if b.get("status") == "proposed"]
+    for b in proposed:
+        b["enforce"] = curate.enforcer_line(b)
     if as_json:
         return _print({"proposals": items, "proposed_learnings": proposed, "autonomous": autonomy.enabled(),
                        "recent_autonomy": store.read_json(paths.path("state", "autonomy-last.json"), {}) or {},
@@ -119,6 +123,8 @@ def list_review(as_json=False):
             print(f"    GitHub issue: {issue.get('url') or issue.get('error') or issue.get('state')}")
     for b in proposed:
         print(f"[{b['id']}] learning: {curate.line(b)[2:]}  (sessions={len(b.get('sessions', []))})")
+        if b["enforce"]:
+            print(f"    {b['enforce']}")
 
 
 def _golden(b, action):
