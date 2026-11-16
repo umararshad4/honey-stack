@@ -5,6 +5,7 @@ Measured on an M1 Pro: dropping these took a tool-call hook from ~55 ms to ~31 m
 """
 import json
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -23,7 +24,8 @@ finally:
 HEAVY = {"honey.autoupdate", "honey.intent", "honey.receipt", "honey.rsi.curate", "honey.rsi.review",
          "honey.rsi.signals", "random", "tempfile", "shutil", "_hashlib", "argparse", "traceback", "glob"}
 
-with tempfile.TemporaryDirectory() as home:
+home = tempfile.mkdtemp(prefix="honey-imports-")
+try:
     os.environ["HONEY_HOME"] = home
     base = {"session_id": "imports", "cwd": REPO}
     hook("claude", dict(base, hook_event_name="SessionStart", source="startup"))  # warm session state
@@ -40,4 +42,7 @@ with tempfile.TemporaryDirectory() as home:
         loaded = set(json.loads(r.stderr[r.stderr.index("["):]))
         assert not loaded & HEAVY, (name, sorted(loaded & HEAVY))
         assert not os.path.exists(os.path.join(home, "logs", "hook-errors.log")), open(os.path.join(home, "logs", "hook-errors.log")).read()
+finally:
+    # SessionStart starts detached jobs that may still hold logs/jobs.log open; Windows can't delete open files.
+    shutil.rmtree(home, ignore_errors=True)
 print("hook imports ok")
