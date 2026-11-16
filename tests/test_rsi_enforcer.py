@@ -119,5 +119,29 @@ class Display(Isolated):
         self.assertTrue(enforce["never force push to main"].startswith("enforce: guard"))
 
 
+class Proof(Isolated):
+    def test_proof_turns_a_suggestion_into_structure(self):
+        b = bullet("running git commands", "never force push to main", 2)
+        curate.attach_enforcer(b)
+        curate.save([b])
+        with mock.object(cli.store, "git_commit"), contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(cli.main(["proof", b["id"], "guard", "denied", "git push -f origin main"]), 0)
+        e = curate.get(b["id"])["enforcer"]
+        self.assertEqual((e["level"], e["applied"]), ("guard", "structure"))
+        self.assertIn("git push -f", e["proof"])
+
+    def test_prose_learning_needs_a_level(self):
+        b = bullet("explaining", "keep it short")
+        curate.save([b])
+        self.assertEqual(curate.record_proof(b["id"], "lint fails on long reply")["applied"], "prose")
+        self.assertEqual(curate.record_proof(b["id"], "lint fails on long reply", "lint")["applied"], "structure")
+
+    def test_unknown_id_and_empty_proof(self):
+        self.assertIsNone(curate.record_proof("nope", "x"))
+        b = bullet("explaining", "keep it short")
+        curate.save([b])
+        self.assertIsNone(curate.record_proof(b["id"], "   "))
+
+
 if __name__ == "__main__":
     unittest.main()

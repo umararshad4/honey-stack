@@ -214,6 +214,10 @@ def main(args) -> int:
         s = sub.add_parser(name)
         s.add_argument("id")
         s.add_argument("--json", action="store_true")
+    s = sub.add_parser("proof", help="Record that a learning's check fails on the recorded mistake")
+    s.add_argument("id")
+    s.add_argument("evidence", nargs="+")
+    s.add_argument("--level", choices=[l for l in curate.ENFORCER_LEVELS if l != "prose"], default="")
     s = sub.add_parser("decide")
     s.add_argument("id")
     s.add_argument("action", choices=["apply", "edit", "skip", "never"])
@@ -273,6 +277,13 @@ def main(args) -> int:
     elif a.cmd == "forget":
         print(f"{a.id} archived and added to never-list" if curate.forget(a.id) else f"no learning {a.id}")
         store.git_commit(f"rsi: forget {a.id}")
+    elif a.cmd == "proof":
+        e = curate.record_proof(a.id, " ".join(a.evidence), a.level)
+        if e is None:
+            print(f"no learning {a.id}")
+            return 1
+        print(f"{a.id}: {e['level']} check recorded ({'structure' if e['applied'] == 'structure' else 'still prose: pass --level'})")
+        store.git_commit(f"rsi: proof {a.id}")
     elif a.cmd == "decide":
         decide(a.id, a.action, a.text)
     elif a.cmd == "note":

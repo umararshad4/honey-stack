@@ -215,6 +215,26 @@ def attach_enforcer(b: dict) -> None:
     b["enforcer"] = enforcer(b)
 
 
+def record_proof(bid: str, proof: str, level: str = ""):
+    """Record that the learning's check was shown failing on the recorded mistake. Returns the enforcer, or None
+    for an unknown id. A prose-level learning needs `level` (type, lint, test or guard) to become structure."""
+    proof = text.redact(" ".join((proof or "").split()), 200)
+    if not proof:
+        return None
+    with store.lock():
+        rows = load()
+        b = next((r for r in rows if r.get("id") == bid), None)
+        if b is None:
+            return None
+        e = enforcer(b) if isinstance(b.get("enforcer"), dict) else suggest_enforcer(b)
+        if level in ENFORCER_LEVELS:
+            e["level"] = level
+        b["enforcer"] = enforcer({"enforcer": {"level": e["level"], "suggestion": e.get("suggestion", ""), "proof": proof}})
+        b["updated"] = text.now()
+        save(rows)
+        return b["enforcer"]
+
+
 def enforcer_line(b: dict) -> str:
     """One short display line for review, or "" for a plain prose rule. Never part of the injected brief."""
     e = enforcer(b)
