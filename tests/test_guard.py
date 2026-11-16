@@ -78,4 +78,7 @@ assert check("cat > a.txt <<EOF\nbuilt on $(date)\nEOF") == (None, None)
 assert check("cat <<'EOF' |bash;\nrm -rf /\nEOF")[1] == "deny"     # consumer followed by a metachar
 assert check("cat <<'EOF' | sh)\nrm -rf ~\nEOF")[1] == "deny"
 assert check("echo $'a\\' <<EOF'\nrm -rf /\nEOF")[1] == "deny"      # $'...' hides << from bash
+import time
+nested = "".join(f"bash <<E{i}\n" for i in range(30)) + "echo hi\n" + "".join(f"E{i}\n" for i in reversed(range(30)))
+t0 = time.time(); r = check(nested); assert time.time() - t0 < 1 and r[1] == "deny", r   # bounded work, fails closed
 print("guard+modes ok")

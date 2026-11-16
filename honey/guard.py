@@ -212,12 +212,12 @@ def _split_heredocs(command: str) -> tuple[str, list[str]]:
             head, tail = line[:m.start()], line[m.end():]
             before = re.split(r"[;&|(`]", head)[-1].split()
             piped = re.search(r"\|\s*(?:\S*/)?(" + "|".join(re.escape(c) for c in sorted(_SHELL_CONSUMERS)) + r")(?=[\s;&|()<>`]|$)", tail)
-            if not m.group(2) and ("$(" in body or "`" in body):
-                # Unquoted delimiter: bash runs command substitutions inside the body.
+            # Unquoted delimiter: bash runs command substitutions inside the body, so it is a command too.
+            expands = not m.group(2) and ("$(" in body or "`" in body)
+            if expands or piped or "$(" in head or "`" in head or (before and before[0].rsplit("/", 1)[-1] in _SHELL_CONSUMERS):
                 shell_bodies.append(body)
-                shell_bodies.extend(a or b for a, b in _SUBSTITUTION_RE.findall(body))
-            if piped or "$(" in head or "`" in head or (before and before[0].rsplit("/", 1)[-1] in _SHELL_CONSUMERS):
-                shell_bodies.append(body)
+                if expands:  # backtick/$( ) fragments don't tokenize as commands inside the body text
+                    shell_bodies.extend(x or y for x, y in _SUBSTITUTION_RE.findall(body))
     return "\n".join(kept), shell_bodies
 
 
@@ -244,16 +244,21 @@ def _find_start_paths(args: list[str]) -> list[str]:
     return paths
 
 
-def dangerous_reason(command, cwd=None) -> str | None:
+_MAX_DEPTH = 8
+
+
+def dangerous_reason(command, cwd=None, _depth: int = 0) -> str | None:
     """Return a block reason if the command is destructive, else None. `cwd` (the tool call's working
     directory) lets recursive cleanup strictly inside the workspace pass; temp dirs always do."""
     if isinstance(command, (list, tuple)):
         command = " ".join(str(part) for part in command)
     if not isinstance(command, str) or not command.strip():
         return None
+    if _depth > _MAX_DEPTH:
+        return "Refuses a command nested too deeply to inspect."
     command, shell_bodies = _split_heredocs(command)
     for body in shell_bodies:
-        inner = dangerous_reason(body, cwd)
+        inner = dangerous_reason(body, cwd, _depth + 1)
         if inner:
             return inner
     compact = re.sub(r"\s+", " ", command.strip())
@@ -282,12 +287,12 @@ def dangerous_reason(command, cwd=None) -> str | None:
         # Recurse into interpreter / eval payloads.
         inline = _interp_inline_command(segment)
         if inline:
-            inner = dangerous_reason(inline, cwd)
+            inner = dangerous_reason(inline, cwd, _depth + 1)
             if inner:
                 return inner
         for i, token in enumerate(segment):
             if token.rsplit("/", 1)[-1] == "eval" and segment[i + 1:]:
-                inner = dangerous_reason(" ".join(segment[i + 1:]), cwd)
+                inner = dangerous_reason(" ".join(segment[i + 1:]), cwd, _depth + 1)
                 if inner:
                     return inner
 
