@@ -11,6 +11,7 @@ check() returns (reason, severity): severity "ask" = recoverable-but-risky (git 
 from __future__ import annotations
 
 import os
+import posixpath
 import re
 import shlex
 import tempfile
@@ -31,18 +32,29 @@ def _is_abs_or_home(target: str) -> bool:
     return target.startswith("/") or target.startswith(HOME_PREFIXES) or bool(DRIVE_RE.match(target))
 
 
+def _norm(path: str) -> str:
+    """Shell-style path for comparison: forward slashes, no `.`/`..`, case-folded on Windows."""
+    path = posixpath.normpath(path.replace("\\", "/"))
+    return path.casefold() if os.name == "nt" else path
+
+
+def _is_abs(path: str) -> bool:
+    path = path.replace("\\", "/")
+    return path.startswith("/") or bool(DRIVE_RE.match(path))
+
+
 def _temp_roots() -> set[str]:
-    roots = {"/tmp", "/private/tmp", tempfile.gettempdir(), os.environ.get("TMPDIR", "")}
-    return {os.path.normpath(r) for r in roots if r and os.path.isabs(r)}
+    roots = {"/tmp", "/private/tmp", tempfile.gettempdir(), os.environ.get("TMPDIR", ""), os.environ.get("TEMP", "")}
+    return {_norm(r) for r in roots if r and _is_abs(r)}
 
 
 def _workspace_root(cwd) -> str | None:
     """cwd as a root whose contents may be cleaned; None for /, home or anything shallower."""
-    if not isinstance(cwd, str) or not os.path.isabs(cwd):
+    if not isinstance(cwd, str) or not _is_abs(cwd):
         return None
-    root = os.path.normpath(cwd)
-    home = os.path.normpath(os.path.expanduser("~"))
-    if len(root.strip("/").split("/")) < 3 or home == root or home.startswith(root + "/"):
+    root = _norm(cwd)
+    home = _norm(os.path.expanduser("~"))
+    if len([part for part in root.split("/") if part]) < 3 or home == root or home.startswith(root + "/"):
         return None
     return root
 
@@ -51,16 +63,15 @@ def _is_scoped_cleanup(target: str, cwd=None) -> bool:
     """True when an absolute target sits strictly inside the workspace or a temp dir, not the root itself
     and not a top-level glob over it (`<root>/*`)."""
     for prefix in HOME_PREFIXES:
-        if target == prefix or target.startswith(prefix + "/"):
+        if target == prefix or target.startswith((prefix + "/", prefix + "\\")):
             target = os.path.expanduser("~") + target[len(prefix):]
             break
-    if not target.startswith("/"):
+    if not _is_abs(target):
         return False
-    path = os.path.normpath(target)
-    roots = _temp_roots() | ({_workspace_root(cwd)} - {None})
-    for root in roots:
-        if path.startswith(root + "/"):
-            first = path[len(root) + 1:].split("/", 1)[0]
+    path = _norm(target)
+    for root in _temp_roots() | ({_workspace_root(cwd)} - {None}):
+        if path.startswith(root.rstrip("/") + "/"):
+            first = path[len(root.rstrip("/")) + 1:].split("/", 1)[0]
             if not any(ch in first for ch in "*?["):
                 return True
     return False

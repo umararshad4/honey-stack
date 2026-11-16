@@ -81,4 +81,8 @@ assert check("echo $'a\\' <<EOF'\nrm -rf /\nEOF")[1] == "deny"      # $'...' hid
 import time
 nested = "".join(f"bash <<E{i}\n" for i in range(30)) + "echo hi\n" + "".join(f"E{i}\n" for i in reversed(range(30)))
 t0 = time.time(); r = check(nested); assert time.time() - t0 < 1 and r[1] == "deny", r   # bounded work, fails closed
+# Windows-shaped paths (Git Bash on Windows): drive letters and backslash cwd from the hook payload
+assert check("rm -rf C:/work/proj/dist", cwd="C:\\work\\proj") == (None, None)
+assert check("rm -rf C:/work/proj", cwd="C:\\work\\proj")[1] == "deny"
+assert check("rm -rf C:/work/other", cwd="C:\\work\\proj")[1] == "deny"
 print("guard+modes ok")
