@@ -20,6 +20,7 @@ GIT = ["git", "-c", "user.name=Test", "-c", "user.email=test@example.com",
        "-c", "commit.gpgsign=false", "-c", "tag.gpgsign=false"]
 
 
+@unittest.skipIf(os.name == 'nt', 'fake codex CLI fixture is an extensionless script; Windows only runs .exe/.cmd')
 class LocalMarketplaceUpdate(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()

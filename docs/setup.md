@@ -6,7 +6,7 @@ Install, activation, response modes, hook checks, updates and uninstall. Back to
 
 Claude Code and/or Codex, `python3` 3.9+ and `git`. macOS, Linux and Windows.
 
-**Windows:** hooks run `python3`, so that exact command must work. Python from the python.org install manager or the Microsoft Store provides it; the classic python.org installer only adds `python` and `py`. Claude Code on Windows runs hooks through Git Bash, which comes with Git for Windows. `honey` is installed as a small launcher file at `~/.local/bin/honey` rather than a symlink, so you don't need Developer Mode.
+**Windows:** hooks run `python3`, so that exact command must work. Python from the python.org install manager or the Microsoft Store provides it; the classic python.org installer only adds `python` and `py`. Claude Code on Windows runs hooks through Git Bash, which comes with Git for Windows. `honey` is installed as a small launcher file at `~/.local/bin/honey` rather than a symlink, so you don't need Developer Mode. Not yet supported on Windows: RSI's autonomous skill patching (drafting and evaluating skill changes on its own); hooks, install, guard, task evidence and learnings work.
 
 ## Install
 

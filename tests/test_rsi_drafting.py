@@ -11,6 +11,7 @@ from helpers import REPO
 from honey import paths
 from honey.rsi import patch, store, text
 
+@unittest.skipIf(os.name == 'nt', 'RSI autonomous skill patching is not supported on Windows yet')
 class Drafting(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(); self.addCleanup(self.tmp.cleanup)
