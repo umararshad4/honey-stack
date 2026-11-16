@@ -12,7 +12,7 @@ import time
 from honey import metrics, paths
 from honey.rsi import signals, store, text
 
-BRIEF_MAX = 1500
+BRIEF_MAX = 1100  # keeps rules + brief near 4 KB per session start
 MAX_ACTIVE_GLOBAL, MAX_ACTIVE_PROJECT, MAX_SKILL_LINES = 25, 10, 12
 STALE_DAYS, ARCHIVE_DAYS, USER_STATED_MULT, CANDIDATE_EXPIRE_DAYS = 30, 90, 2, 45
 MATCH = 0.6

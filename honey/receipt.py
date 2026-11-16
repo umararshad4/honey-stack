@@ -5,7 +5,8 @@ import re
 
 from honey import tasks
 
-RECEIPT = re.compile(r"(?im)\bchecks run\b|^\s*skipped:|^\s*risk:")
+RECEIPT = re.compile(r"(?im)\bchecks run\b|^\W*skipped:|^\W*risk:|^\W*verdict:")
+VERDICT = re.compile(r"(?im)^\W*verdict:\W*(not verified|verified|inconclusive)\b")
 DONE = re.compile(r'\b(done|fixed|completed?|implemented|removed|uninstalled|disabled|enabled|configured|all (?:tests|checks) pass(?:ed)?)\b', re.I)
 UNRESOLVED = re.compile(r"\b(not (?:yet )?(?:done|fixed|complete)|(?:remains?|still) unverified|unable to|could not|couldn't|verification (?:failed|pending))\b", re.I)
 
@@ -21,7 +22,13 @@ def check(payload: dict, state: dict):
     if msg and DONE.search(msg) and not UNRESOLVED.search(msg) and missing:
         state['nagged'] = True
         return "evidence", "completion claimed without fresh observed evidence for: " + ", ".join(missing)
-    if not state.get("edited") or not msg or RECEIPT.search(msg) or msg.rstrip("*_ `").endswith("?"):
+    if not state.get("edited") or not msg or msg.rstrip("*_ `").endswith("?"):
+        return None
+    if RECEIPT.search(msg):
+        verdict = VERDICT.search(msg)
+        if verdict and verdict.group(1).lower() != "verified" and DONE.search(msg) and not UNRESOLVED.search(msg):
+            state["nagged"] = True
+            return "verdict", f"claimed done while the status block says Verdict: {verdict.group(1).upper()}"
         return None
     state["nagged"] = True
     return "receipt", "edit turn ended without a `Checks run: … Skipped: … Risk: …` line"
