@@ -10,6 +10,13 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+### Added
+- `honey ship`: check, commit, push and open (or reuse) a PR in one call. It stages only the named paths, commits nothing when `--check` fails, refuses the default branch without `--allow-default`, never force-pushes, and looks up the PR while the push runs. The `ship` skill uses it as its fast path.
+- `tests/run.py` runs test files in parallel (`-j`, default: CPU count, biggest first) and takes `--changed [BASE]` to run only affected tests, plus test name filters. The full suite drops from 128 s to 28 s on an 8-core machine.
+
+### Fixed
+- `tests/test_autoupdate.py` runs on its own (it now imports the isolated test home).
+
 ## [1.1.0] - 2026-11-16
 
 ### Added

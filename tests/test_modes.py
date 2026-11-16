@@ -8,13 +8,13 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from helpers import REPO, ctx_text, hook
+from helpers import REPO, ctx_text, hook, TempHome
 from honey import modes
 
 
 class ResponseModes(unittest.TestCase):
     def setUp(self):
-        self.tmp = tempfile.TemporaryDirectory()
+        self.tmp = TempHome()
         self.addCleanup(self.tmp.cleanup)
         self.home = Path(self.tmp.name)
         self.env = patch.dict(os.environ, HONEY_HOME=str(self.home), HONEY_NO_AUTOUPDATE='1')
