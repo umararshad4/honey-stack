@@ -49,7 +49,7 @@ class AutonomyJobs(unittest.TestCase):
         saved = store.read_json(paths.path("proposals", item["id"] + ".json"))
         self.assertEqual(saved["status"], "applied")
         self.assertEqual(saved["decision_source"], "automatic")
-        with open(self.doc) as f:
+        with open(self.doc, encoding="utf-8") as f:
             self.assertIn("WHEN finishing → show proof", f.read())
         self.assertEqual(store.read_jsonl(paths.path("golden.jsonl")), [])
 
@@ -58,7 +58,7 @@ class AutonomyJobs(unittest.TestCase):
         autonomy.configure(False)
         self.run_weekly()
         self.assertEqual(store.read_json(paths.path("proposals", item["id"] + ".json"))["status"], "pending")
-        with open(self.doc) as f:
+        with open(self.doc, encoding="utf-8") as f:
             self.assertEqual(f.read(), "# personal\n")
 
     def test_paused_hooks_do_not_spawn(self):

@@ -146,7 +146,7 @@ class RepairUndo(Isolated):
 
 class InstructionAutonomy(Isolated):
     def proposal(self, action, line, doc):
-        with open(os.path.join(self.claude, 'CLAUDE.md'), 'w') as f:
+        with open(os.path.join(self.claude, 'CLAUDE.md'), 'w', encoding="utf-8") as f:
             f.write(doc)
         b = curate.new_bullet('always', 'decide routine choices yourself', 'global', 'preference', 'user-stated', 2,
                               [{'sid': 'x'}], 'active')
@@ -162,7 +162,7 @@ class InstructionAutonomy(Isolated):
         p = self.proposal('remove', '- Never push to main', '# mine\n- Never push to main\n')
         out = autonomy.run()
         self.assertIn(p['id'], [d['id'] for d in out['deferred']])
-        self.assertIn('- Never push to main', open(os.path.join(self.claude, 'CLAUDE.md')).read())
+        self.assertIn('- Never push to main', open(os.path.join(self.claude, 'CLAUDE.md'), encoding="utf-8").read())
         self.assertEqual(store.read_json(paths.path('proposals', p['id'] + '.json'))['status'], 'pending')
 
     def test_autonomy_may_edit_lines_inside_the_managed_block(self):
@@ -170,7 +170,7 @@ class InstructionAutonomy(Isolated):
         p = self.proposal('edit', '- learned old', doc)
         out = autonomy.run()
         self.assertIn(p['id'], out['applied'])
-        self.assertIn('- replaced', open(os.path.join(self.claude, 'CLAUDE.md')).read())
+        self.assertIn('- replaced', open(os.path.join(self.claude, 'CLAUDE.md'), encoding="utf-8").read())
 
 
 if __name__ == '__main__':

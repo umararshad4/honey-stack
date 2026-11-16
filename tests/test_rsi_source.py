@@ -27,15 +27,15 @@ class SourceCheckout(unittest.TestCase):
         self.git('config', 'user.email', 'test@example.com')
         self.git('config', 'user.name', 'Test')
         (self.repo / 'honey').mkdir()
-        (self.repo / 'honey' / '__init__.py').write_text('')
+        (self.repo / 'honey' / '__init__.py').write_text('', encoding="utf-8")
         (self.repo / '.codex-plugin').mkdir()
-        (self.repo / '.codex-plugin' / 'plugin.json').write_text('{"name":"honey"}')
+        (self.repo / '.codex-plugin' / 'plugin.json').write_text('{"name":"honey"}', encoding="utf-8")
         self.git('add', '.'); self.git('commit', '-qm', 'source')
         self.cache = self.root / 'plugins' / 'cache' / 'honey-stack' / 'honey' / '0.9.1'
         self.cache.mkdir(parents=True)
 
     def git(self, *args):
-        return subprocess.run(['git', '-C', str(self.repo), *args], check=True, capture_output=True, text=True).stdout.strip()
+        return subprocess.run(['git', '-C', str(self.repo), *args], check=True, capture_output=True, text=True, encoding='utf-8').stdout.strip()
 
     def test_source_and_installed_runtime(self):
         with mock.object(paths, 'REPO', str(self.repo)):
@@ -63,7 +63,7 @@ class SourceCheckout(unittest.TestCase):
             with mock.object(paths, 'REPO', str(self.cache)):
                 with self.assertRaises(RuntimeError):
                     paths.source_repo()
-        (self.repo / '.codex-plugin' / 'plugin.json').write_text('{"name":"unrelated"}')
+        (self.repo / '.codex-plugin' / 'plugin.json').write_text('{"name":"unrelated"}', encoding="utf-8")
         store.write_json(paths.path('synced.json'), {'source_repo': str(self.repo)})
         with mock.object(paths, 'REPO', str(self.cache)):
             with self.assertRaises(RuntimeError):
