@@ -168,9 +168,22 @@ def _interp_inline_command(segment: list[str]) -> str | None:
 _HEREDOC_RE = re.compile(r"(?<!<)<<(-?)[ \t]*(['\"]?)([A-Za-z_][\w.-]*)\2")
 
 
+_SHELL_CONSUMERS = INTERPRETERS | {"eval", "source", ".", "xargs"}
+
+
+def _unquoted(prefix: str) -> bool:
+    """True when `prefix` ends outside any quote, so a following `<<` is a real operator."""
+    try:
+        shlex.split(prefix)
+        return True
+    except ValueError:
+        return False
+
+
 def _split_heredocs(command: str) -> tuple[str, list[str]]:
-    """Drop heredoc bodies from the command text: they are data for the receiving program. Bodies fed to a
-    shell interpreter (`bash <<EOF`) are returned so they can be checked as commands."""
+    """Drop heredoc bodies from the command text: they are data for the receiving program. Bodies a shell
+    consumes (`bash <<EOF`, `cat <<EOF | sh`, `eval "$(cat <<EOF`) are returned to be checked as commands.
+    Fails closed: a quoted `<<` or a heredoc with no terminator line keeps its lines in the command text."""
     lines = command.split("\n")
     kept: list[str] = []
     shell_bodies: list[str] = []
@@ -180,22 +193,41 @@ def _split_heredocs(command: str) -> tuple[str, list[str]]:
         kept.append(line)
         i += 1
         for m in _HEREDOC_RE.finditer(line):
+            if not _unquoted(line[:m.start()]):
+                continue
             strip_tabs, word = m.group(1) == "-", m.group(3)
-            body: list[str] = []
-            while i < len(lines) and (lines[i].lstrip("\t") if strip_tabs else lines[i]) != word:
-                body.append(lines[i])
-                i += 1
-            i += 1  # the terminator line
-            before = re.split(r"[;&|(]", line[:m.start()])[-1].split()
-            piped = re.search(r"\|\s*(?:\S*/)?(" + "|".join(sorted(INTERPRETERS)) + r")\b", line[m.end():])
-            if piped or (before and before[0].rsplit("/", 1)[-1] in INTERPRETERS):
-                shell_bodies.append("\n".join(body))
+            end = i
+            while end < len(lines) and (lines[end].lstrip("\t") if strip_tabs else lines[end]) != word:
+                end += 1
+            if end >= len(lines):
+                break  # no terminator: not a well-formed heredoc, keep and inspect the rest as commands
+            body = "\n".join(lines[i:end])
+            i = end + 1
+            head, tail = line[:m.start()], line[m.end():]
+            before = re.split(r"[;&|(`]", head)[-1].split()
+            piped = re.search(r"\|\s*(?:\S*/)?(" + "|".join(re.escape(c) for c in sorted(_SHELL_CONSUMERS)) + r")(?:\s|$)", tail)
+            if piped or "$(" in head or "`" in head or (before and before[0].rsplit("/", 1)[-1] in _SHELL_CONSUMERS):
+                shell_bodies.append(body)
     return "\n".join(kept), shell_bodies
 
 
+_FIND_GLOBAL_FLAGS = {"-H", "-L", "-P"}
+
+
 def _find_start_paths(args: list[str]) -> list[str]:
-    paths = []
-    for arg in args:
+    """Start paths of `find`: operands after global options (-H/-L/-P, -O<n>, -D <opts>) and before the
+    first expression token."""
+    paths: list[str] = []
+    skip_next = False
+    for idx, arg in enumerate(args):
+        if skip_next:
+            skip_next = False
+            continue
+        if not paths and (arg in _FIND_GLOBAL_FLAGS or re.fullmatch(r"-O\d*", arg)):
+            continue
+        if not paths and arg == "-D":
+            skip_next = True
+            continue
         if arg.startswith(("-", "(", "!")):
             break
         paths.append(arg)

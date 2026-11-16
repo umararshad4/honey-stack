@@ -61,4 +61,13 @@ assert check(f'rm -rf {ws}/build && echo "oops', cwd=ws) == (None, None)
 assert check('rm -rf /etc/x; echo "unterminated', cwd=ws)[1] == "deny"
 assert check('rm -rf ~; echo "x')[1] == "deny"
 assert check('rm -rf /; echo "x')[1] == "deny"
+# fail closed: quoted <<, missing terminator, eval/$( ) consumers, find global options
+assert check("echo '<<EOF'\nrm -rf /\nEOF")[1] == "deny"
+assert check("echo \"x <<EOF\"\nrm -rf ~")[1] == "deny"
+assert check("cat <<EOF\nrm -rf /")[1] == "deny"                         # no terminator
+assert check('eval "$(cat <<EOF\nrm -rf /\nEOF\n)"')[1] == "deny"
+assert check("source /dev/stdin <<EOF\nrm -rf ~\nEOF")[1] == "deny"
+assert check("find -L / -name x -delete")[1] == "deny"
+assert check("find -O3 -D exec ~ -delete")[1] == "deny"
+assert check("find -H /tmp/cache -delete") == (None, None)
 print("guard+modes ok")
