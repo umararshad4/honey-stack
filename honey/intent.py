@@ -38,6 +38,11 @@ _NOT_TERM = {"to", "it", "this", "that", "they", "he", "she", "we", "you", "i", 
 _STATE = {"not", "broken", "fine", "done", "wrong", "working", "failing", "ok", "okay", "good", "bad", "ready", "still",
           "already", "down", "up", "live", "deployed", "missing", "empty", "slow", "fast", "correct", "right", "true",
           "false", "a", "an", "the", "now", "being", "too", "very", "also"}
+# A saved term is loaded into every later session, so its meaning must read like a name, never an instruction.
+_ORDER = re.compile(r"\b(?:ignore|disregard|override|always|never|must|should|instructions?|rules?|system|prompt|run|execute"
+                    r"|curl|wget|sudo|rm|delete|push|deploy|install|token|password|secret|key|http|www)\b|[`$<>{}|;]", re.I)
+TERM_MAX_PROMPT = 400
+TERM_MAX_WORDS = 8
 _TRAIL = {"which", "that", "so", "and", "but", "right", "ok", "okay", "bro", "please", "now", "btw"}
 
 
@@ -59,8 +64,13 @@ def status_check(prompt: str) -> bool:
 
 
 def term(prompt: str):
-    """(term, meaning) when the user states what a word means, else None. Questions never count."""
-    p = (prompt or "")[:1000]
+    """(term, meaning) when the user states what a word means, else None. Questions never count.
+
+    Only short, typed prompts qualify: pasted documents, rendered output and code can't plant a saved term.
+    """
+    p = prompt or ""
+    if len(p) > TERM_MAX_PROMPT or PASTED.search(p) or "```" in p:
+        return None
     for rx in (TERM_MEAN, TERM_TOLD):
         m = rx.search(p)
         if not m or m.group("end") == "?":
@@ -74,7 +84,7 @@ def term(prompt: str):
         while words and words[-1].lower().strip(",") in _TRAIL:
             words.pop()
         meaning = " ".join(words).strip(" ,")
-        if not meaning:
+        if not meaning or len(words) > TERM_MAX_WORDS or _ORDER.search(meaning) or text.injection_hit(meaning):
             continue
         if m.groupdict().get("v", "").lower() == "is" and (words[0].lower() in _STATE or len(words) > 6):
             continue  # "X is broken" describes a state, not a name
