@@ -36,7 +36,7 @@ def source_checkout(candidate, own=False):
                 return None
         except (OSError, ValueError, AttributeError):
             return None
-    result = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, text=True, timeout=5)
+    result = subprocess.run(["git", "-C", root, "rev-parse", "--show-toplevel"], capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=5)
     return root if result.returncode == 0 and os.path.realpath(result.stdout.strip()) == root else None
 
 
@@ -71,7 +71,7 @@ def project_slug(cwd: str) -> str:
     cwd = cwd or os.getcwd()
     try:
         out = subprocess.run(["git", "-C", cwd, "remote", "get-url", "origin"],
-                             capture_output=True, text=True, timeout=2).stdout.strip()
+                             capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=2).stdout.strip()
     except Exception:
         out = ""
     if out:
@@ -80,6 +80,11 @@ def project_slug(cwd: str) -> str:
             return re.sub(r"[^A-Za-z0-9_.-]", "", f"{m.group(1)}-{m.group(2)}").lower()
     base = os.path.basename(os.path.normpath(cwd)) or "root"
     return "nogit-" + re.sub(r"[^A-Za-z0-9_.-]", "", base).lower()[:40] + "-" + hashlib.sha1(cwd.encode()).hexdigest()[:6]
+
+
+def shell_path(p: str) -> str:
+    """A path for a shell command string. Claude Code runs commands in Git Bash on Windows; forward slashes work there."""
+    return p.replace("\\", "/") if os.name == "nt" else p
 
 
 def claude_dir() -> str:

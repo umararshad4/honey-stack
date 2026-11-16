@@ -48,7 +48,7 @@ def snapshot(root: str, eval_dir: str = "evals") -> dict:
     base = Path(root, eval_dir)
     try:
         manifest_files = _files(base / MANIFEST)
-        manifest = json.loads((base / MANIFEST).read_text())
+        manifest = json.loads((base / MANIFEST).read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
         raise ValueError("maintained behavioral manifest is missing or invalid") from exc
     if not isinstance(manifest, dict):
