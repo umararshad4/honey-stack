@@ -15,6 +15,7 @@ Successful main CI automatically versions and publishes releases. Manual release
 - `tests/run.py` runs test files in parallel (`-j`, default: CPU count, biggest first) and takes `--changed [BASE]` to run only affected tests, plus test name filters. The full suite drops from 128 s to 28 s on an 8-core machine.
 
 ### Fixed
+- guard: `rm -rf` and `find -delete` no longer warn on absolute paths strictly inside the tool call's working directory or a temp dir (#55, #58). The directory itself, `<root>/*`, `..` escapes, siblings, home and `/` still warn. Heredoc bodies are data unless a shell consumes them (`bash <<EOF`, `| sh`, `eval "$(cat <<EOF`, unquoted-delimiter `$( )`). Quoted, commented or unterminated heredocs and `$'...'` prefixes keep their lines under inspection, nesting is capped at depth 8, and drive-letter or backslash Windows paths compare the same way.
 - `tests/test_autoupdate.py` runs on its own (it now imports the isolated test home).
 
 ## [1.2.0] - 2026-11-16
