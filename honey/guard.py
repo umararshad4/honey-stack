@@ -15,7 +15,8 @@ import re
 import shlex
 import tempfile
 
-HOME_PREFIXES = ("~", "$HOME", "${HOME}")
+HOME_PREFIXES = ("~", "$HOME", "${HOME}", "$USERPROFILE", "${USERPROFILE}", "%USERPROFILE%")
+DRIVE_RE = re.compile(r"^[A-Za-z]:(?:[\\/]|$)")  # Windows drive paths: C:/, C:\, bare C:
 INTERPRETERS = {"bash", "sh", "zsh", "dash", "ksh", "fish", "ash"}
 # git global options that take a value (consume the following token).
 GIT_VALUE_OPTS = {"-c", "-C", "--git-dir", "--work-tree", "--namespace", "--exec-path", "--super-prefix"}
@@ -27,7 +28,7 @@ PROTECTED_WRITE_RE = re.compile(r"/(etc/(passwd|shadow|sudoers|hosts)|boot/)", r
 
 
 def _is_abs_or_home(target: str) -> bool:
-    return target.startswith("/") or target.startswith(HOME_PREFIXES)
+    return target.startswith("/") or target.startswith(HOME_PREFIXES) or bool(DRIVE_RE.match(target))
 
 
 def _temp_roots() -> set[str]:
