@@ -35,16 +35,15 @@ class Ship(unittest.TestCase):
         subprocess.run(["git", "init", "-q", "--bare", "-b", "main", str(remote)], check=True)
         subprocess.run(["git", "init", "-q", "-b", "main", str(self.repo)], check=True)
         self.git("remote", "add", "origin", str(remote))
-        (self.repo / "a.txt").write_text("a\n")
+        (self.repo / "a.txt").write_text("a\n", encoding="utf-8")
         self.git("add", "a.txt")
         self.git("commit", "-qm", "init")
         self.git("push", "-q", "-u", "origin", "main")
         self.git("switch", "-q", "-c", "feat/x")
-        gh = self.tmp / "gh"
-        gh.write_text(FAKE_GH)
-        gh.chmod(0o755)
+        gh = self.tmp / "fake_gh.py"
+        gh.write_text(FAKE_GH, encoding="utf-8")
         self.log = self.tmp / "gh.log"
-        self.env = dict(os.environ, HONEY_GH=str(gh), FAKE_GH_LOG=str(self.log),
+        self.env = dict(os.environ, HONEY_GH=json.dumps([sys.executable, str(gh)]), FAKE_GH_LOG=str(self.log),
                         GIT_AUTHOR_NAME="t", GIT_AUTHOR_EMAIL="t@t", GIT_COMMITTER_NAME="t", GIT_COMMITTER_EMAIL="t@t")
 
     def git(self, *args):
@@ -52,10 +51,10 @@ class Ship(unittest.TestCase):
 
     def ship(self, *args, **env):
         return subprocess.run([sys.executable, str(Path(REPO, "bin/honey")), "ship", *args], cwd=self.repo,
-                              env=dict(self.env, **env), capture_output=True, text=True)
+                              env=dict(self.env, **env), capture_output=True, text=True, encoding="utf-8")
 
     def gh_calls(self):
-        return [json.loads(l) for l in self.log.read_text().splitlines()] if self.log.exists() else []
+        return [json.loads(l) for l in self.log.read_text(encoding="utf-8").splitlines()] if self.log.exists() else []
 
     def test_commit_push_and_open_pr_in_one_call(self):
         (self.repo / "b.txt").write_text("b\n")

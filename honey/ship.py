@@ -14,7 +14,13 @@ USAGE = "honey ship -m SUBJECT [--body TEXT] [--trailer LINE]... [--fixes 1,2] [
 
 
 def _run(args, **kw):
-    return subprocess.run(args, capture_output=True, text=True, **kw)
+    return subprocess.run(args, capture_output=True, text=True, encoding="utf-8", errors="replace", **kw)
+
+
+def _gh() -> list:
+    """The gh command: HONEY_GH may name an executable or hold a JSON argv list (tests, Windows wrappers)."""
+    raw = os.environ.get("HONEY_GH", "gh")
+    return json.loads(raw) if raw.lstrip().startswith("[") else [raw]
 
 
 def _git(*args) -> str:
@@ -88,10 +94,9 @@ def main(argv: list) -> int:
         return _fail("commit failed (a hook may have rejected it); nothing pushed\n" + (r.stdout + r.stderr).strip())
     print(f"committed {_git('rev-parse', '--short', 'HEAD')} {a.message.strip()}", flush=True)
 
-    gh = os.environ.get("HONEY_GH", "gh")
     # Look up an existing PR while the push runs: the two network calls overlap.
-    view = subprocess.Popen([gh, "pr", "view", "--json", "url,state"], stdout=subprocess.PIPE,
-                            stderr=subprocess.DEVNULL, text=True) if a.pr else None
+    view = subprocess.Popen([*_gh(), "pr", "view", "--json", "url,state"], stdout=subprocess.PIPE,
+                            stderr=subprocess.DEVNULL, text=True, encoding="utf-8", errors="replace") if a.pr else None
     upstream = _git("rev-parse", "--abbrev-ref", "--symbolic-full-name", "@{u}")
     if upstream.split("/", 1)[-1] != branch:  # none yet, or a branch cut from origin/main still tracking it
         upstream = ""
@@ -119,11 +124,11 @@ def main(argv: list) -> int:
     body_file, tmp = a.pr_body_file, None
     if not body_file:
         fd, tmp = tempfile.mkstemp(prefix="honey-ship-", suffix=".md")
-        with os.fdopen(fd, "w") as f:
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
             f.write(_message(argparse.Namespace(message="", body=a.body, fixes=a.fixes, trailer=None)).strip() + "\n")
         body_file = tmp
     try:
-        cmd = [gh, "pr", "create", "--base", a.base or default, "--title", a.title or a.message.strip(),
+        cmd = [*_gh(), "pr", "create", "--base", a.base or default, "--title", a.title or a.message.strip(),
                "--body-file", body_file] + (["--draft"] if a.draft else [])
         r = _run(cmd)
     finally:

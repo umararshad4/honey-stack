@@ -17,6 +17,9 @@ import sys
 import tempfile
 import time
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # Windows consoles default to cp1252
+
 here = os.path.dirname(os.path.abspath(__file__))
 repo = os.path.dirname(here)
 NONE = ('{"session_summary":"","candidates":[],"bullet_labels":[],"skill_feedback":[],"toolkit_misfires":[],'
@@ -28,11 +31,12 @@ def run_one(t):
     start = time.monotonic()
     try:
         none = os.path.join(h, "none-reflection.json")  # tests never make a paid reflector call
-        with open(none, "w") as f:
+        with open(none, "w", encoding="utf-8") as f:
             f.write(NONE)
         env = dict(os.environ, HONEY_HOME=h, PYTHONDONTWRITEBYTECODE="1", HONEY_FAKE_LLM=none, HONEY_NO_AUTOUPDATE="1")
         env.pop("RSI_CHILD", None), env.pop("HONEY_DISABLE", None)
-        r = subprocess.run([sys.executable, t], env=env, capture_output=True, text=True, cwd=here)
+        r = subprocess.run([sys.executable, t], env=env, capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", cwd=here)
     finally:
         shutil.rmtree(h, ignore_errors=True)  # a detached RSI job may still be writing; never fail the run on cleanup
     return t, r, time.monotonic() - start
@@ -42,7 +46,7 @@ def changed_files(base):
     out = set()
     for args in (["diff", "--name-only", f"{base}...HEAD"], ["diff", "--name-only", "HEAD"],
                  ["ls-files", "--others", "--exclude-standard"]):
-        r = subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True)
+        r = subprocess.run(["git", *args], cwd=repo, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if r.returncode != 0 and args[1] == "--name-only" and "..." in args[-1]:
             return None  # unknown base: caller runs everything
         out.update(line for line in r.stdout.splitlines() if line)
@@ -51,7 +55,10 @@ def changed_files(base):
 
 def affected(tests, files):
     """Tests touched by `files`; None means run everything."""
-    texts = {t: open(t, encoding="utf-8").read() for t in tests}
+    texts = {}
+    for t in tests:
+        with open(t, encoding="utf-8") as f:
+            texts[t] = f.read()
     picked = set()
     for f in files:
         name = os.path.basename(f)
