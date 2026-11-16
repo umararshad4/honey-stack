@@ -43,9 +43,18 @@ def _is_abs(path: str) -> bool:
     return path.startswith("/") or bool(DRIVE_RE.match(path))
 
 
+def _deep_enough(root: str, parts: int) -> bool:
+    """At least `parts` path components below the filesystem or drive root (never `/` or a bare `C:`)."""
+    names = [name for name in root.split("/") if name]
+    if names and DRIVE_RE.match(names[0] + "/"):
+        names = names[1:]
+    return len(names) >= parts
+
+
 def _temp_roots() -> set[str]:
     roots = {"/tmp", "/private/tmp", tempfile.gettempdir(), os.environ.get("TMPDIR", ""), os.environ.get("TEMP", "")}
-    return {_norm(r) for r in roots if r and _is_abs(r)}
+    # A temp variable set to `/` or `C:\` must not exempt the whole disk.
+    return {r for r in (_norm(r) for r in roots if r and _is_abs(r)) if _deep_enough(r, 1)}
 
 
 def _workspace_root(cwd) -> str | None:
@@ -54,7 +63,7 @@ def _workspace_root(cwd) -> str | None:
         return None
     root = _norm(cwd)
     home = _norm(os.path.expanduser("~"))
-    if len([part for part in root.split("/") if part]) < 3 or home == root or home.startswith(root + "/"):
+    if not _deep_enough(root, 3) or home == root or home.startswith(root + "/"):
         return None
     return root
 
@@ -70,8 +79,8 @@ def _is_scoped_cleanup(target: str, cwd=None) -> bool:
         return False
     path = _norm(target)
     for root in _temp_roots() | ({_workspace_root(cwd)} - {None}):
-        if path.startswith(root.rstrip("/") + "/"):
-            first = path[len(root.rstrip("/")) + 1:].split("/", 1)[0]
+        if path.startswith(root + "/"):  # roots are normalized and never `/`, so this is a strict prefix
+            first = path[len(root) + 1:].split("/", 1)[0]
             if not any(ch in first for ch in "*?["):
                 return True
     return False

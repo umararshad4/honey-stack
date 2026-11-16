@@ -82,7 +82,16 @@ import time
 nested = "".join(f"bash <<E{i}\n" for i in range(30)) + "echo hi\n" + "".join(f"E{i}\n" for i in reversed(range(30)))
 t0 = time.time(); r = check(nested); assert time.time() - t0 < 1 and r[1] == "deny", r   # bounded work, fails closed
 # Windows-shaped paths (Git Bash on Windows): drive letters and backslash cwd from the hook payload
-assert check("rm -rf C:/work/proj/dist", cwd="C:\\work\\proj") == (None, None)
-assert check("rm -rf C:/work/proj", cwd="C:\\work\\proj")[1] == "deny"
-assert check("rm -rf C:/work/other", cwd="C:\\work\\proj")[1] == "deny"
+assert check("rm -rf C:/src/work/proj/dist", cwd="C:\\src\\work\\proj") == (None, None)
+assert check("rm -rf C:/src/work/proj", cwd="C:\\src\\work\\proj")[1] == "deny"
+assert check("rm -rf C:/src/work/other", cwd="C:\\src\\work\\proj")[1] == "deny"
+assert check("rm -rf C:/work/proj/dist", cwd="C:\\work\\proj")[1] == "deny"   # 2 levels below the drive: too shallow
+# a temp variable pointing at a filesystem or drive root must not exempt every path
+for var, value in (("TMPDIR", "/"), ("TEMP", "C:\\"), ("TMPDIR", "C:")):
+    saved = os.environ.get(var)
+    os.environ[var] = value
+    try:
+        assert check("rm -rf /etc/x")[1] == "deny" and check("rm -rf C:/Windows/x")[1] == "deny", (var, value)
+    finally:
+        os.environ.pop(var) if saved is None else os.environ.__setitem__(var, saved)
 print("guard+modes ok")
