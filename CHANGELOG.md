@@ -10,6 +10,8 @@ Successful main CI automatically versions and publishes releases. Manual release
 
 ## [Unreleased]
 
+## [1.5.2] - 2026-11-19
+
 ### Fixed
 - RSI reflection: a Claude account failure (sign-in, billing, usage limit) no longer stops reflection for the day. That engine moves behind Codex for 6 hours, and the daily failure cap now counts each engine separately.
 
@@ -329,7 +331,8 @@ Six production-engineering skills, each with current (2026) reference files, dec
   - `/rsi coach`, `/rsi bootstrap`, the upstream radar, a golden suite and holdout sessions
 - `honey install | uninstall | doctor | sync`: dry-run first, recorded in a manifest, fully reversible.
 
-[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/umararshad4/honey-stack/compare/v1.5.2...HEAD
+[1.5.2]: https://github.com/umararshad4/honey-stack/compare/v1.5.1...v1.5.2
 [1.5.1]: https://github.com/umararshad4/honey-stack/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/umararshad4/honey-stack/compare/v1.4.1...v1.5.0
 [1.4.1]: https://github.com/umararshad4/honey-stack/compare/v1.4.0...v1.4.1
