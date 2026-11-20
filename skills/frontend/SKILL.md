@@ -4,7 +4,7 @@ description: "Use for web UI design, builds, fixes and reviews, including CSS, a
 license: MIT
 metadata:
   reviewed: "2026-11-20"
-  sources: "MCT (local) ~/.claude/skills/frontend-ui-ux-harness, ~/.claude/skills/ui-system, ~/.claude/skills/design-consistency, ~/.claude/skills/frontend-architecture, ~/.claude/skills/react-quality, ~/.claude/skills/nextjs-app-router, ~/.claude/skills/performance-audit, ~/.claude/skills/react-doctor; emilkowalski/skills (MIT) emil-design-eng/SKILL.md + performance-cheatsheet.md; emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/review-animations/{SKILL.md,STANDARDS.md}, skills/improve-animations/SKILL.md, skills/animation-performance/SKILL.md, skills/mobile-native/SKILL.md (adapted)"
+  sources: "MCT (local) ~/.claude/skills/frontend-ui-ux-harness, ~/.claude/skills/ui-system, ~/.claude/skills/design-consistency, ~/.claude/skills/frontend-architecture, ~/.claude/skills/react-quality, ~/.claude/skills/nextjs-app-router, ~/.claude/skills/performance-audit, ~/.claude/skills/react-doctor; emilkowalski/skills (MIT) emil-design-eng/SKILL.md + performance-cheatsheet.md; emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/review-animations/{SKILL.md,STANDARDS.md}, skills/improve-animations/SKILL.md, skills/animation-performance/SKILL.md, skills/mobile-native/SKILL.md (adapted); Vercel Web Interface Guidelines, Google web.dev and Vercel AI SDK UI (reviewed 2026-11-20): https://vercel.com/design/guidelines, https://web.dev/baseline, https://web.dev/learn/design, https://web.dev/learn/accessibility, https://web.dev/articles/vitals, https://ai-sdk.dev/docs/ai-sdk-ui/overview"
 ---
 
 # Frontend
