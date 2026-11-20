@@ -54,7 +54,7 @@ Bugs merge onto the flow at `debug`, which hands its fix to `verify`.
 | Safely upgrade dependencies, patch a CVE, handle a breaking change or EOL | `upgrade` |
 | A production outage: triage, mitigate, roll back, communicate, postmortem | `incident` |
 | A skill misfired or a lesson should stick; improve honey-stack itself | `rsi` |
-| UI, layout, styling, responsive, design-system work | `frontend` |
+| Design, build, fix or review web UI, including accessibility, responsive layouts, design systems and Vercel AI SDK UI | `frontend` for current Vercel and Google web.dev guidance, alongside the task’s primary skill |
 | Mocked product UI illustrations or animated cursor demos | `stageshow` |
 | Application animation, motion audit or dropped frames | `frontend` (motion references); `review` or `perf` for their respective checks |
 | Drive the real app to find bugs before users do | `qa` |
