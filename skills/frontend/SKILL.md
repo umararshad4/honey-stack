@@ -1,15 +1,24 @@
 ---
 name: frontend
-description: "Use for UI, styling, layout, components, responsive or interaction work, and React or Next.js component, hook, route or rendering changes."
+description: "Use for web UI design, builds, fixes and reviews, including CSS, accessibility, AI SDK UI, React hooks and Next.js rendering."
 license: MIT
 metadata:
-  reviewed: "2026-11-01"
+  reviewed: "2026-11-20"
   sources: "MCT (local) ~/.claude/skills/frontend-ui-ux-harness, ~/.claude/skills/ui-system, ~/.claude/skills/design-consistency, ~/.claude/skills/frontend-architecture, ~/.claude/skills/react-quality, ~/.claude/skills/nextjs-app-router, ~/.claude/skills/performance-audit, ~/.claude/skills/react-doctor; emilkowalski/skills (MIT) emil-design-eng/SKILL.md + performance-cheatsheet.md; emilkowalski/skills a81dbca07f2217b7103e510c0f13f8d5b017afc9 skills/review-animations/{SKILL.md,STANDARDS.md}, skills/improve-animations/SKILL.md, skills/animation-performance/SKILL.md, skills/mobile-native/SKILL.md (adapted)"
 ---
 
 # Frontend
 
 Match the product that exists before adding to it. A narrow request gets a narrow change with visual parity. A redesign happens only when the user asks for one.
+
+For every web UI task, consult the current [Vercel Web Interface Guidelines](https://vercel.com/design/guidelines) and the applicable Google web.dev guidance below when planning the change. Use those rules to check the result. Apply them to the affected user journey, including shared components. If a source is unavailable, use the checks below and disclose that the live guidance could not be verified.
+
+### Google web.dev guidance
+
+- **Browser support.** When introducing an HTML, CSS or JavaScript feature, check its current Baseline status against the project's supported browsers. If a supported browser lacks the feature, provide a working fallback and test the affected action there. [Baseline](https://web.dev/baseline)
+- **Responsive layouts.** Resize through intermediate widths and test shared components in their narrowest real container. Set breakpoints where content stops fitting. For image-heavy layouts, verify the browser selects an appropriately sized asset. [Learn Responsive Design](https://web.dev/learn/design)
+- **Accessibility.** Walk the changed flow by keyboard. For custom controls or dynamic updates, check accessible names, roles, states and announcements with a screen reader. [Learn Accessibility](https://web.dev/learn/accessibility)
+- **Performance.** For changes affecting loading, interaction latency or layout stability, check available field data at the 75th percentile for mobile and desktop separately. Google's good thresholds are LCP ≤ 2.5 s, INP ≤ 200 ms and CLS ≤ 0.1. If field data is unavailable, use a local performance trace to diagnose the changed journey and label the evidence as a lab measurement. [Core Web Vitals](https://web.dev/articles/vitals)
 
 ## 1. Read the existing UI
 
@@ -57,6 +66,11 @@ Done when: each state that can occur on the changed surface renders something de
 
 Done when: the changed controls work with the keyboard alone and every input has a label.
 
+- Forms preserve input after validation errors, allow paste and autofill, and associate field-level errors with the relevant controls. Test an invalid submission and recovery.
+- Check browser Back and Forward on navigable views. Preserve meaningful filters in the URL when users need to bookmark or share the view.
+- Check reduced-motion preferences, zoom, and the supported color schemes. Reserve space for late-loading media and verify focus stays visible under sticky headers.
+- Format dates, numbers and currencies for the user's locale. Test realistic long values in controls, tables and status messages.
+
 ## 5. React and Next.js
 
 Inline defaults, with detail in the references:
@@ -73,6 +87,10 @@ Read the reference that matches the change:
 - Slow pages, bundle size, rerenders, images, Core Web Vitals: `references/perf.md`.
 
 Done when: the change respects the server/client boundary and the conventions of the folder it lives in.
+
+### Vercel AI SDK UI
+
+For chat, completion or generative UI using Vercel's SDK, check the installed SDK and framework adapter versions before choosing APIs. Follow the matching [AI SDK UI documentation](https://ai-sdk.dev/docs/ai-sdk-ui/overview). For chat, render each supported message part and derive controls from the request status. Exercise submission, partial output, stop, completion and retry after failure. When tools appear in the transcript, test pending, result and error states. Keep focus in the composer and announce status changes without reading every streamed token.
 
 ## 6. Check it
 
@@ -94,4 +112,4 @@ For new screens and redesigns, load these by name when installed: `frontend-desi
 
 ## Report
 
-Name the system you followed (components, tokens, variants), any new value with its reason, the React Doctor result and the responsive check.
+For reviews, tie each finding to a file and line, the affected interaction and a concrete fix. Name the system you followed (components, tokens, variants), any new value with its reason, the React Doctor result and the responsive check.
